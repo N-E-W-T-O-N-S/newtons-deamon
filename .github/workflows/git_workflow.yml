@@ -25,7 +25,7 @@ jobs:
       run: |
         mkdir ./output
         git clone https://github.com/N-E-W-T-O-N-S/unity-api.git ./output
-        cp bin/Debug/netstandard2.1/NEWTONS.dll /output
+        cp bin/Debug/netstandard2.1/NEWTONS.dll ./output
     - name: push to repo
       uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
       env:

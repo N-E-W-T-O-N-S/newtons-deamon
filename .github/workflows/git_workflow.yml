@@ -21,16 +21,17 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: setup dll file
+    - name: setup repo and dll file
       run: |
-        mkdir output
-        cp bin/Debug/netstandard2.1/NEWTONS.dll output
+        mkdir /output
+        git clone https://github.com/N-E-W-T-O-N-S/unity-api.git /output
+        cp bin/Debug/netstandard2.1/NEWTONS.dll /output
     - name: push to repo
       uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
       env:
         SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
       with:
-        source-directory: output
+        source-directory: /output
         destination-github-username: 'N-E-W-T-O-N-S'
         destination-repository-name: 'unity-api'
         user-email: $secrets.DEPLOY_EMAIL

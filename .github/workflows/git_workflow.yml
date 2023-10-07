@@ -1,0 +1,30 @@
+
+name: GIT
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_run:
+    workflows: [".NET"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 3.1.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: GIT push
+      run: |
+        cd bin/Debug/netstandard2.1
+
+        ls

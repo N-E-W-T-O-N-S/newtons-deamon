@@ -35,7 +35,7 @@ jobs:
       with:
         source-directory: output
         destination-github-username: '${{secrets.DEPLOY_NAME}}'
-        destination-repository-name: '${{secrets.DEPLOY_EMAIL}}'
+        destination-repository-name: 'N-E-W-T-O-N-S/unity-api'
         user-email: $secrets.DEPLOY_EMAIL
         commit-message: automated dll update
         target-branch: main

@@ -34,8 +34,8 @@ jobs:
         SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
       with:
         source-directory: output
-        destination-github-username: '${{secrets.DEPLOY_NAME}}'
-        destination-repository-name: 'N-E-W-T-O-N-S/unity-api'
+        destination-github-username: 'N-E-W-T-O-N-S'
+        destination-repository-name: 'unity-api'
         user-email: $secrets.DEPLOY_EMAIL
         commit-message: automated dll update
         target-branch: main

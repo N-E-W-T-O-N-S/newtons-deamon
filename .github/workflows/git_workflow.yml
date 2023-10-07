@@ -10,7 +10,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env: 
+      CI_COMMIT_MESSAGE: Continuous Integration Build Artifacts
+      CI_COMMIT_AUTHOR: Continuous Integration
+      
     steps:
     - uses: actions/checkout@v3
     - name: Setup .NET
@@ -21,10 +24,18 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: GIT push
+    - name: setup dll file
       run: |
-        cd bin/Debug/netstandard2.1
-
-        git clone https://github.com/N-E-W-T-O-N-S/unity-api.git
-        cd unity-api
-        ls
+        mkdir output
+        cp bin/Debug/netstandard2.1/NEWTONS.dll output
+    - name: push to repo
+      uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
+      env:
+        SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      with:
+        source-directory: output
+        destination-github-username: '${{secrets.DEPLOY_NAME}}'
+        destination-repository-name: '${{secrets.DEPLOY_EMAIL}}'
+        user-email: $secrets.DEPLOY_EMAIL
+        commit-message: automated dll update
+        target-branch: main

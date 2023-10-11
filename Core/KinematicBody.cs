@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    internal class KinematicBody
+    public class KinematicBody
     {
         public Vector3 Position { get; set; }
         public Quaternion Rotation { get; set; }

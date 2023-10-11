@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace NEWTONS
+namespace NEWTONS.Core
 {
     public struct Vector3 : IEquatable<Vector3>, IFormattable
     {

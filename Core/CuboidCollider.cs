@@ -6,15 +6,7 @@ namespace NEWTONS.Core
 {
     public class CuboidCollider
     {
-        public float Length { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
-
-        public CuboidCollider(float length, float width, float height)
-        {
-            Length = length;
-            Width = width;
-            Height = height;
-        }
+        public Vector3 Center { get; set; } = new Vector3(0, 0, 0);
+        public Vector3 Size { get; set; } = new Vector3(1, 1, 1);
     }
 }

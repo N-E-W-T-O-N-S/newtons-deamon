@@ -6,5 +6,6 @@ namespace NEWTONS.Core
 {
     public class Collider
     {
+        public KinematicBody? AttachedKinematicBody { get; set; }
     }
 }

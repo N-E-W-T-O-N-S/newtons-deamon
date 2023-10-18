@@ -4,8 +4,9 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class Collider
+    public enum CollisionDetectionMode
     {
-        public KinematicBody? KinematicBody { get; set; }
+        Continuous,
+        Discrete
     }
 }

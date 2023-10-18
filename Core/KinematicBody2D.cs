@@ -12,6 +12,7 @@ namespace NEWTONS.Core
         public Vector2 Velocity { get; set; }
         public Vector2 CenterOfMass { get; set; }
         public float Mass { get; set; }
+        public bool UseGravity { get; set; }
 
         public void MoveToPosition(Vector2 newPosition)
         {

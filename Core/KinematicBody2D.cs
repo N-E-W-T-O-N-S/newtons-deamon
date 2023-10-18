@@ -5,13 +5,14 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    internal class KinematicBody2D
+    public class KinematicBody2D
     {
         public Vector2 Position { get; set; }
         public Quaternion Rotation { get; set; }
         public Vector2 Velocity { get; set; }
         public Vector2 CenterOfMass { get; set; }
         public float Mass { get; set; }
+        public bool UseGravity { get; set; }
 
         public void MoveToPosition(Vector2 newPosition)
         {

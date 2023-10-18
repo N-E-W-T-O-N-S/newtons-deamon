@@ -12,10 +12,16 @@ namespace NEWTONS.Core
         public Vector3 Velocity { get; set; }
         public Vector3 CenterOfMass { get; set; }
         public float Mass { get; set; }
+        public bool UseGravity { get; set; } = true;
+
+        public KinematicBody() 
+        { 
+            Physics.Bodies.Add(this);
+        }
 
         public void MoveToPosition(Vector3 newPosition)
         {
-            throw new NotImplementedException();
+            Position = newPosition;
         }
         public void MoveToRotation(Quaternion newRotation)
         {

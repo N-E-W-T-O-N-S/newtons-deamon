@@ -7,8 +7,34 @@ namespace NEWTONS.Core
 {
     public class KinematicBody
     {
-        public Vector3 Position { get; set; }
-        public Quaternion Rotation { get; set; }
+        public event Action? UpdatePosition;
+        public event Action? UpdateRotation;
+
+        //Active Properties
+        private Vector3 position;
+
+        public Vector3 Position
+        {
+            get => position;
+            set 
+            { 
+                position = value;
+                UpdatePosition?.Invoke();
+            }
+        }
+        private Vector3 rotation;
+
+        public Vector3 Rotation
+        {
+            get => rotation;
+            set
+            {
+                rotation = value;
+                UpdateRotation?.Invoke();
+            }
+        }
+
+        //Passive Properties
         public Vector3 Velocity { get; set; }
         public Vector3 CenterOfMass { get; set; }
         public float Mass { get; set; }

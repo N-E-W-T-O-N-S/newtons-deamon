@@ -182,11 +182,7 @@ namespace NEWTONS.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
         {
-            //TODO: Mathf impl for Clamp
-            if (t < 0)
-                t = 0;
-            else if (t > 1f)
-                t = 1f;
+            t = Mathf.Clamp01(t);
             return new Vector2(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
         }
 
@@ -199,11 +195,7 @@ namespace NEWTONS.Core
 
             float dot = Dot(start, end);
 
-            //TODO: Clamp in Mathf
-            if (dot < -1f)
-                dot = -1f;
-            else if (dot > 1f) 
-                dot = 1f;
+            dot = Mathf.Clamp(dot, -1, 1);
 
             float angle = MathF.Acos(dot);
 

@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
 {
@@ -16,6 +15,7 @@ namespace NEWTONS.Core
         /// </summary>
         public static Vector3 Gravity { get; set; } = new Vector3(0, -9.81f, 0);
 
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Update(float deltaTime)
         {
             for (int i = 0; i < Bodies.Count; i++)
@@ -28,8 +28,15 @@ namespace NEWTONS.Core
                 if (body.Velocity != Vector3.Zero)
                     deltaPos += body.Velocity * deltaTime;
 
-                body.MoveToPosition(body.Position + deltaPos);
+                if (deltaPos != Vector3.Zero)
+                    body.MoveToPosition(body.Position + deltaPos);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void RemoveBody(KinematicBody body)
+        {
+            Bodies.Remove(body);
         }
     }
 }

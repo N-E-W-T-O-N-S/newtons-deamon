@@ -5,6 +5,7 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
+    [System.Serializable]
     public class KinematicBody
     {
         public event Action? UpdatePosition;
@@ -37,8 +38,23 @@ namespace NEWTONS.Core
         //Passive Properties
         public Vector3 Velocity { get; set; }
         public Vector3 CenterOfMass { get; set; }
-        public float Mass { get; set; }
-        public bool UseGravity { get; set; } = true;
+        private float mass;
+
+        public float Mass
+        {
+            get => mass;
+            set { mass = Mathf.Max(value, PhysicsInfo.MinMass); }
+        }
+
+        private float drag;
+
+        public float Drag
+        {
+            get => drag;
+            set { drag = Mathf.Max(value, PhysicsInfo.MinDrag); }
+        }
+
+        public bool UseGravity { get; set; }
 
         public KinematicBody() 
         { 
@@ -49,13 +65,30 @@ namespace NEWTONS.Core
         {
             Position = newPosition;
         }
+
         public void MoveToRotation(Quaternion newRotation)
         {
             throw new NotImplementedException();
         }
-        public void AddForce(Vector3 newForce)
+
+        //TODO: Look into have deltaTime be a global variable
+        public void AddForce(Vector3 force, ForceMode forceMode, float deltaTime)
         {
-            throw new NotImplementedException();
+            switch (forceMode)
+            {
+                case ForceMode.Force:
+                    Velocity += force / Mass * deltaTime;
+                    break;
+                case ForceMode.Acceleration:
+                    Velocity += force * deltaTime;
+                    break;
+                case ForceMode.Impulse:
+                    Velocity += force * deltaTime / Mass;
+                    break;
+                case ForceMode.VelocityChange:
+                    Velocity += force;
+                    break;
+            }
         }
     }
 }

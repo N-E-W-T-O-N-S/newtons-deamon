@@ -7,13 +7,30 @@ namespace NEWTONS.Core
     {
         public static List<KinematicBody> Bodies { get; set; } = new List<KinematicBody>();
 
-
-
         /// <summary>
         /// Acceleration applied to the Physics World
         /// <br /> Default (0, -9.81f, 0)
         /// </summary>
         public static Vector3 Gravity { get; set; } = new Vector3(0, -9.81f, 0);
+        public bool UsePhysicalDrag { get; set; } = false;
+
+        private float density;
+
+        public float Density
+        {
+            get => density;
+            set { density = Mathf.Max(value, PhysicsInfo.MinDensity); }
+        }
+
+
+        private float temperature;
+
+        public float Temperature
+        {
+            get => temperature;
+            set { temperature = Mathf.Max(value, PhysicsInfo.MinTemperature); }
+        }
+
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Update(float deltaTime)

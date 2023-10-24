@@ -5,7 +5,6 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    [System.Serializable]
     public class KinematicBody
     {
         public event Action? UpdatePosition;

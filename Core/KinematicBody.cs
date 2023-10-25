@@ -5,11 +5,10 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    [System.Serializable]
     public class KinematicBody
     {
-        public event Action? UpdatePosition;
-        public event Action? UpdateRotation;
+        public event Action? OnUpdatePosition;
+        public event Action? OnUpdateRotation;
 
         //Active Properties
         private Vector3 position;
@@ -20,10 +19,11 @@ namespace NEWTONS.Core
             set 
             { 
                 position = value;
-                UpdatePosition?.Invoke();
+                OnUpdatePosition?.Invoke();
             }
         }
         private Vector3 rotation;
+
 
         public Vector3 Rotation
         {
@@ -31,7 +31,7 @@ namespace NEWTONS.Core
             set
             {
                 rotation = value;
-                UpdateRotation?.Invoke();
+                OnUpdateRotation?.Invoke();
             }
         }
 

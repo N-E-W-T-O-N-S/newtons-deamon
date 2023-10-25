@@ -4,15 +4,13 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class SphereCollider
+    public class SphereCollider : Collider
     {
-        public float Radius { get; set; }
-        public Vector3 Offset { get; set; }
-
-        public SphereCollider(float radius, Vector3 offset)
+        public SphereCollider(float radius, KinematicBody? kinematicBody, Vector3 center, PrimitiveShape shape) : base(kinematicBody, center, shape)
         {
             Radius = radius;
-            Offset = offset;
         }
+
+        public float Radius { get; set; }
     }
 }

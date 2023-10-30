@@ -4,9 +4,13 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class CuboidCollider
+    public class CuboidCollider : Collider
     {
-        public Vector3 Center { get; set; } = new Vector3(0, 0, 0);
-        public Vector3 Size { get; set; } = new Vector3(1, 1, 1);
+        public CuboidCollider(Vector3 scale, KinematicBody? kinematicBody, Vector3 center, PrimitiveShape shape) : base(kinematicBody, center, shape)
+        {
+            Scale = scale;
+        }
+
+        public Vector3 Scale { get; set; }
     }
 }

@@ -16,6 +16,7 @@ namespace NEWTONS.Core
         public static Vector3 Gravity { get; set; } = new Vector3(0, -9.81f, 0);
         public static bool UseCustomDrag { get; set; } = false;
 
+
         private static float density;
 
         public static float Density
@@ -23,6 +24,7 @@ namespace NEWTONS.Core
             get => density;
             set { density = Mathf.Max(value, PhysicsInfo.MinDensity); }
         }
+
 
         private static float temperature;
 

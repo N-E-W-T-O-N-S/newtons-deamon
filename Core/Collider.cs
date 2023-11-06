@@ -22,8 +22,8 @@ namespace NEWTONS.Core
             Shape = shape;
             Physics.Collideres.Add(this);
         }
-
-        public KinematicBody Body { get; set; }
+        
+        public KinematicBody Body;
         public Vector3 Center;
         public PrimitiveShape Shape { get; }
 

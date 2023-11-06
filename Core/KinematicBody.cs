@@ -14,10 +14,29 @@ namespace NEWTONS.Core
         private List<IKinematicBodyReference> _references = new List<IKinematicBodyReference>();
         private bool _isDisposed = false;
 
+        /// <summary>
+        /// Implements with default values
+        /// <br /> <see cref="Mass"/> = 1f
+        /// </summary>
+        public KinematicBody()
+        {
+            Mass = 1f;
+            Physics.Bodies.Add(this);
+        }
+
+        public KinematicBody(Vector3 position, Vector3 rotation, float drag, float mass)
+        {
+            Position = position;
+            Rotation = rotation;
+            Mass = mass;
+            Drag = drag;
+            Physics.Bodies.Add(this);
+        }
+
         //Active Properties
 
         /// <summary>
-        /// <u><b>WARNING:</b></u> Do not use, Only for Serilization
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
         public Vector3 position;
 
@@ -32,7 +51,7 @@ namespace NEWTONS.Core
         }
 
         /// <summary>
-        /// <u><b>WARNING:</b></u> Do not use, Only for Serilization
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
         public Vector3 rotation;
 
@@ -53,7 +72,7 @@ namespace NEWTONS.Core
         public Vector3 CenterOfMass;
 
         /// <summary>
-        /// <u><b>WARNING:</b></u> Do not use, Only for Serilization
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
         public float mass;
 
@@ -64,7 +83,7 @@ namespace NEWTONS.Core
         }
 
         /// <summary>
-        /// <u><b>WARNING:</b></u> Do not use, Only for Serilization
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
         public float drag;
 
@@ -75,11 +94,6 @@ namespace NEWTONS.Core
         }
 
         public bool UseGravity;
-
-        public KinematicBody() 
-        { 
-            Physics.Bodies.Add(this);
-        }
 
         public void MoveToPosition(Vector3 newPosition)
         {

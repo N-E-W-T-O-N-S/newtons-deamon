@@ -60,6 +60,7 @@ namespace NEWTONS.Core
         public static void RemoveBody(KinematicBody body)
         {
             Bodies.Remove(body);
+            body.Dispose();
         }
     }
 }

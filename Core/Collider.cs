@@ -4,18 +4,50 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class Collider
+    [System.Serializable]
+    public class Collider : IKinematicBodyReference, IDisposable
     {
+        private List<IColliderReference> _references = new List<IColliderReference>();
+        private bool _isDsposed = false;
+
+        public Collider()
+        {
+
+        }
+
         public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape)
         {
-            KinematicBody = kinematicBody;
+            Body = kinematicBody;
             Center = center;
             Shape = shape;
             Physics.Collideres.Add(this);
         }
 
-        public KinematicBody KinematicBody { get; set; }
-        public Vector3 Center { get; set; }
+        public KinematicBody Body { get; set; }
+        public Vector3 Center;
         public PrimitiveShape Shape { get; }
+
+        public void AddReference(IColliderReference reference)
+        {
+            _references.Add(reference);
+        }
+
+        public void Dispose()
+        {
+            if (!_isDsposed)
+                return;
+            Body = null;
+            for (int i = 0; i < _references.Count; i++)
+            {
+                _references[i].Dispose();
+            }
+            _isDsposed = true;
+        }
+
+        public IKinematicBodyReference SetKinematicBody(KinematicBody kinematicBody)
+        {
+            Body = kinematicBody;
+            return this;
+        }
     }
 }

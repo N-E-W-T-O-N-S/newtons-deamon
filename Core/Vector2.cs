@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
 {
+    [System.Serializable]
     public struct Vector2 : IEquatable<Vector2>, IFormattable
     {
         public float x;

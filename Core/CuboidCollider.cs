@@ -34,6 +34,7 @@ namespace NEWTONS.Core
 
         public bool IsColliding(KonvexCollider other)
         {
+            bool colliding = false;
             float lengthX = Mathf.Abs((other.Center.x + other.Body.Position.x) - (Center.x + Body.Position.x));
             float lengthY = Mathf.Abs((other.Center.y + other.Body.Position.y) - (Center.y + Body.Position.y));
             float lengthZ = Mathf.Abs((other.Center.z + other.Body.Position.z) - (Center.z + Body.Position.z));
@@ -52,8 +53,56 @@ namespace NEWTONS.Core
             float gapZ = lengthZ - (half_d_k1 + half_d_k2);
 
             if (gapX < 0 && gapY < 0 && gapZ < 0)
-                return true;
-            return false;
+            {
+                //TODO: Not working properly with different scales
+                //TODO: Boxes somehow slightly overlap because of dir floating point in accurasy
+                colliding = true;
+                Vector3 dir = -Body.Velocity.Normalized;
+                Vector3 bodyDir = other.Body.Position - Body.Position;
+
+                float absX = Mathf.Abs(gapX);
+                float absY = Mathf.Abs(gapY);
+                float absZ = Mathf.Abs(gapZ);
+                float xDistSquare = bodyDir.x * bodyDir.x;
+                float yDistSquare = bodyDir.y * bodyDir.y;
+                float zDistSquare = bodyDir.z * bodyDir.z;
+
+
+                float gap;
+                if (xDistSquare > yDistSquare && xDistSquare > zDistSquare)
+                {
+                    gap = absX;
+                }
+                else if (yDistSquare > xDistSquare && yDistSquare > zDistSquare)
+                {
+                    gap = absY;
+                }
+                else if (zDistSquare > xDistSquare && zDistSquare > yDistSquare)
+                {
+                    gap = absZ;
+                }
+                else
+                {
+                    if (zDistSquare == yDistSquare || zDistSquare == xDistSquare)
+                        gap = absZ;
+                    else if (xDistSquare == yDistSquare || xDistSquare == zDistSquare)
+                        gap = absX;
+                    else
+                        gap = absY;
+                }
+
+
+                Vector3 backDist = new Vector3(dir.x * gap, dir.y * gap, dir.z * gap);
+                Body.Velocity = Vector3.Zero;
+                Body.Position += backDist;
+            }
+            return colliding;
+        }
+
+        public void AddToPhysicsEngine()
+        {
+            if (!Physics.Collideres.Contains(this))
+                Physics.Collideres.Add(this);
         }
     }
 }

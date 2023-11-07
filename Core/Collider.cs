@@ -12,7 +12,7 @@ namespace NEWTONS.Core
 
         public Collider()
         {
-
+            //Physics.Collideres.Add(this);
         }
 
         public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape)

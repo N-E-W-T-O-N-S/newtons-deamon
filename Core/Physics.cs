@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -51,6 +52,18 @@ namespace NEWTONS.Core
 
                 if (deltaPos != Vector3.Zero)
                     body.MoveToPosition(body.Position + deltaPos);
+            }
+
+            for (int i = 0; i < Collideres.Count; i++)
+            {
+                for (int j = 0; j < Collideres.Count; j++)
+                {
+                    CuboidCollider c1 = (CuboidCollider)Collideres[i];
+                    CuboidCollider c2 = (CuboidCollider)Collideres[j];
+                    if (c1 == c2)
+                        continue;
+                    bool hit = c1.IsColliding(c2);
+                }
             }
         }
 

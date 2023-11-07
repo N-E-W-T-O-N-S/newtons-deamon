@@ -21,8 +21,6 @@ namespace NEWTONS.Core
         public KinematicBody()
         {
             Mass = 1f;
-
-            Physics.Bodies.Add(this);
         }
 
         public KinematicBody(Vector3 position, Vector3 rotation, float drag, float mass)
@@ -31,7 +29,7 @@ namespace NEWTONS.Core
             Rotation = rotation;
             Mass = mass;
             Drag = drag;
-            Physics.Bodies.Add(this);
+            AddToPhysicsEngine();
         }
 
         //Active Properties
@@ -142,6 +140,12 @@ namespace NEWTONS.Core
                     Velocity += force;
                     break;
             }
+        }
+
+        public void AddToPhysicsEngine()
+        {
+            if (!Physics.Bodies.Contains(this))
+                Physics.Bodies.Add(this);
         }
 
         public void AddReference(IKinematicBodyReference reference)

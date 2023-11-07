@@ -158,6 +158,9 @@ namespace NEWTONS.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ComponentMultiply(Vector2 a, Vector2 b) => new Vector2(a.x * b.x, a.y * b.y);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly float Dot(Vector2 a) => x * a.x + y * a.y;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

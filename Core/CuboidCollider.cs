@@ -8,7 +8,7 @@ namespace NEWTONS.Core
     [System.Serializable]
     public class CuboidCollider : KonvexCollider
     {
-        public static readonly Vector3[] points = new Vector3[8]
+        public static readonly Vector3[] defaultPoints = new Vector3[8]
         {
             new Vector3(-0.5f, 0.5f, 0.5f),
             new Vector3(0.5f, 0.5f, 0.5f),
@@ -22,11 +22,12 @@ namespace NEWTONS.Core
 
         public CuboidCollider()
         {
-            Points = points;
+            Points = defaultPoints;
             Scale = new Vector3(1, 1, 1);
+            GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center) : base(scale, points, kinematicBody, center, PrimitiveShape.Cube)
+        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center) : base(scale, defaultPoints, kinematicBody, center, PrimitiveShape.Cube)
         {
 
         }
@@ -38,16 +39,16 @@ namespace NEWTONS.Core
             float lengthZ = Mathf.Abs((other.Center.z + other.Body.Position.z) - (Center.z + Body.Position.z));
 
             //TODO: scale != width, height and length for all konvex shapes
-            float half_w_k1 = Scale.x / 2;
-            float half_w_k2 = other.Scale.x / 2;
+            float half_w_k1 = GlobalScales.x / 2;
+            float half_w_k2 = other.GlobalScales.x / 2;
             float gapX = lengthX - (half_w_k1 + half_w_k2);
 
-            float half_h_k1 = Scale.y / 2;
-            float half_h_k2 = other.Scale.y / 2;
+            float half_h_k1 = GlobalScales.y / 2;
+            float half_h_k2 = other.GlobalScales.y / 2;
             float gapY = lengthY - (half_h_k1 + half_h_k2);
 
-            float half_d_k1 = Scale.z / 2;
-            float half_d_k2 = other.Scale.z / 2;
+            float half_d_k1 = GlobalScales.z / 2;
+            float half_d_k2 = other.GlobalScales.z / 2;
             float gapZ = lengthZ - (half_d_k1 + half_d_k2);
 
             if (gapX < 0 && gapY < 0 && gapZ < 0)

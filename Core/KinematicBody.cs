@@ -21,6 +21,7 @@ namespace NEWTONS.Core
         public KinematicBody()
         {
             Mass = 1f;
+
             Physics.Bodies.Add(this);
         }
 
@@ -51,6 +52,15 @@ namespace NEWTONS.Core
         }
 
         /// <summary>
+        /// Does not invoke <see cref="OnUpdatePosition"/>
+        /// </summary>
+        public Vector3 PositionNoNotify
+        {
+            get => position;
+            set => position = value;
+        }
+
+        /// <summary>
         /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
         public Vector3 rotation;
@@ -63,6 +73,15 @@ namespace NEWTONS.Core
                 rotation = value;
                 OnUpdateRotation?.Invoke();
             }
+        }
+
+        /// <summary>
+        /// Does not invoke <see cref="OnUpdateRotation"/>
+        /// </summary>
+        public Vector3 RotationNoNotify 
+        { 
+            get => position; 
+            set => position = value; 
         }
 
         //Passive Properties

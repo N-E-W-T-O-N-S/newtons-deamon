@@ -54,8 +54,11 @@ namespace NEWTONS.Core
 
             if (gapX < 0 && gapY < 0 && gapZ < 0)
             {
+                if (Body.Velocity == Vector3.Zero || Body.IsStatic)
+                    return true;
+
                 //TODO: Not working properly with different scales
-                //TODO: Boxes somehow slightly overlap because of dir floating point in accurasy
+
                 colliding = true;
                 Vector3 dir = -Body.Velocity.Normalized;
                 Vector3 bodyDir = other.Body.Position - Body.Position;
@@ -67,33 +70,27 @@ namespace NEWTONS.Core
                 float yDistSquare = bodyDir.y * bodyDir.y;
                 float zDistSquare = bodyDir.z * bodyDir.z;
 
+                // if (zDistSquare > xDistSquare && zDistSquare > yDistSquare)
 
-                float gap;
-                if (xDistSquare > yDistSquare && xDistSquare > zDistSquare)
+                float gap = 0f;
+                if ((xDistSquare > yDistSquare && xDistSquare > zDistSquare) || xDistSquare == yDistSquare)
                 {
-                    gap = absX;
+                    if (dir.x != 0)
+                        gap = absX / Mathf.Abs(dir.x);
                 }
-                else if (yDistSquare > xDistSquare && yDistSquare > zDistSquare)
+                else if ((yDistSquare > xDistSquare && yDistSquare > zDistSquare) || yDistSquare == zDistSquare) 
                 {
-                    gap = absY;
-                }
-                else if (zDistSquare > xDistSquare && zDistSquare > yDistSquare)
-                {
-                    gap = absZ;
+                    if (dir.y != 0)
+                        gap = absY / Mathf.Abs(dir.y);
                 }
                 else
                 {
-                    if (zDistSquare == yDistSquare || zDistSquare == xDistSquare)
-                        gap = absZ;
-                    else if (xDistSquare == yDistSquare || xDistSquare == zDistSquare)
-                        gap = absX;
-                    else
-                        gap = absY;
+                    if (dir.z != 0)
+                        gap = absZ / Mathf.Abs(dir.z);
                 }
 
-
-                Vector3 backDist = new Vector3(dir.x * gap, dir.y * gap, dir.z * gap);
-                Body.Velocity = Vector3.Zero;
+                Vector3 backDist = dir * gap;
+                //Body.Velocity = Vector3.Zero;
                 Body.Position += backDist;
             }
             return colliding;

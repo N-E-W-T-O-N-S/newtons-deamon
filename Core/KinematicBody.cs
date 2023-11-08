@@ -82,7 +82,11 @@ namespace NEWTONS.Core
             set => position = value; 
         }
 
+        //<----------------------->
         //Passive Properties
+        //<----------------------->
+
+        public bool IsStatic;
 
         public Vector3 Velocity;
 
@@ -129,12 +133,6 @@ namespace NEWTONS.Core
             {
                 case ForceMode.Force:
                     Velocity += force / Mass * deltaTime;
-                    break;
-                case ForceMode.Acceleration:
-                    Velocity += force * deltaTime;
-                    break;
-                case ForceMode.Impulse:
-                    Velocity += force * deltaTime / Mass;
                     break;
                 case ForceMode.VelocityChange:
                     Velocity += force;

@@ -41,7 +41,8 @@ namespace NEWTONS.Core
             {
                 KinematicBody body = Bodies[i];
                 Vector3 deltaPos = Vector3.Zero;
-
+                if (body.IsStatic)
+                    continue;
 
                 if (body.UseGravity)
                     body.Velocity += Gravity * deltaTime;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -20,6 +21,9 @@ namespace NEWTONS.Core
             new Vector3(0.5f, -0.5f, -0.5f)
         };
 
+        /// <summary>
+        ///  <b><u>WARNING:</u> only used for Serialization</b>
+        /// </summary>
         public CuboidCollider()
         {
             Points = defaultPoints;
@@ -70,28 +74,23 @@ namespace NEWTONS.Core
                 float yDistSquare = bodyDir.y * bodyDir.y;
                 float zDistSquare = bodyDir.z * bodyDir.z;
 
-                // if (zDistSquare > xDistSquare && zDistSquare > yDistSquare)
-
                 float gap = 0f;
-                if ((xDistSquare > yDistSquare && xDistSquare > zDistSquare) || xDistSquare == yDistSquare)
+                if (((xDistSquare > yDistSquare && xDistSquare > zDistSquare) || xDistSquare == yDistSquare || (dir.y == 0 && dir.z == 0)) && dir.x != 0)
                 {
-                    if (dir.x != 0)
-                        gap = absX / Mathf.Abs(dir.x);
+                    gap = absX / Mathf.Abs(dir.x);
                 }
-                else if ((yDistSquare > xDistSquare && yDistSquare > zDistSquare) || yDistSquare == zDistSquare) 
+                else if (((yDistSquare > xDistSquare && yDistSquare > zDistSquare) || yDistSquare == zDistSquare || (dir.x == 0 && dir.z == 0)) && dir.y != 0)
                 {
-                    if (dir.y != 0)
-                        gap = absY / Mathf.Abs(dir.y);
+                    gap = absY / Mathf.Abs(dir.y);
                 }
-                else
+                else if (dir.z != 0)
                 {
-                    if (dir.z != 0)
-                        gap = absZ / Mathf.Abs(dir.z);
+                    gap = absZ / Mathf.Abs(dir.z);
                 }
 
                 Vector3 backDist = dir * gap;
                 //Body.Velocity = Vector3.Zero;
-                Body.Position += backDist;
+                Body.MoveToPosition(Body.Position + backDist);
             }
             return colliding;
         }

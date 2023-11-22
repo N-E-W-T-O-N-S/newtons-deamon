@@ -5,13 +5,39 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class KinematicBody
+    [System.Serializable]
+    public class KinematicBody : IDisposable
     {
         public event Action? OnUpdatePosition;
         public event Action? OnUpdateRotation;
 
+        private List<IKinematicBodyReference> _references = new List<IKinematicBodyReference>();
+        private bool _isDisposed = false;
+
+        /// <summary>
+        /// Implements with default values
+        /// <br /> <see cref="Mass"/> = 1f
+        /// </summary>
+        public KinematicBody()
+        {
+            Mass = 1f;
+        }
+
+        public KinematicBody(Vector3 position, Vector3 rotation, float drag, float mass)
+        {
+            Position = position;
+            Rotation = rotation;
+            Mass = mass;
+            Drag = drag;
+            AddToPhysicsEngine();
+        }
+
         //Active Properties
-        private Vector3 position;
+
+        /// <summary>
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
+        /// </summary>
+        public Vector3 position;
 
         public Vector3 Position
         {
@@ -22,8 +48,20 @@ namespace NEWTONS.Core
                 OnUpdatePosition?.Invoke();
             }
         }
-        private Vector3 rotation;
 
+        /// <summary>
+        /// Does not invoke <see cref="OnUpdatePosition"/>
+        /// </summary>
+        public Vector3 PositionNoNotify
+        {
+            get => position;
+            set => position = value;
+        }
+
+        /// <summary>
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
+        /// </summary>
+        public Vector3 rotation;
 
         public Vector3 Rotation
         {
@@ -35,10 +73,29 @@ namespace NEWTONS.Core
             }
         }
 
+        /// <summary>
+        /// Does not invoke <see cref="OnUpdateRotation"/>
+        /// </summary>
+        public Vector3 RotationNoNotify 
+        { 
+            get => position; 
+            set => position = value; 
+        }
+
+        //<----------------------->
         //Passive Properties
-        public Vector3 Velocity { get; set; }
-        public Vector3 CenterOfMass { get; set; }
-        private float mass;
+        //<----------------------->
+
+        public bool IsStatic;
+
+        public Vector3 Velocity;
+
+        public Vector3 CenterOfMass;
+
+        /// <summary>
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
+        /// </summary>
+        public float mass;
 
         public float Mass
         {
@@ -46,7 +103,10 @@ namespace NEWTONS.Core
             set { mass = Mathf.Max(value, PhysicsInfo.MinMass); }
         }
 
-        private float drag;
+        /// <summary>
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
+        /// </summary>
+        public float drag;
 
         public float Drag
         {
@@ -54,12 +114,7 @@ namespace NEWTONS.Core
             set { drag = Mathf.Max(value, PhysicsInfo.MinDrag); }
         }
 
-        public bool UseGravity { get; set; }
-
-        public KinematicBody() 
-        { 
-            Physics.Bodies.Add(this);
-        }
+        public bool UseGravity;
 
         public void MoveToPosition(Vector3 newPosition)
         {
@@ -79,16 +134,33 @@ namespace NEWTONS.Core
                 case ForceMode.Force:
                     Velocity += force / Mass * deltaTime;
                     break;
-                case ForceMode.Acceleration:
-                    Velocity += force * deltaTime;
-                    break;
-                case ForceMode.Impulse:
-                    Velocity += force * deltaTime / Mass;
-                    break;
                 case ForceMode.VelocityChange:
                     Velocity += force;
                     break;
             }
+        }
+
+        public void AddToPhysicsEngine()
+        {
+            if (!Physics.Bodies.Contains(this))
+                Physics.Bodies.Add(this);
+        }
+
+        public void AddReference(IKinematicBodyReference reference)
+        {
+            _references.Add(reference);
+        }
+
+        public void Dispose()
+        {
+            if (_isDisposed)
+                return;
+            for (int i = 0; i < _references.Count; i++)
+            {
+                _references[i].Dispose();
+            }
+            _references.Clear();
+            _isDisposed = true;
         }
     }
 }

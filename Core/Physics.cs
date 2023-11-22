@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -16,7 +17,6 @@ namespace NEWTONS.Core
         public static Vector3 Gravity { get; set; } = new Vector3(0, -9.81f, 0);
         public static bool UseCustomDrag { get; set; } = false;
 
-
         private static float density;
 
         public static float Density
@@ -24,7 +24,6 @@ namespace NEWTONS.Core
             get => density;
             set { density = Mathf.Max(value, PhysicsInfo.MinDensity); }
         }
-
 
         private static float temperature;
 
@@ -42,7 +41,8 @@ namespace NEWTONS.Core
             {
                 KinematicBody body = Bodies[i];
                 Vector3 deltaPos = Vector3.Zero;
-
+                if (body.IsStatic)
+                    continue;
 
                 if (body.UseGravity)
                     body.Velocity += Gravity * deltaTime;
@@ -54,12 +54,25 @@ namespace NEWTONS.Core
                 if (deltaPos != Vector3.Zero)
                     body.MoveToPosition(body.Position + deltaPos);
             }
+
+            for (int i = 0; i < Collideres.Count; i++)
+            {
+                for (int j = 0; j < Collideres.Count; j++)
+                {
+                    CuboidCollider c1 = (CuboidCollider)Collideres[i];
+                    CuboidCollider c2 = (CuboidCollider)Collideres[j];
+                    if (c1 == c2)
+                        continue;
+                    bool hit = c1.IsColliding(c2);
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RemoveBody(KinematicBody body)
         {
             Bodies.Remove(body);
+            body.Dispose();
         }
     }
 }

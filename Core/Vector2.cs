@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
 {
+    [System.Serializable]
     public struct Vector2 : IEquatable<Vector2>, IFormattable
     {
         public float x;
@@ -155,6 +156,9 @@ namespace NEWTONS.Core
             else
                 this = Zero;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ComponentMultiply(Vector2 a, Vector2 b) => new Vector2(a.x * b.x, a.y * b.y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly float Dot(Vector2 a) => x * a.x + y * a.y;

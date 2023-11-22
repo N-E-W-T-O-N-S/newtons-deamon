@@ -6,7 +6,7 @@ namespace NEWTONS.Core
 {
     public class SphereCollider : Collider
     {
-        public SphereCollider(float radius, KinematicBody? kinematicBody, Vector3 center, PrimitiveShape shape) : base(kinematicBody, center, shape)
+        public SphereCollider(float radius, KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape) : base(kinematicBody, center, shape)
         {
             Radius = radius;
         }

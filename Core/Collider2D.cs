@@ -5,34 +5,33 @@ using System.Text;
 namespace NEWTONS.Core
 {
     [System.Serializable]
-    public class Collider : IKinematicBodyReference
+    public class Collider2D : IKinematicBodyReference2D
     {
-        private List<IColliderReference> _references = new List<IColliderReference>();
+        private List<IColliderReference2D> _references = new List<IColliderReference2D>();
         private bool _isDsposed = false;
 
-        public Collider()
+        public KinematicBody2D Body;
+        public Vector2 Center;
+        public PrimitiveShape2D Shape { get; }
+
+        public Collider2D()
         {
-            
+
         }
 
-        public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape)
+        public Collider2D(KinematicBody2D kinematicBody, Vector2 center, PrimitiveShape2D shape)
         {
             Scale = scale;
             Body = kinematicBody;
             Center = center;
             Shape = shape;
-            Physics.Colliders.Add(this);
+            Physics2D.Colliders.Add(this);
         }
-        
-        public KinematicBody Body;
-        public Vector3 Center;
-        public PrimitiveShape Shape { get; }
-
 
         /// <summary>
         /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
-        public Vector3 globalScale;
+        public Vector2 globalScale;
 
         /// <summary>
         /// The Global Scale of the Collider
@@ -40,27 +39,28 @@ namespace NEWTONS.Core
         /// <para> returns the set global scale and multiplies it by a collider scale <seealso cref="Scale"/> </para>
         /// 
         /// </summary>
-        public Vector3 GlobalScales 
-        { 
-            get => Vector3.ComponentMultiply(globalScale, Scale);
-            set => globalScale = value; 
+        public Vector2 GlobalScales
+        {
+            get => Vector2.ComponentMultiply(globalScale, Scale);
+            set => globalScale = value;
         }
 
         /// <summary>
         /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>
-        public Vector3 scale;
+        public Vector2 scale;
 
-        public Vector3 Scale
+        public Vector2 Scale
         {
             get => scale;
             set
             {
-                scale = new Vector3(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0), Mathf.Max(value.z, 0));
+                scale = new Vector2(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0));
+
             }
         }
 
-        public void AddReference(IColliderReference reference)
+        public void AddReference(IColliderReference2D reference)
         {
             _references.Add(reference);
         }
@@ -77,10 +77,11 @@ namespace NEWTONS.Core
             _isDsposed = true;
         }
 
-        public IKinematicBodyReference SetKinematicBody(KinematicBody kinematicBody)
+        public IKinematicBodyReference2D SetKinematicBody(KinematicBody2D kinematicBody)
         {
             Body = kinematicBody;
             return this;
         }
+
     }
 }

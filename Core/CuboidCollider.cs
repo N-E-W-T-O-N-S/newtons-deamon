@@ -97,8 +97,8 @@ namespace NEWTONS.Core
 
         public void AddToPhysicsEngine()
         {
-            if (!Physics.Collideres.Contains(this))
-                Physics.Collideres.Add(this);
+            if (!Physics.Colliders.Contains(this))
+                Physics.Colliders.Add(this);
         }
     }
 }

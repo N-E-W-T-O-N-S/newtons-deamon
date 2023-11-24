@@ -69,17 +69,17 @@ namespace NEWTONS.Core
             Vector2[] bScaledPoints = other.ScaledPoints;
 
             Vector2[] axisToCheck = aNormals.Concat(bNormals).ToArray();
-            float aMin = Mathf.Infinity;
-            float aMax = Mathf.NegativeInfinity;
-            float bMin = Mathf.Infinity;
-            float bMax = Mathf.NegativeInfinity;
 
             //TODO: optimisation
             for (int i = 0; i < axisToCheck.Length; i++)
             {
+                float aMin = Mathf.Infinity;
+                float aMax = Mathf.NegativeInfinity;
+                float bMin = Mathf.Infinity;
+                float bMax = Mathf.NegativeInfinity;
                 for (int j = 0; j < aScaledPoints.Length; j++)
                 {
-                    float dot = Vector2.Dot(axisToCheck[i], aScaledPoints[j]);
+                    float dot = Vector2.Dot(axisToCheck[i], aScaledPoints[j] + Body.Position);
                     if (dot < aMin)
                         aMin = dot;
                     else if (dot > aMax)
@@ -88,7 +88,7 @@ namespace NEWTONS.Core
 
                 for (int j = 0; j < bScaledPoints.Length; j++)
                 {
-                    float dot = Vector2.Dot(axisToCheck[i], bScaledPoints[j]);
+                    float dot = Vector2.Dot(axisToCheck[i], bScaledPoints[j] + other.Body.Position);
                     if (dot < bMin)
                         bMin = dot;
                     else if (dot > bMax)

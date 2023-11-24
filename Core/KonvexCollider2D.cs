@@ -82,7 +82,7 @@ namespace NEWTONS.Core
                     float dot = Vector2.Dot(axisToCheck[i], aScaledPoints[j] + Body.Position);
                     if (dot < aMin)
                         aMin = dot;
-                    else if (dot > aMax)
+                    if (dot > aMax)
                         aMax = dot;
                 }
 
@@ -91,7 +91,7 @@ namespace NEWTONS.Core
                     float dot = Vector2.Dot(axisToCheck[i], bScaledPoints[j] + other.Body.Position);
                     if (dot < bMin)
                         bMin = dot;
-                    else if (dot > bMax)
+                    if (dot > bMax)
                         bMax = dot;
                 }
                 if ((aMin < bMax && aMin > bMin) || (bMin < aMax && bMin > aMin))

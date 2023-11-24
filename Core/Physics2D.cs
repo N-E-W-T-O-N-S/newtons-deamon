@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class Physics
+    public class Physics2D
     {
-        public static List<KinematicBody> Bodies { get; set; } = new List<KinematicBody>();
-        public static List<Collider> Colliders { get; set; } = new List<Collider>();
+        public static List<Collider2D> Colliders { get; set; } = new List<Collider2D>();
+        public static List<KinematicBody2D> Bodies { get; set; } = new List<KinematicBody2D>();
 
         /// <summary>
         /// Acceleration applied to the Physics World
         /// <br /> Default (0, -9.81f, 0)
         /// </summary>
-        public static Vector3 Gravity { get; set; } = new Vector3(0, -9.81f, 0);
+        public static Vector2 Gravity { get; set; } = new Vector2(0, -9.81f);
         public static bool UseCustomDrag { get; set; } = false;
 
         private static float density;
@@ -39,8 +39,8 @@ namespace NEWTONS.Core
         {
             for (int i = 0; i < Bodies.Count; i++)
             {
-                KinematicBody body = Bodies[i];
-                Vector3 deltaPos = Vector3.Zero;
+                KinematicBody2D body = Bodies[i];
+                Vector2 deltaPos = Vector2.Zero;
                 if (body.IsStatic)
                     continue;
 
@@ -48,28 +48,28 @@ namespace NEWTONS.Core
                     body.Velocity += Gravity * deltaTime;
                 //if (!UsePhysicalDrag)
                 //    body.Velocity += -body.Velocity.Normalized * (body.Drag / body.Mass * deltaTime);
-                if (body.Velocity != Vector3.Zero)
+                if (body.Velocity != Vector2.Zero)
                     deltaPos += body.Velocity * deltaTime;
 
-                if (deltaPos != Vector3.Zero)
+                if (deltaPos != Vector2.Zero)
                     body.MoveToPosition(body.Position + deltaPos);
             }
 
-            for (int i = 0; i < Colliders.Count; i++)
-            {
-                for (int j = 0; j < Colliders.Count; j++)
-                {
-                    CuboidCollider c1 = (CuboidCollider)Colliders[i];
-                    CuboidCollider c2 = (CuboidCollider)Colliders[j];
-                    if (c1 == c2)
-                        continue;
-                    bool hit = c1.IsColliding(c2);
-                }
-            }
+            //for (int i = 0; i < Colliders.Count; i++)
+            //{
+            //    for (int j = 0; j < Colliders.Count; j++)
+            //    {
+            //        KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
+            //        KonvexCollider2D c2 = (KonvexCollider2D)Colliders[j];
+            //        if (c1 == c2)
+            //            continue;
+            //        bool hit = c1.Collision(c2);
+            //    }
+            //}
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void RemoveBody(KinematicBody body)
+        public static void RemoveBody(KinematicBody2D body)
         {
             Bodies.Remove(body);
             body.Dispose();

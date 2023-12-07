@@ -15,7 +15,7 @@ namespace NEWTONS.Core
             
         }
 
-        public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape)
+        public Collider(KinematicBody kinematicBody, Vector3 scale,Vector3 center, PrimitiveShape shape)
         {
             Scale = scale;
             Body = kinematicBody;

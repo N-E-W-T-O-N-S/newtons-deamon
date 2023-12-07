@@ -15,10 +15,8 @@ namespace NEWTONS.Core
         private List<IKinematicBodyReference2D> _references = new List<IKinematicBodyReference2D>();
         private bool _isDisposed = false;
 
-        /// <summary>
-        /// Implements with default values
-        /// <br /> <see cref="Mass"/> = 1f
-        /// </summary>
+
+        [Obsolete]
         public KinematicBody2D()
         {
             Mass = 1f;
@@ -35,9 +33,7 @@ namespace NEWTONS.Core
 
         //Active Properties
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Position instead")]
         public Vector2 position;
 
         public Vector2 Position
@@ -59,9 +55,7 @@ namespace NEWTONS.Core
             set => position = value;
         }
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Rotation instead")]
         public Vector2 rotation;
 
         public Vector2 Rotation
@@ -93,9 +87,7 @@ namespace NEWTONS.Core
 
         public Vector2 CenterOfMass;
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Mass instead")]
         public float mass;
 
         public float Mass
@@ -104,9 +96,7 @@ namespace NEWTONS.Core
             set { mass = Mathf.Max(value, PhysicsInfo.MinMass); }
         }
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Drag instead")]
         public float drag;
 
         public float Drag

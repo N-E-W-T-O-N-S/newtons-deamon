@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace NEWTONS.Core
@@ -21,9 +22,7 @@ namespace NEWTONS.Core
             new Vector3(0.5f, -0.5f, -0.5f)
         };
 
-        /// <summary>
-        ///  <b><u>WARNING:</u> only used for Serialization</b>
-        /// </summary>
+        [Obsolete]
         public CuboidCollider()
         {
             Points = defaultPoints;
@@ -31,7 +30,7 @@ namespace NEWTONS.Core
             GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center) : base(scale, defaultPoints, kinematicBody, center, PrimitiveShape.Cube)
+        public CuboidCollider(KinematicBody kinematicBody, Vector3 scale, Vector3 center) : base(defaultPoints, kinematicBody, scale, center, PrimitiveShape.Cube)
         {
 
         }

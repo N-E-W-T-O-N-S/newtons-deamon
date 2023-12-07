@@ -12,6 +12,8 @@ namespace NEWTONS.Core
 
         public KinematicBody2D Body;
         public Vector2 Center;
+        public float Rotation;
+        public Vector2 CenterOfMass;
         public PrimitiveShape2D Shape { get; }
 
         public Collider2D()
@@ -19,18 +21,18 @@ namespace NEWTONS.Core
 
         }
 
-        public Collider2D(KinematicBody2D kinematicBody, Vector2 center, PrimitiveShape2D shape)
+        public Collider2D(KinematicBody2D kinematicBody, Vector2 scale, Vector2 center, float rotation, Vector2 centerOfMass, PrimitiveShape2D shape)
         {
             Scale = scale;
             Body = kinematicBody;
             Center = center;
+            Rotation = rotation;
+            CenterOfMass = centerOfMass;
             Shape = shape;
             Physics2D.Colliders.Add(this);
         }
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use GlobalScales instead")]
         public Vector2 globalScale;
 
         /// <summary>
@@ -45,9 +47,7 @@ namespace NEWTONS.Core
             set => globalScale = value;
         }
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Scale instead")]
         public Vector2 scale;
 
         public Vector2 Scale

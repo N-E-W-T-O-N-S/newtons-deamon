@@ -14,10 +14,7 @@ namespace NEWTONS.Core
         private List<IKinematicBodyReference> _references = new List<IKinematicBodyReference>();
         private bool _isDisposed = false;
 
-        /// <summary>
-        /// Implements with default values
-        /// <br /> <see cref="Mass"/> = 1f
-        /// </summary>
+        [Obsolete]
         public KinematicBody()
         {
             Mass = 1f;
@@ -32,11 +29,11 @@ namespace NEWTONS.Core
             AddToPhysicsEngine();
         }
 
-        //Active Properties
+        // <----------------------->
+        // Active Properties
+        // <----------------------->
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Position instead")]
         public Vector3 position;
 
         public Vector3 Position
@@ -58,9 +55,7 @@ namespace NEWTONS.Core
             set => position = value;
         }
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Rotation instead")]
         public Vector3 rotation;
 
         public Vector3 Rotation
@@ -82,9 +77,9 @@ namespace NEWTONS.Core
             set => position = value; 
         }
 
-        //<----------------------->
-        //Passive Properties
-        //<----------------------->
+        // <----------------------->
+        // Passive Properties
+        // <----------------------->
 
         public bool IsStatic;
 
@@ -92,9 +87,7 @@ namespace NEWTONS.Core
 
         public Vector3 CenterOfMass;
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Mass instead")]
         public float mass;
 
         public float Mass
@@ -103,9 +96,7 @@ namespace NEWTONS.Core
             set { mass = Mathf.Max(value, PhysicsInfo.MinMass); }
         }
 
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
+        [Obsolete("Use Drag instead")]
         public float drag;
 
         public float Drag

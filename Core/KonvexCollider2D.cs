@@ -41,17 +41,18 @@ namespace NEWTONS.Core
         /// <summary>
         /// rotated and scaled points
         /// </summary>
-        public Vector2[] Points 
+        public Vector2[] Points
         {
             get
             {
                 Vector2[] points = new Vector2[PointsRaw.Length];
-                Vector2 a = new Vector2(Mathf.Cos(Rotation * (Mathf.PI / 180)), Mathf.Sin(Rotation * (Mathf.PI / 180))).Normalized;
+                float deg2Rad = Mathf.Deg2Rad;
+                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
                 Vector2 b = new Vector2(-a.y, a.x);
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
-                    Vector2 rotatedPoints = PointsRaw[i].x * a + PointsRaw[i].y * b;
-                    points[i] = new Vector2(rotatedPoints.x * GlobalScales.x, rotatedPoints.y * GlobalScales.y);
+                    Vector2 scaledPoints = new Vector2(PointsRaw[i].x * GlobalScales.x, PointsRaw[i].y * GlobalScales.y);
+                    points[i] = scaledPoints.x * a + scaledPoints.y * b;
                 }
                 return points;
             }
@@ -63,7 +64,8 @@ namespace NEWTONS.Core
             get
             {
                 Vector2[] rotatedPoints = new Vector2[PointsRaw.Length];
-                Vector2 a = new Vector2(Mathf.Cos(Rotation), Mathf.Sin(Rotation));
+                float deg2Rad = Mathf.Deg2Rad;
+                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
                 Vector2 b = new Vector2(-a.y, a.x);
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
@@ -107,11 +109,18 @@ namespace NEWTONS.Core
 
         public bool Collision(KonvexCollider2D other)
         {
+            if (Body.Velocity == Vector2.Zero)
+                return false;
+
             Vector2[] aEdgeNormals = EdgeNormals;
             Vector2[] bEdgeNormals = other.EdgeNormals;
             Vector2[] aScaledPoints = Points;
             Vector2[] bScaledPoints = other.Points;
+            // Maybe do not concat
             Vector2[] axisToCheck = aEdgeNormals.Concat(bEdgeNormals).ToArray();
+
+            float depth = Mathf.Infinity;
+            Vector2 normal = Vector2.Zero;
 
             //TODO: optimisation
             for (int i = 0; i < axisToCheck.Length; i++)
@@ -137,12 +146,25 @@ namespace NEWTONS.Core
                     if (dot > bMax)
                         bMax = dot;
                 }
-                if ((aMin < bMax && aMin > bMin) || (bMin < aMax && bMin > aMin))
-                    continue;
-                else
+
+                if (aMin >= bMax || bMin >= aMax)
                     return false;
+
+                float d = Mathf.Min(aMax - bMin, bMax - aMin);
+                if (d < depth)
+                {
+                    depth = d;
+                    normal = axisToCheck[i];
+                }
+
             }
 
+            Vector2 dir = other.GlobalCenter - GlobalCenter;
+
+            if (Vector2.Dot(dir, normal) > 0)
+                normal = -normal;
+
+            Body.MoveToPosition(Body.Position + (normal * depth));
 
             return true;
         }

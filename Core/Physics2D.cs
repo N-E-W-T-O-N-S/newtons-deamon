@@ -55,17 +55,17 @@ namespace NEWTONS.Core
                     body.MoveToPosition(body.Position + deltaPos);
             }
 
-            //for (int i = 0; i < Colliders.Count; i++)
-            //{
-            //    for (int j = 0; j < Colliders.Count; j++)
-            //    {
-            //        KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
-            //        KonvexCollider2D c2 = (KonvexCollider2D)Colliders[j];
-            //        if (c1 == c2)
-            //            continue;
-            //        bool hit = c1.Collision(c2);
-            //    }
-            //}
+            for (int i = 0; i < Colliders.Count; i++)
+            {
+                for (int j = 0; j < Colliders.Count; j++)
+                {
+                    KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
+                    KonvexCollider2D c2 = (KonvexCollider2D)Colliders[j];
+                    if (c1 == c2)
+                        continue;
+                    bool hit = c1.Collision(c2);
+                }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

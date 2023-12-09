@@ -36,7 +36,7 @@ namespace NEWTONS.Core
         public Vector2 globalScale;
 
         /// <summary>
-        /// The Global Scale of the Collider
+        /// the global scale of the collider
         /// 
         /// <para> returns the set global scale and multiplies it by a collider scale <seealso cref="Scale"/> </para>
         /// 
@@ -58,6 +58,14 @@ namespace NEWTONS.Core
                 scale = new Vector2(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0));
 
             }
+        }
+
+        /// <summary>
+        /// the global center of the collider
+        /// </summary>
+        public Vector2 GlobalCenter 
+        { 
+            get => Center + Body.Position; 
         }
 
         public void AddReference(IColliderReference2D reference)

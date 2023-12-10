@@ -109,7 +109,7 @@ namespace NEWTONS.Core
 
         public bool Collision(KonvexCollider2D other)
         {
-            if (Body.Velocity == Vector2.Zero)
+            if (Body.Velocity == Vector2.Zero && other.Body.Velocity == Vector2.Zero)
                 return false;
 
             Vector2[] aEdgeNormals = EdgeNormals;

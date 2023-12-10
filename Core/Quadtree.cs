@@ -6,11 +6,8 @@ namespace NEWTONS.Core
 {
     public class Quadtree<T>
     {
-        public Vector2 Center { get; set; }
-        public float HalfWidth { get; set; }
-        public float HalfHeight { get; set; }
+        public Rectangle Boundary { get; set; }
         public int Capacity { get; set; }
-        public int MaxDepth { get; set; }
         public bool Divided { get; set; }
         public List<QuadtreeData<T>> Points { get; private set; } = new List<QuadtreeData<T>>();
 
@@ -19,26 +16,26 @@ namespace NEWTONS.Core
         /// </summary>
         private Quadtree<T>[] _nodes = new Quadtree<T>[4];
 
-        public Quadtree(Vector2 ceter, float halfWidth, float halfHeight, int capacity, int maxDepth, List<QuadtreeData<T>> points)
+        public Quadtree(Rectangle boundary, int capacity)
         {
-            Center = ceter;
-            HalfWidth = halfWidth;
-            HalfHeight = halfHeight;
+            Boundary = boundary;
             Capacity = capacity;
-            MaxDepth = maxDepth;
-            Points = points;
 
             Divided = false;
         }
 
-        public bool Insert(QuadtreeData<T> point)
+        /// <summary>
+        /// Inserts a QuadtreeData into the Quadtree
+        /// </summary>
+        /// <returns>true if successful</returns>
+        public bool Insert(QuadtreeData<T> data)
         {
-            if (!InBounds(point.Position))
+            if (!Boundary.InBounds(data.Position))
                 return false;
 
             if (Points.Count < Capacity)
             {
-                Points.Add(point);
+                Points.Add(data);
                 return true;
             }
             if (!Divided)
@@ -46,7 +43,7 @@ namespace NEWTONS.Core
 
             for (int i = 0; i < _nodes.Length; i++)
             {
-                if (_nodes[i].Insert(point))
+                if (_nodes[i].Insert(data))
                     return true;
             }
 
@@ -56,33 +53,42 @@ namespace NEWTONS.Core
 
         private void Subdivide()
         {
-            float width = HalfWidth / 2;
-            float height = HalfHeight / 2;
+            float width = Boundary.Size.x / 2;
+            float height = Boundary.Size.y / 2;
+            float x = Boundary.Position.x;
+            float y = Boundary.Position.y;
 
             // North West
-            _nodes[0] = new Quadtree<T>(new Vector2(Center.x - width, Center.y + height), width, height, Capacity, MaxDepth - 1, new List<QuadtreeData<T>>());
+            _nodes[0] = new Quadtree<T>(new Rectangle(new Vector2(x - width, y + height), new Vector2(width, height)), Capacity);
 
             // North East
-            _nodes[1] = new Quadtree<T>(new Vector2(Center.x + width, Center.y + height), width, height, Capacity, MaxDepth - 1, new List<QuadtreeData<T>>());
+            _nodes[1] = new Quadtree<T>(new Rectangle(new Vector2(x + width, y + height), new Vector2(width, height)), Capacity);
 
             // South East
-            _nodes[2] = new Quadtree<T>(new Vector2(Center.x + width, Center.y - height), width, height, Capacity, MaxDepth - 1, new List<QuadtreeData<T>>());
+            _nodes[2] = new Quadtree<T>(new Rectangle(new Vector2(x + width, y - height), new Vector2(width, height)), Capacity);
 
             // South West
-            _nodes[3] = new Quadtree<T>(new Vector2(Center.x - width, Center.y - height), width, height, Capacity, MaxDepth - 1, new List<QuadtreeData<T>>());
+            _nodes[3] = new Quadtree<T>(new Rectangle(new Vector2(x - width, y - height), new Vector2(width, height)), Capacity);
 
             Divided = true;
         }
 
-        public List<QuadtreeData<T>> Query(Vector2 pos, Vector2 scale)
+        /// <summary>
+        /// Gets all the QuadtreeData in the given area
+        /// </summary>
+        /// <param name="pos">position of the rectangle</param>
+        /// <param name="scale">scale of the rectangle in halfs</param>
+        /// <returns></returns>
+        public List<QuadtreeData<T>> Receive(Vector2 pos, Vector2 scale)
         {
             List<QuadtreeData<T>> data = new List<QuadtreeData<T>>();
-            if (!Intersects(pos, scale))
+            Rectangle rect = new Rectangle(pos, scale);
+            if (!Boundary.Intersects(rect))
                 return data;
 
             foreach (var item in Points)
             {
-                if (InBounds(pos, scale, item.Position))
+                if (rect.InBounds(item.Position))
                     data.Add(item);
             }
 
@@ -90,26 +96,10 @@ namespace NEWTONS.Core
             {
                 if (_nodes[i] == null)
                     break;
-                data.AddRange(_nodes[i].Query(pos, scale));
+                data.AddRange(_nodes[i].Receive(pos, scale));
             }
 
             return data;
-        }
-
-        public bool InBounds(Vector2 point)
-        {
-            //TODO: edge cases => what if point is on the edge of the quadtree
-            return point.x >= Center.x - HalfWidth && point.x <= Center.x + HalfWidth && point.y >= Center.y - HalfHeight && point.y <= Center.y + HalfHeight;
-        }
-
-        public bool InBounds(Vector2 ceter, Vector2 scale, Vector2 point)
-        {
-               return point.x >= ceter.x - scale.x && point.x <= ceter.x + scale.x && point.y >= ceter.y - scale.y && point.y <= ceter.y + scale.y;
-        }
-
-        public bool Intersects(Vector2 point, Vector2 scale)
-        {
-            return point.x + scale.x >= Center.x - HalfWidth && point.x - scale.x <= Center.x + HalfWidth && point.y + scale.y >= Center.y - HalfHeight && point.y - scale.y <= Center.y + HalfHeight;
         }
 
         public List<Quadtree<T>> GetTrees()

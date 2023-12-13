@@ -71,14 +71,14 @@ namespace NEWTONS.Core
                 _quadtree.Insert(new QuadtreeData<Collider2D>(Colliders[i].GlobalCenter, Colliders[i]));
             }
 
-
             for (int i = 0; i < Colliders.Count; i++)
             {
                 // TODO: Scale may not be the best way to determine the size of the collider
                 var qtDataToCheck = _quadtree.Receive(Colliders[i].GlobalCenter, Colliders[i].Scale);
+
+                KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
                 foreach (var qtData in qtDataToCheck)
                 {
-                    KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
                     KonvexCollider2D c2 = (KonvexCollider2D)qtData.Data;
                     if (c1 == c2 || checkedCollisions[c1].Contains(c2) || checkedCollisions[c2].Contains(c1))
                         continue;

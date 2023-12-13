@@ -129,6 +129,7 @@ namespace NEWTONS.Core
                 float aMax = Mathf.NegativeInfinity;
                 float bMin = Mathf.Infinity;
                 float bMax = Mathf.NegativeInfinity;
+
                 for (int j = 0; j < aScaledPoints.Length; j++)
                 {
                     float dot = Vector2.Dot(axisToCheck[i], aScaledPoints[j] + Body.Position);
@@ -159,12 +160,15 @@ namespace NEWTONS.Core
 
             }
 
+            //TODO: set both bodies back depending on their mass
+            // --------------------------------------------------
             Vector2 dir = other.GlobalCenter - GlobalCenter;
 
             if (Vector2.Dot(dir, normal) > 0)
                 normal = -normal;
 
-            Body.MoveToPosition(Body.Position + (normal * depth));
+            Body.MoveToPosition(Body.Position + (-Body.Velocity.Normalized * depth));
+            // --------------------------------------------------
 
             return true;
         }

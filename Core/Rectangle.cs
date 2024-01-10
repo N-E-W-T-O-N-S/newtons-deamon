@@ -4,17 +4,17 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public struct Rectangle
+    public readonly struct Rectangle
     {
         /// <summary>
         /// position of the rectangle
         /// </summary>
-        public Vector2 Position { get; set; }
+        public Vector2 Position { get; }
 
         /// <summary>
         /// the size of the rectangle in <b>half</b> widths and heights
         /// </summary>
-        public Vector2 Size { get; set; }
+        public Vector2 Size { get; }
 
         public Rectangle(Vector2 position, Vector2 size)
         {
@@ -22,12 +22,12 @@ namespace NEWTONS.Core
             Size = size;
         }
 
-        public bool InBounds(Vector2 point)
+        public readonly bool InBounds(Vector2 point)
         {
             return point.x >= Position.x - Size.x && point.x <= Position.x + Size.x && point.y >= Position.y - Size.y && point.y <= Position.y + Size.y;
         }
 
-        public bool Intersects(Rectangle rectangle)
+        public readonly bool Intersects(Rectangle rectangle)
         {
             return
                 (

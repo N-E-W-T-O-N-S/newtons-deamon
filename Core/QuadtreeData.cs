@@ -4,10 +4,10 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public struct QuadtreeData<T>
+    public readonly struct QuadtreeData<T>
     {
-        public Vector2 Position { get; set; }
-        public T Data { get; set; }
+        public Vector2 Position { get; }
+        public T Data { get; }
 
         public QuadtreeData(Vector3 position, T data)
         {

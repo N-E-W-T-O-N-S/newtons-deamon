@@ -9,9 +9,9 @@ namespace NEWTONS.Core
     public class KonvexCollider2D : Collider2D
     {
 
-        private readonly Vector2[] _defaultPoints = new Vector2[]
+        private static readonly Vector2[] _defaultPoints = new Vector2[]
         {
-            //Points of a hexagon start right and go clockwise
+            //Points of a hexagon start right going clockwise
             new Vector2(0.5f, 0),
             new Vector2(0.25f, 0.433f),
             new Vector2(-0.25f, 0.433f),
@@ -167,7 +167,16 @@ namespace NEWTONS.Core
             if (Vector2.Dot(dir, normal) > 0)
                 normal = -normal;
 
-            Body.MoveToPosition(Body.Position + (-Body.Velocity.Normalized * depth));
+            float velocityB1 = Body.Velocity.magnitude;
+            float velocityB2 = other.Body.Velocity.magnitude;
+            float combinedVelocity = velocityB1 + velocityB2;
+
+            float depth1 = (velocityB1 / combinedVelocity) * depth;
+            float depth2 = (velocityB2 / combinedVelocity) * depth;
+
+
+            Body.MoveToPosition(Body.Position + (normal * depth1));
+            other.Body.MoveToPosition(other.Body.Position + (-normal * depth2));
             // --------------------------------------------------
 
             return true;

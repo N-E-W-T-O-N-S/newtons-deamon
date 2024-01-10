@@ -31,7 +31,7 @@ namespace NEWTONS.Core
             GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center) : base(scale, defaultPoints, kinematicBody, center, PrimitiveShape.Cube)
+        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, float restitution) : base(scale, defaultPoints, kinematicBody, center, PrimitiveShape.Cube, restitution)
         {
 
         }
@@ -91,6 +91,9 @@ namespace NEWTONS.Core
                 Vector3 backDist = dir * gap;
                 //Body.Velocity = Vector3.Zero;
                 Body.MoveToPosition(Body.Position + backDist);
+                CollisionResponse(this, other);
+
+
             }
             return colliding;
         }
@@ -99,6 +102,55 @@ namespace NEWTONS.Core
         {
             if (!Physics.Collideres.Contains(this))
                 Physics.Collideres.Add(this);
+        }
+
+        public void CollisionResponse(KonvexCollider body, KonvexCollider other)
+        {
+            KinematicBody firstBody = body.Body;
+            KinematicBody secondBody = other.Body;
+
+            float m1 = firstBody.Mass;
+            float m2 = secondBody.Mass;
+            Vector3 v1 = firstBody.Velocity;
+            Vector3 v2 = secondBody.Velocity;
+            Vector3 pos1 = firstBody.Position;
+            Vector3 pos2 = secondBody.Position;
+            float e = (body.Restitution + other.Restitution) / 2;
+            float meff;
+
+            Vector3 n = (pos2 - pos1) / Vector3.Magnitude(pos2 - pos1);
+            if (secondBody.IsStatic)
+                meff = m1;
+            else if (firstBody.IsStatic)
+                meff = m2;
+            else
+                meff = 1 / ((1 / m1) + (1 / m2));
+
+            Vector3 vimp = Vector3.ComponentMultiply(n, (v1 - v2));
+            Vector3 j = (1 + e) * meff * vimp;
+            Vector3 dv1;
+            Vector3 dv2;
+
+            if (firstBody.IsStatic)
+            {
+                dv1 = new Vector3(0, 0, 0);
+                dv2 = Vector3.ComponentMultiply(j / m2, n);
+            }
+            else if (secondBody.IsStatic)
+            {
+                dv1 = -Vector3.ComponentMultiply(j / m1, n);
+                //dv1.x *= -1;
+                dv2 = new Vector3(0, 0, 0);
+            }
+            else
+            {
+                dv1 = -Vector3.ComponentMultiply(j / m1, n);
+                //dv1.x *= -1;
+                dv2 = Vector3.ComponentMultiply(j / m2, n);
+            }
+
+            firstBody.Velocity += dv1;
+            secondBody.Velocity += dv2;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
 {
-    public class Physics
+    public sealed class Physics
     {
         public static List<KinematicBody> Bodies { get; set; } = new List<KinematicBody>();
         public static List<Collider> Colliders { get; set; } = new List<Collider>();

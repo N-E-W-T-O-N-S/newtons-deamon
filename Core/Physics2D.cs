@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NEWTONS.Core
 {
-    public class Physics2D
+    public sealed class Physics2D
     {
         public static List<Collider2D> Colliders { get; set; } = new List<Collider2D>();
         public static List<KinematicBody2D> Bodies { get; set; } = new List<KinematicBody2D>();
@@ -63,11 +63,9 @@ namespace NEWTONS.Core
             Rectangle boundary = new Rectangle(new Vector2(0, 0), new Vector2(100, 100));
             _quadtree = new Quadtree<Collider2D>(boundary, 4);
 
-            // TODO: think more about checking if two colliders have already been checked
-            Dictionary<Collider2D, HashSet<Collider2D>> checkedCollisions = new Dictionary<Collider2D, HashSet<Collider2D>>();
+            HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
             for (int i = 0; i < Colliders.Count; i++)
             {
-                checkedCollisions.Add(Colliders[i], new HashSet<Collider2D>());
                 _quadtree.Insert(new QuadtreeData<Collider2D>(Colliders[i].GlobalCenter, Colliders[i]));
             }
 
@@ -80,13 +78,15 @@ namespace NEWTONS.Core
                 foreach (var qtData in qtDataToCheck)
                 {
                     KonvexCollider2D c2 = (KonvexCollider2D)qtData.Data;
-                    if (c1 == c2 || checkedCollisions[c1].Contains(c2) || checkedCollisions[c2].Contains(c1))
+                    ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
+                    if (c1 == c2 || checkd.Contains(compareTupl))
                         continue;
+
                     checks++;
                     bool hit = c1.Collision(c2);
 
-                    checkedCollisions[c1].Add(c2);
-                    checkedCollisions[c2].Add(c1);
+                    compareTupl = (c2, c1);
+                    checkd.Add(compareTupl);
                 }
             }
             return checks;

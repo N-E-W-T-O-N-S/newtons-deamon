@@ -15,18 +15,20 @@ namespace NEWTONS.Core
             //Physics.Collideres.Add(this);
         }
 
-        public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape)
+        public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape, float restitution)
         {
             Scale = scale;
             Body = kinematicBody;
             Center = center;
             Shape = shape;
+            Restitution = restitution;
             Physics.Collideres.Add(this);
         }
         
         public KinematicBody Body;
         public Vector3 Center;
         public PrimitiveShape Shape { get; }
+        public float Restitution = 0.5f;
 
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
@@ -204,7 +205,14 @@ namespace NEWTONS.Core
         public static Vector3 ComponentMultiply(Vector3 a, Vector3 b) => new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3 ComponentDivision(Vector3 a, Vector3 b) => new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+        public static Vector3 ComponentDivision(Vector3 a, Vector3 b)
+        {
+            float x = (b.x == 0) ? 1 : a.x / b.x;
+            float y = (b.y == 0) ? 1 : a.y / b.y;
+            float z = (b.z == 0) ? 1 : a.z / b.z;
+
+            return new Vector3(x, y, z);
+        } 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Cross(Vector3 lhs, Vector3 rhs)

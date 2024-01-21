@@ -22,7 +22,7 @@ namespace NEWTONS.Core
             Center = center;
             Shape = shape;
             Restitution = restitution;
-            Physics.Collideres.Add(this);
+            Physics.Colliders.Add(this);
         }
         
         public KinematicBody Body;

@@ -5,10 +5,10 @@ using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
 {
-    public class Physics
+    public sealed class Physics
     {
         public static List<KinematicBody> Bodies { get; set; } = new List<KinematicBody>();
-        public static List<Collider> Collideres { get; set; } = new List<Collider>();
+        public static List<Collider> Colliders { get; set; } = new List<Collider>();
 
         /// <summary>
         /// Acceleration applied to the Physics World
@@ -55,12 +55,12 @@ namespace NEWTONS.Core
                     body.MoveToPosition(body.Position + deltaPos);
             }
 
-            for (int i = 0; i < Collideres.Count; i++)
+            for (int i = 0; i < Colliders.Count; i++)
             {
-                for (int j = 0; j < Collideres.Count; j++)
+                for (int j = 0; j < Colliders.Count; j++)
                 {
-                    CuboidCollider c1 = (CuboidCollider)Collideres[i];
-                    CuboidCollider c2 = (CuboidCollider)Collideres[j];
+                    CuboidCollider c1 = (CuboidCollider)Colliders[i];
+                    CuboidCollider c2 = (CuboidCollider)Colliders[j];
                     if (c1 == c2)
                         continue;
                     bool hit = c1.IsColliding(c2);

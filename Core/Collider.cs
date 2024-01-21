@@ -5,14 +5,14 @@ using System.Text;
 namespace NEWTONS.Core
 {
     [System.Serializable]
-    public class Collider : IKinematicBodyReference, IDisposable
+    public class Collider : IKinematicBodyReference
     {
         private List<IColliderReference> _references = new List<IColliderReference>();
-        private bool _isDsposed = false;
+        private bool _isDisposed = false;
 
         public Collider()
         {
-            //Physics.Collideres.Add(this);
+            
         }
 
         public Collider(KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape, float restitution)
@@ -69,14 +69,14 @@ namespace NEWTONS.Core
 
         public void Dispose()
         {
-            if (!_isDsposed)
+            if (!_isDisposed)
                 return;
             Body = null;
             for (int i = 0; i < _references.Count; i++)
             {
                 _references[i].Dispose();
             }
-            _isDsposed = true;
+            _isDisposed = true;
         }
 
         public IKinematicBodyReference SetKinematicBody(KinematicBody kinematicBody)

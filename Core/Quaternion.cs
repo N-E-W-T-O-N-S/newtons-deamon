@@ -44,6 +44,7 @@ namespace NEWTONS.Core
             return new Quaternion(this.x + q2.x, this.y + q2.y, this.z + q2.z, this.w + q2.w);
 
         }
+        
         /// <summary>
         /// multiplies two quaternions
         /// </summary>

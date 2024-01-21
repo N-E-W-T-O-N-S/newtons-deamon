@@ -25,12 +25,12 @@ namespace NEWTONS.Core
         [Obsolete]
         public CuboidCollider()
         {
-            Points = defaultPoints;
+            PointsRaw = defaultPoints;
             Scale = new Vector3(1, 1, 1);
             GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, float restitution) : base(scale, defaultPoints, kinematicBody, center, PrimitiveShape.Cube, restitution)
+        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, float restitution) : base(defaultPoints, scale, kinematicBody, center, rotation, PrimitiveShape.Cube, restitution)
         {
 
         }

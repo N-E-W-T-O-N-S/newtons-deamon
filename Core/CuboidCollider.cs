@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace NEWTONS.Core
@@ -21,9 +22,7 @@ namespace NEWTONS.Core
             new Vector3(0.5f, -0.5f, -0.5f)
         };
 
-        /// <summary>
-        ///  <b><u>WARNING:</u> only used for Serialization</b>
-        /// </summary>
+        [Obsolete]
         public CuboidCollider()
         {
             Points = defaultPoints;
@@ -100,8 +99,8 @@ namespace NEWTONS.Core
 
         public void AddToPhysicsEngine()
         {
-            if (!Physics.Collideres.Contains(this))
-                Physics.Collideres.Add(this);
+            if (!Physics.Colliders.Contains(this))
+                Physics.Colliders.Add(this);
         }
 
         public void CollisionResponse(KonvexCollider body, KonvexCollider other)

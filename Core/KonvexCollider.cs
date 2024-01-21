@@ -30,6 +30,11 @@ namespace NEWTONS.Core
             }
         }
 
+        public bool Collision(KonvexCollider other)
+        {
+
+            return false;
+        }
 
     }
 }

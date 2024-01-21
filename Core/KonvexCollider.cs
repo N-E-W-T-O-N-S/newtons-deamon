@@ -10,23 +10,23 @@ namespace NEWTONS.Core
             
         }
 
-        public KonvexCollider(Vector3 scale, Vector3[] points, KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape, float restitution) : base(kinematicBody, center, shape, restitution)
+        public KonvexCollider(Vector3[] points, Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, PrimitiveShape shape, float restitution) : base(scale, kinematicBody, center, rotation, shape, restitution)
         {
-            Points = points;
+            PointsRaw = points;
         }
 
-        public Vector3[] Points;
+        public Vector3[] PointsRaw;
 
-        public Vector3[] ScaledPoints
+        public Vector3[] Points
         {
             get 
             {
-                Vector3[] scaledPoints = new Vector3[Points.Length];
-                for (int i = 0; i < Points.Length; i++)
+                Vector3[] points = new Vector3[PointsRaw.Length];
+                for (int i = 0; i < PointsRaw.Length; i++)
                 {
-                    scaledPoints[i] = new Vector3(Points[i].x * GlobalScales.x, Points[i].y * GlobalScales.y, Points[i].z * GlobalScales.z);
+                    points[i] = Quaternion.RotateVector(new Vector3(PointsRaw[i].x * GlobalScales.x, PointsRaw[i].y * GlobalScales.y, PointsRaw[i].z * GlobalScales.z), Rotation);
                 }
-                return scaledPoints;
+                return points;
             }
         }
 

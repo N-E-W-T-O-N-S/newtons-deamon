@@ -10,7 +10,7 @@ namespace NEWTONS.Core
             
         }
 
-        public KonvexCollider(Vector3[] points, KinematicBody kinematicBody, Vector3 scale, Vector3 center, PrimitiveShape shape) : base(kinematicBody, scale, center, shape)
+        public KonvexCollider(Vector3 scale, Vector3[] points, KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape, float restitution) : base(kinematicBody, center, shape, restitution)
         {
             Points = points;
         }

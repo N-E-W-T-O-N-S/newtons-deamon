@@ -32,17 +32,23 @@ namespace NEWTONS.Core
 
             return new Quaternion(x, y, z, w);
         }
-
         public static Quaternion operator -(Quaternion q1, Quaternion q2) => new Quaternion(q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w);
-
-
-
+            
+        /// <summary>
+        /// adds two quaternions
+        /// </summary>
+        /// <param name="q2">Quaternion</param>
+        /// <returns>added quaternion</returns>
         public Quaternion Add(Quaternion q2)
         {
             return new Quaternion(this.x + q2.x, this.y + q2.y, this.z + q2.z, this.w + q2.w);
 
         }
-
+        /// <summary>
+        /// multiplies two quaternions
+        /// </summary>
+        /// <param name="q2">Quaternion</param>
+        /// <returns>multiplied quaternion</returns>
         public Quaternion Multiply(Quaternion q2) 
         {
             float x2 = this.x * q2.w + this.y * q2.z - this.z * q2.y + this.w * q2.x;
@@ -52,24 +58,36 @@ namespace NEWTONS.Core
 
             return new Quaternion(x2, y2, z2, w2);
         }
-
+        /// <summary>
+        /// zero clue what that does.
+        /// </summary>
+        /// <param name="q"></param>
+        /// <returns></returns>
         public static float Magnitude(Quaternion q)
         {
             return Mathf.Sqrt(q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w);
         }
-
+        /// <summary>
+        /// normalized a quaternion
+        /// </summary>
+        /// <param name="q">Quaternion</param>
+        /// <returns>a normalized quaternion</returns>
         public static Quaternion Normalize(Quaternion q)
         {
             float mag = Magnitude(q);
 
             return new Quaternion(1 * q.x / mag, 1 * q.y / mag, 1 *  q.z / mag, q.w / mag);
         }
-
+        
         public static Quaternion Conjugate(Quaternion q)
         {
             return new Quaternion(-q.x, -q.y, -q.z, q.w);
         }
-
+        /// <summary>
+        /// the inverse of a quaternion
+        /// </summary>
+        /// <param name="q">Quaternion</param>
+        /// <returns>an inversed quaternion</returns>
         public static Quaternion Inverse(Quaternion q)
         {
             float magSquared = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w;
@@ -83,7 +101,12 @@ namespace NEWTONS.Core
 
             return new Quaternion(x, y, z, w);
         }
-
+        /// <summary>
+        /// this rotates a vector by a quaternion.
+        /// </summary>
+        /// <param name="v">Vector3</param>
+        /// <param name="q">Quaternion</param>
+        /// <returns>a Vector3 rotated by a given quaternion</returns>
         public static Vector3 RotateVector(Vector3 v, Quaternion q)
         {
             Quaternion vecQuat = new Quaternion(v.x, v.y, v.z);
@@ -91,7 +114,12 @@ namespace NEWTONS.Core
 
             return new Vector3(resultQuat.x, resultQuat.y, resultQuat.z);
         }
-
+        
+        /// <summary>
+        /// this converts a quaternion to euler angles.
+        /// </summary>
+        /// <param name="q">Quaternion</param>
+        /// <returns>a Vector3 with radiant values</returns>
         public static Vector3 ToEulerAngle(Quaternion q)
         {
             Vector3 angles;
@@ -110,10 +138,14 @@ namespace NEWTONS.Core
             float siny_cosp = 2 * (q.w * q.z + q.x * q.y);
             float cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
             angles.z = Mathf.Atan2(siny_cosp, cosy_cosp);
-
+        
             return angles;
         }
-
+        /// <summary>
+        /// this converts a euler angle (Vector3) to a quaternion.
+        /// </summary>
+        /// <param name="v">euler angle</param>
+        /// <returns>a quaternion</returns>
         public static Quaternion ToQuaternion(Vector3 v)
         {
             float cr = Mathf.Cos(v.x * 0.5f);

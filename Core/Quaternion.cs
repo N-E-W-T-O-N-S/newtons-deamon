@@ -2,6 +2,9 @@
 
 namespace NEWTONS.Core
 {
+    /// <summary>
+    /// A struct to represent rotation in 3D space
+    /// </summary>
     [System.Serializable]
     public struct Quaternion
     {
@@ -21,6 +24,8 @@ namespace NEWTONS.Core
             this.z = z;
             w = 0f;
         }
+
+        public static Quaternion Identity => new Quaternion(0, 0, 0, 1);
 
         public static Quaternion operator +(Quaternion q1, Quaternion q2) => new Quaternion(q1.x + q2.x, q1.y + q2.y, q1.z + q2.z, q1.w + q2.w);
         public static Quaternion operator *(Quaternion q1, Quaternion q2)

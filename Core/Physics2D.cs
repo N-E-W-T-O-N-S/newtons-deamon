@@ -36,7 +36,7 @@ namespace NEWTONS.Core
         }
 
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Update(float deltaTime)
         {
             for (int i = 0; i < Bodies.Count; i++)

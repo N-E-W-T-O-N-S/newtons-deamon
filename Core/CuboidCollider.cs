@@ -22,20 +22,26 @@ namespace NEWTONS.Core
             new Vector3(0.5f, -0.5f, -0.5f)
         };
 
+        public static readonly int[] defaultIndices = new int[24]
+        {
+            0, 1, 1, 3, 2, 3, 0, 2, 4, 5, 5, 7, 6, 7, 4, 6, 0, 4, 1, 5, 2, 6, 3, 7
+        };
+
         [Obsolete]
         public CuboidCollider()
         {
             PointsRaw = defaultPoints;
+            Indices = defaultIndices;
             Scale = new Vector3(1, 1, 1);
             GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, float restitution) : base(defaultPoints, scale, kinematicBody, center, rotation, PrimitiveShape.Cube, restitution)
+        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, float restitution) : base(defaultPoints, defaultIndices, scale, kinematicBody, center, rotation, PrimitiveShape.Cube, restitution)
         {
 
         }
 
-        public bool IsColliding(KonvexCollider other)
+        public override bool IsColliding(KonvexCollider other)
         {
             bool colliding = false;
             float lengthX = Mathf.Abs((other.Center.x + other.Body.Position.x) - (Center.x + Body.Position.x));

@@ -61,9 +61,9 @@ namespace NEWTONS.Core
                 {
                     CuboidCollider c1 = (CuboidCollider)Colliders[i];
                     CuboidCollider c2 = (CuboidCollider)Colliders[j];
-                    if (c1 == c2)
+                    if (c1 == c2 || (c1.Body.IsStatic && c2.Body.IsStatic))
                         continue;
-                    bool hit = c1.IsColliding(c2);
+                    c1.IsColliding(c2);
                 }
             }
         }

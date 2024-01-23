@@ -12,7 +12,7 @@ namespace NEWTONS.Core
 
         public Collider()
         {
-            Rotation = new Quaternion(0, 0, 0, 1);
+            Rotation = Quaternion.Identity;
         }
 
         public Collider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, PrimitiveShape shape, float restitution)

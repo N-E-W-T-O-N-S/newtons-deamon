@@ -27,80 +27,95 @@ namespace NEWTONS.Core
             0, 1, 1, 3, 2, 3, 0, 2, 4, 5, 5, 7, 6, 7, 4, 6, 0, 4, 1, 5, 2, 6, 3, 7
         };
 
+        public static readonly Vector3[] defaultNormals = new Vector3[6]
+        {
+            new Vector3( 1,  0,  0),
+            new Vector3(-1,  0,  0),
+            new Vector3( 0,  1,  0),
+            new Vector3( 0, -1,  0),
+            new Vector3( 0,  0,  1),
+            new Vector3( 0,  0, -1)
+        };
+
         [Obsolete]
         public CuboidCollider()
         {
             PointsRaw = defaultPoints;
             Indices = defaultIndices;
+            NormalsRaw = defaultNormals;
             Scale = new Vector3(1, 1, 1);
             GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, float restitution) : base(defaultPoints, defaultIndices, scale, kinematicBody, center, rotation, PrimitiveShape.Cube, restitution)
+        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, float restitution) : base(defaultPoints, defaultIndices, defaultNormals, scale, kinematicBody, center, rotation, PrimitiveShape.Cube, restitution)
         {
 
         }
 
         public override bool IsColliding(KonvexCollider other)
         {
-            bool colliding = false;
-            float lengthX = Mathf.Abs((other.Center.x + other.Body.Position.x) - (Center.x + Body.Position.x));
-            float lengthY = Mathf.Abs((other.Center.y + other.Body.Position.y) - (Center.y + Body.Position.y));
-            float lengthZ = Mathf.Abs((other.Center.z + other.Body.Position.z) - (Center.z + Body.Position.z));
+            bool didCollide = base.IsColliding(other);
+            if (!didCollide)
+                return false;
+            //bool colliding = false;
+            //float lengthX = Mathf.Abs((other.Center.x + other.Body.Position.x) - (Center.x + Body.Position.x));
+            //float lengthY = Mathf.Abs((other.Center.y + other.Body.Position.y) - (Center.y + Body.Position.y));
+            //float lengthZ = Mathf.Abs((other.Center.z + other.Body.Position.z) - (Center.z + Body.Position.z));
 
-            //TODO: scale != width, height and length for all konvex shapes
-            float half_w_k1 = GlobalScales.x / 2;
-            float half_w_k2 = other.GlobalScales.x / 2;
-            float gapX = lengthX - (half_w_k1 + half_w_k2);
+            ////TODO: scale != width, height and length for all konvex shapes
+            //float half_w_k1 = GlobalScales.x / 2;
+            //float half_w_k2 = other.GlobalScales.x / 2;
+            //float gapX = lengthX - (half_w_k1 + half_w_k2);
 
-            float half_h_k1 = GlobalScales.y / 2;
-            float half_h_k2 = other.GlobalScales.y / 2;
-            float gapY = lengthY - (half_h_k1 + half_h_k2);
+            //float half_h_k1 = GlobalScales.y / 2;
+            //float half_h_k2 = other.GlobalScales.y / 2;
+            //float gapY = lengthY - (half_h_k1 + half_h_k2);
 
-            float half_d_k1 = GlobalScales.z / 2;
-            float half_d_k2 = other.GlobalScales.z / 2;
-            float gapZ = lengthZ - (half_d_k1 + half_d_k2);
+            //float half_d_k1 = GlobalScales.z / 2;
+            //float half_d_k2 = other.GlobalScales.z / 2;
+            //float gapZ = lengthZ - (half_d_k1 + half_d_k2);
 
-            if (gapX < 0 && gapY < 0 && gapZ < 0)
-            {
-                if (Body.Velocity == Vector3.Zero || Body.IsStatic)
-                    return true;
+            //if (gapX < 0 && gapY < 0 && gapZ < 0)
+            //{
+            //    if (Body.Velocity == Vector3.Zero || Body.IsStatic)
+            //        return true;
 
-                //TODO: Not working properly with different scales
+            //    //TODO: Not working properly with different scales
 
-                colliding = true;
-                Vector3 dir = -Body.Velocity.Normalized;
-                Vector3 bodyDir = other.Body.Position - Body.Position;
+            //    colliding = true;
+            //    Vector3 dir = -Body.Velocity.Normalized;
+            //    Vector3 bodyDir = other.Body.Position - Body.Position;
 
-                float absX = Mathf.Abs(gapX);
-                float absY = Mathf.Abs(gapY);
-                float absZ = Mathf.Abs(gapZ);
-                float xDistSquare = bodyDir.x * bodyDir.x;
-                float yDistSquare = bodyDir.y * bodyDir.y;
-                float zDistSquare = bodyDir.z * bodyDir.z;
+            //    float absX = Mathf.Abs(gapX);
+            //    float absY = Mathf.Abs(gapY);
+            //    float absZ = Mathf.Abs(gapZ);
+            //    float xDistSquare = bodyDir.x * bodyDir.x;
+            //    float yDistSquare = bodyDir.y * bodyDir.y;
+            //    float zDistSquare = bodyDir.z * bodyDir.z;
 
-                float gap = 0f;
-                if (((xDistSquare > yDistSquare && xDistSquare > zDistSquare) || xDistSquare == yDistSquare || (dir.y == 0 && dir.z == 0)) && dir.x != 0)
-                {
-                    gap = absX / Mathf.Abs(dir.x);
-                }
-                else if (((yDistSquare > xDistSquare && yDistSquare > zDistSquare) || yDistSquare == zDistSquare || (dir.x == 0 && dir.z == 0)) && dir.y != 0)
-                {
-                    gap = absY / Mathf.Abs(dir.y);
-                }
-                else if (dir.z != 0)
-                {
-                    gap = absZ / Mathf.Abs(dir.z);
-                }
+            //    float gap = 0f;
+            //    if (((xDistSquare > yDistSquare && xDistSquare > zDistSquare) || xDistSquare == yDistSquare || (dir.y == 0 && dir.z == 0)) && dir.x != 0)
+            //    {
+            //        gap = absX / Mathf.Abs(dir.x);
+            //    }
+            //    else if (((yDistSquare > xDistSquare && yDistSquare > zDistSquare) || yDistSquare == zDistSquare || (dir.x == 0 && dir.z == 0)) && dir.y != 0)
+            //    {
+            //        gap = absY / Mathf.Abs(dir.y);
+            //    }
+            //    else if (dir.z != 0)
+            //    {
+            //        gap = absZ / Mathf.Abs(dir.z);
+            //    }
 
-                Vector3 backDist = dir * gap;
-                //Body.Velocity = Vector3.Zero;
-                Body.MoveToPosition(Body.Position + backDist);
-                CollisionResponse(this, other);
+            //Vector3 backDist = dir * gap;
+            //    //Body.Velocity = Vector3.Zero;
+            //Body.MoveToPosition(Body.Position + backDist);
+            CollisionResponse(this, other);
 
 
-            }
-            return colliding;
+            //}
+            //return colliding;
+            return didCollide;
         }
 
         public void AddToPhysicsEngine()

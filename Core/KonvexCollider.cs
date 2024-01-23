@@ -56,7 +56,7 @@ namespace NEWTONS.Core
             }
         }
 
-        public virtual bool IsColliding(KonvexCollider other)
+        public virtual CollisionInfo IsColliding(KonvexCollider other)
         {
             List<Vector3> edges1 = new List<Vector3>();
             List<Vector3> edges2 = new List<Vector3>();
@@ -122,7 +122,12 @@ namespace NEWTONS.Core
                 }
 
                 if (aMin >= bMax || bMin >= aMax)
-                    return false;
+                {
+                    return new CollisionInfo() 
+                    {
+                        didCollide = false
+                    };
+                }
 
                 float d = Mathf.Min(aMax - bMin, bMax - aMin);
                 if (d < depth)
@@ -148,8 +153,13 @@ namespace NEWTONS.Core
             Body.MoveToPosition(Body.Position + (normal * depth1));
             other.Body.MoveToPosition(other.Body.Position + (-normal * depth2));
 
+            CollisionInfo info = new CollisionInfo()
+            {
+                didCollide = true,
+                Normal = normal
+            };
 
-            return true;
+            return info;
         }
 
     }

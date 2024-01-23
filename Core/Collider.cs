@@ -12,7 +12,7 @@ namespace NEWTONS.Core
 
         public Collider()
         {
-            
+            Rotation = new Quaternion(0, 0, 0, 1);
         }
 
         public Collider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, PrimitiveShape shape, float restitution)
@@ -62,6 +62,14 @@ namespace NEWTONS.Core
             {
                 scale = new Vector3(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0), Mathf.Max(value.z, 0));
             }
+        }
+
+        /// <summary>
+        /// the global center of the collider
+        /// </summary>
+        public Vector3 GlobalCenter
+        {
+            get => Center + Body.Position;
         }
 
         public void AddReference(IColliderReference reference)

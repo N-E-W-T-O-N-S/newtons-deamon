@@ -18,9 +18,10 @@ namespace NEWTONS.Core
         public KinematicBody()
         {
             Mass = 1f;
+            Rotation = Quaternion.Identity;
         }
 
-        public KinematicBody(Vector3 position, Vector3 rotation, float drag, float mass)
+        public KinematicBody(Vector3 position, Quaternion rotation, float drag, float mass)
         {
             Position = position;
             Rotation = rotation;
@@ -56,9 +57,9 @@ namespace NEWTONS.Core
         }
 
         [Obsolete("Use Rotation instead")]
-        public Vector3 rotation;
+        public Quaternion rotation;
 
-        public Vector3 Rotation
+        public Quaternion Rotation
         {
             get => rotation;
             set
@@ -71,10 +72,9 @@ namespace NEWTONS.Core
         /// <summary>
         /// Does not invoke <see cref="OnUpdateRotation"/>
         /// </summary>
-        public Vector3 RotationNoNotify 
+        public Quaternion RotationNoNotify 
         { 
-            get => position; 
-            set => position = value; 
+            set => rotation = value; 
         }
 
         // <----------------------->
@@ -114,7 +114,7 @@ namespace NEWTONS.Core
 
         public void MoveToRotation(Quaternion newRotation)
         {
-            throw new NotImplementedException();
+            Rotation = newRotation;
         }
 
         //TODO: Look into have deltaTime be a global variable

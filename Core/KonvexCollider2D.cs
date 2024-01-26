@@ -28,7 +28,7 @@ namespace NEWTONS.Core
             GlobalScales = new Vector2(1, 1);
         }
 
-        public KonvexCollider2D(Vector2[] points, KinematicBody2D kinematicBody, Vector2 scale, Vector2 center, float rotation, Vector2 centerOfMass, PrimitiveShape2D shape) : base(kinematicBody, scale, center, rotation, centerOfMass, shape)
+        public KonvexCollider2D(Vector2[] points, KinematicBody2D kinematicBody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape) : base(kinematicBody, scale, center, centerOfMass, shape)
         {
             PointsRaw = points;
         }
@@ -47,7 +47,7 @@ namespace NEWTONS.Core
             {
                 Vector2[] points = new Vector2[PointsRaw.Length];
                 float deg2Rad = Mathf.Deg2Rad;
-                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
+                Vector2 a = new Vector2(Mathf.Cos(Body.Rotation * deg2Rad), Mathf.Sin(Body.Rotation * deg2Rad)).Normalized;
                 Vector2 b = new Vector2(-a.y, a.x);
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
@@ -65,7 +65,7 @@ namespace NEWTONS.Core
             {
                 Vector2[] rotatedPoints = new Vector2[PointsRaw.Length];
                 float deg2Rad = Mathf.Deg2Rad;
-                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
+                Vector2 a = new Vector2(Mathf.Cos(Body.Rotation * deg2Rad), Mathf.Sin(Body.Rotation * deg2Rad)).Normalized;
                 Vector2 b = new Vector2(-a.y, a.x);
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {

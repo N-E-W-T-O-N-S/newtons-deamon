@@ -12,7 +12,7 @@ namespace NEWTONS.Core
 
         public KinematicBody2D Body;
         public Vector2 Center;
-        public float Rotation;
+        //public float Rotation;
         public Vector2 CenterOfMass;
         public PrimitiveShape2D Shape { get; }
 
@@ -21,12 +21,12 @@ namespace NEWTONS.Core
 
         }
 
-        public Collider2D(KinematicBody2D kinematicBody, Vector2 scale, Vector2 center, float rotation, Vector2 centerOfMass, PrimitiveShape2D shape)
+        public Collider2D(KinematicBody2D kinematicBody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape)
         {
             Scale = scale;
             Body = kinematicBody;
             Center = center;
-            Rotation = rotation;
+            //Rotation = rotation;
             CenterOfMass = centerOfMass;
             Shape = shape;
             Physics2D.Colliders.Add(this);

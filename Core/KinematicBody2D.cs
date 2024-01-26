@@ -22,7 +22,7 @@ namespace NEWTONS.Core
             Mass = 1f;
         }
 
-        public KinematicBody2D(Vector2 position, Vector2 rotation, float drag, float mass)
+        public KinematicBody2D(Vector2 position, float rotation, float drag, float mass)
         {
             Position = position;
             Rotation = rotation;
@@ -51,14 +51,13 @@ namespace NEWTONS.Core
         /// </summary>
         public Vector2 PositionNoNotify
         {
-            get => position;
             set => position = value;
         }
 
         [Obsolete("Use Rotation instead")]
-        public Vector2 rotation;
+        public float rotation;
 
-        public Vector2 Rotation
+        public float Rotation
         {
             get => rotation;
             set
@@ -71,10 +70,9 @@ namespace NEWTONS.Core
         /// <summary>
         /// Does not invoke <see cref="OnUpdateRotation"/>
         /// </summary>
-        public Vector2 RotationNoNotify
+        public float RotationNoNotify
         {
-            get => position;
-            set => position = value;
+            set => rotation = value;
         }
 
         //<----------------------->

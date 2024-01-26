@@ -47,7 +47,7 @@ namespace NEWTONS.Core
             GlobalScales = new Vector3(1, 1, 1);
         }
 
-        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, float restitution) : base(defaultPoints, defaultIndices, defaultNormals, scale, kinematicBody, center, rotation, PrimitiveShape.Cube, restitution)
+        public CuboidCollider(Vector3 scale, KinematicBody kinematicBody, Vector3 center, float restitution) : base(defaultPoints, defaultIndices, defaultNormals, scale, kinematicBody, center, PrimitiveShape.Cube, restitution)
         {
 
         }
@@ -89,11 +89,20 @@ namespace NEWTONS.Core
 
 
             if (secondBody.IsStatic)
+            {
                 meff = m1;
+                v2 = Vector3.Zero;
+            }
             else if (firstBody.IsStatic)
+            {
                 meff = m2;
+                v1 = Vector3.Zero;
+            }
             else
                 meff = 1 / ((1 / m1) + (1 / m2));
+
+            if (v1 == Vector3.Zero && v2 == Vector3.Zero)
+                return;
 
             Vector3 vimp = Vector3.ComponentMultiply(n, (v1 - v2));
             Vector3 j = (1 + e) * meff * vimp;

@@ -8,10 +8,10 @@ namespace NEWTONS.Core
     {
         public KonvexCollider()
         {
-            
+
         }
 
-        public KonvexCollider(Vector3[] points, int[] indices, Vector3[] normals, Vector3 scale, KinematicBody kinematicBody, Vector3 center, Quaternion rotation, PrimitiveShape shape, float restitution) : base(scale, kinematicBody, center, rotation, shape, restitution)
+        public KonvexCollider(Vector3[] points, int[] indices, Vector3[] normals, Vector3 scale, KinematicBody kinematicBody, Vector3 center, PrimitiveShape shape, float restitution) : base(scale, kinematicBody, center, shape, restitution)
         {
             PointsRaw = points;
             Indices = indices;
@@ -23,14 +23,14 @@ namespace NEWTONS.Core
         /// <summary>
         /// the normals of each face rotated by the collider
         /// </summary>
-        public Vector3[] Normals 
-        { 
+        public Vector3[] Normals
+        {
             get
             {
                 Vector3[] normals = new Vector3[NormalsRaw.Length];
                 for (int i = 0; i < NormalsRaw.Length; i++)
                 {
-                    normals[i] = Quaternion.RotateVector(NormalsRaw[i], Rotation);
+                    normals[i] = Quaternion.RotateVector(NormalsRaw[i], Body.Rotation);
                 }
                 return normals;
             }
@@ -45,12 +45,12 @@ namespace NEWTONS.Core
         /// </summary>
         public Vector3[] Points
         {
-            get 
+            get
             {
                 Vector3[] points = new Vector3[PointsRaw.Length];
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
-                    points[i] = Quaternion.RotateVector(Vector3.Scale(PointsRaw[i], GlobalScales), Rotation);
+                    points[i] = Quaternion.RotateVector(Vector3.Scale(PointsRaw[i], GlobalScales), Body.Rotation);
                 }
                 return points;
             }
@@ -123,7 +123,7 @@ namespace NEWTONS.Core
 
                 if (aMin >= bMax || bMin >= aMax)
                 {
-                    return new CollisionInfo() 
+                    return new CollisionInfo()
                     {
                         didCollide = false
                     };
@@ -142,13 +142,28 @@ namespace NEWTONS.Core
             if (Vector3.Dot(dir, normal) > 0)
                 normal = -normal;
 
-            float velocityB1 = Body.Velocity.magnitude;
-            float velocityB2 = other.Body.Velocity.magnitude;
+            float velocityB1 = Body.IsStatic ? 0 : Body.Velocity.magnitude;
+            float velocityB2 = other.Body.IsStatic ? 0 : other.Body.Velocity.magnitude;
             float combinedVelocity = velocityB1 + velocityB2;
 
-            float depth1 = (velocityB1 / combinedVelocity) * depth;
-            float depth2 = (velocityB2 / combinedVelocity) * depth;
 
+            // TEMP SOLUTION BECAUSE THERE ARE NOR ROTATIONAL FORCES
+            // <--------------------------------------------------->
+            float depth1;
+            float depth2;
+
+            if (combinedVelocity > 0)
+            {
+                depth1 = (velocityB1 / combinedVelocity) * depth;
+                depth2 = (velocityB2 / combinedVelocity) * depth;
+            }
+            else
+            {
+                float combinedMass = Body.Mass + other.Body.Mass;
+                depth1 = Body.IsStatic ? 0 : (Body.Mass / combinedMass) * depth;
+                depth2 = other.Body.IsStatic ? 0 : (other.Body.Mass / combinedMass) * depth;
+            }
+            // <--------------------------------------------------->
 
             Body.MoveToPosition(Body.Position + (normal * depth1));
             other.Body.MoveToPosition(other.Body.Position + (-normal * depth2));

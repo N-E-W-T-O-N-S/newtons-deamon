@@ -14,7 +14,6 @@ namespace NEWTONS.Core
         private List<IKinematicBodyReference> _references = new List<IKinematicBodyReference>();
         private bool _isDisposed = false;
 
-        [Obsolete]
         public KinematicBody()
         {
             Mass = 1f;
@@ -27,7 +26,6 @@ namespace NEWTONS.Core
             Rotation = rotation;
             Mass = mass;
             Drag = drag;
-            AddToPhysicsEngine();
         }
 
         // <----------------------->

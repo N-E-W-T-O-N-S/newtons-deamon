@@ -16,7 +16,6 @@ namespace NEWTONS.Core
         private bool _isDisposed = false;
 
 
-        [Obsolete]
         public KinematicBody2D()
         {
             Mass = 1f;
@@ -28,7 +27,6 @@ namespace NEWTONS.Core
             Rotation = rotation;
             Mass = mass;
             Drag = drag;
-            AddToPhysicsEngine();
         }
 
         //Active Properties

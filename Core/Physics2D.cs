@@ -8,7 +8,7 @@ namespace NEWTONS.Core
     public sealed class Physics2D
     {
         public static List<Collider2D> Colliders { get; set; } = new List<Collider2D>();
-        public static List<KinematicBody2D> Bodies { get; set; } = new List<KinematicBody2D>();
+        public static List<Rigidbody2D> Bodies { get; set; } = new List<Rigidbody2D>();
 
         private static Quadtree<Collider2D> _quadtree;
 
@@ -41,7 +41,7 @@ namespace NEWTONS.Core
         {
             for (int i = 0; i < Bodies.Count; i++)
             {
-                KinematicBody2D body = Bodies[i];
+                Rigidbody2D body = Bodies[i];
                 if (body.IsStatic)
                     continue;
                 
@@ -72,7 +72,7 @@ namespace NEWTONS.Core
             for (int i = 0; i < Colliders.Count; i++)
             {
                 // TODO: Scale may not be the best way to determine the size of the collider
-                var qtDataToCheck = _quadtree.Receive(Colliders[i].GlobalCenter, Colliders[i].Scale);
+                var qtDataToCheck = _quadtree.Receive(Colliders[i].GlobalCenter, Colliders[i].Size);
 
                 KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
                 foreach (var qtData in qtDataToCheck)
@@ -93,7 +93,7 @@ namespace NEWTONS.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void RemoveBody(KinematicBody2D body)
+        public static void RemoveBody(Rigidbody2D body)
         {
             Bodies.Remove(body);
             body.Dispose();

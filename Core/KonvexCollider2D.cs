@@ -24,11 +24,9 @@ namespace NEWTONS.Core
         public KonvexCollider2D()
         {
             PointsRaw = _defaultPoints;
-            Scale = new Vector2(1, 1);
-            GlobalScales = new Vector2(1, 1);
         }
 
-        public KonvexCollider2D(Vector2[] points, KinematicBody2D kinematicBody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape) : base(kinematicBody, scale, center, centerOfMass, shape)
+        public KonvexCollider2D(Vector2[] points, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape) : base(rigidbody, scale, center, centerOfMass, shape)
         {
             PointsRaw = points;
         }
@@ -47,11 +45,11 @@ namespace NEWTONS.Core
             {
                 Vector2[] points = new Vector2[PointsRaw.Length];
                 float deg2Rad = Mathf.Deg2Rad;
-                Vector2 a = new Vector2(Mathf.Cos(Body.Rotation * deg2Rad), Mathf.Sin(Body.Rotation * deg2Rad)).Normalized;
+                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
                 Vector2 b = new Vector2(-a.y, a.x);
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
-                    Vector2 scaledPoints = new Vector2(PointsRaw[i].x * GlobalScales.x, PointsRaw[i].y * GlobalScales.y);
+                    Vector2 scaledPoints = Vector2.Scale(PointsRaw[i], ScaledSize);
                     points[i] = scaledPoints.x * a + scaledPoints.y * b;
                 }
                 return points;
@@ -65,7 +63,7 @@ namespace NEWTONS.Core
             {
                 Vector2[] rotatedPoints = new Vector2[PointsRaw.Length];
                 float deg2Rad = Mathf.Deg2Rad;
-                Vector2 a = new Vector2(Mathf.Cos(Body.Rotation * deg2Rad), Mathf.Sin(Body.Rotation * deg2Rad)).Normalized;
+                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
                 Vector2 b = new Vector2(-a.y, a.x);
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
@@ -83,7 +81,7 @@ namespace NEWTONS.Core
                 Vector2[] scaledPoints = new Vector2[PointsRaw.Length];
                 for (int i = 0; i < PointsRaw.Length; i++)
                 {
-                    scaledPoints[i] = new Vector2(PointsRaw[i].x * GlobalScales.x, PointsRaw[i].y * GlobalScales.y);
+                    scaledPoints[i] = Vector2.Scale(PointsRaw[i], ScaledSize);
                 }
                 return scaledPoints;
             }
@@ -178,12 +176,5 @@ namespace NEWTONS.Core
 
             return true;
         }
-
-        public void AddToPhysicsEngine()
-        {
-            if (!Physics2D.Colliders.Contains(this))
-                Physics2D.Colliders.Add(this);
-        }
-
     }
 }

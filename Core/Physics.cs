@@ -7,7 +7,7 @@ namespace NEWTONS.Core
 {
     public sealed class Physics
     {
-        public static List<KinematicBody> Bodies { get; set; } = new List<KinematicBody>();
+        public static List<Rigidbody> Bodies { get; set; } = new List<Rigidbody>();
         public static List<Collider> Colliders { get; set; } = new List<Collider>();
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace NEWTONS.Core
         }
 
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Update(float deltaTime)
         {
             for (int i = 0; i < Bodies.Count; i++)
             {
-                KinematicBody body = Bodies[i];
+                Rigidbody body = Bodies[i];
                 Vector3 deltaPos = Vector3.Zero;
                 if (body.IsStatic)
                     continue;
@@ -59,8 +59,8 @@ namespace NEWTONS.Core
             {
                 for (int j = 0; j < Colliders.Count; j++)
                 {
-                    CuboidCollider c1 = (CuboidCollider)Colliders[i];
-                    CuboidCollider c2 = (CuboidCollider)Colliders[j];
+                    Collider c1 = Colliders[i];
+                    Collider c2 = Colliders[j];
                     if (c1 == c2 || (c1.Body.IsStatic && c2.Body.IsStatic))
                         continue;
                     c1.IsColliding(c2);
@@ -69,7 +69,7 @@ namespace NEWTONS.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void RemoveBody(KinematicBody body)
+        public static void RemoveBody(Rigidbody body)
         {
             Bodies.Remove(body);
             body.Dispose();

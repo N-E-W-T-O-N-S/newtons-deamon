@@ -1,44 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Text;
 
 namespace NEWTONS.Core
 {
     [System.Serializable]
-    public class KinematicBody2D : IDisposable
+    public class Rigidbody : IDisposable
     {
         public event Action? OnUpdatePosition;
         public event Action? OnUpdateRotation;
 
-        private List<IKinematicBodyReference2D> _references = new List<IKinematicBodyReference2D>();
+        private List<IRigidbodyReference> _references = new List<IRigidbodyReference>();
         private bool _isDisposed = false;
 
-
-        public KinematicBody2D()
+        public Rigidbody()
         {
             Mass = 1f;
+            Rotation = Quaternion.Identity;
         }
 
-        public KinematicBody2D(Vector2 position, float rotation, float drag, float mass)
+        public Rigidbody(Vector3 position, Quaternion rotation, float drag, float mass, bool addToEngine = true)
         {
             Position = position;
             Rotation = rotation;
             Mass = mass;
             Drag = drag;
+            if (addToEngine)
+                AddToPhysicsEngine();
         }
 
-        //Active Properties
+        // <----------------------->
+        // Active Properties
+        // <----------------------->
 
         [Obsolete("Use Position instead")]
-        public Vector2 position;
+        public Vector3 position;
 
-        public Vector2 Position
+        public Vector3 Position
         {
             get => position;
-            set
-            {
+            set 
+            { 
                 position = value;
                 OnUpdatePosition?.Invoke();
             }
@@ -47,15 +50,15 @@ namespace NEWTONS.Core
         /// <summary>
         /// Does not invoke <see cref="OnUpdatePosition"/>
         /// </summary>
-        public Vector2 PositionNoNotify
+        public Vector3 PositionNoNotify
         {
             set => position = value;
         }
 
         [Obsolete("Use Rotation instead")]
-        public float rotation;
+        public Quaternion rotation;
 
-        public float Rotation
+        public Quaternion Rotation
         {
             get => rotation;
             set
@@ -68,20 +71,20 @@ namespace NEWTONS.Core
         /// <summary>
         /// Does not invoke <see cref="OnUpdateRotation"/>
         /// </summary>
-        public float RotationNoNotify
-        {
-            set => rotation = value;
+        public Quaternion RotationNoNotify 
+        { 
+            set => rotation = value; 
         }
 
-        //<----------------------->
-        //Passive Properties
-        //<----------------------->
+        // <----------------------->
+        // Passive Properties
+        // <----------------------->
 
         public bool IsStatic;
 
-        public Vector2 Velocity;
+        public Vector3 Velocity;
 
-        public Vector2 CenterOfMass;
+        public Vector3 CenterOfMass;
 
         [Obsolete("Use Mass instead")]
         public float mass;
@@ -103,18 +106,18 @@ namespace NEWTONS.Core
 
         public bool UseGravity;
 
-        public void MoveToPosition(Vector2 newPosition)
+        public void MoveToPosition(Vector3 newPosition)
         {
             Position = newPosition;
         }
 
         public void MoveToRotation(Quaternion newRotation)
         {
-            throw new NotImplementedException();
+            Rotation = newRotation;
         }
 
         //TODO: Look into have deltaTime be a global variable
-        public void AddForce(Vector2 force, ForceMode forceMode, float deltaTime)
+        public void AddForce(Vector3 force, ForceMode forceMode, float deltaTime)
         {
             switch (forceMode)
             {
@@ -129,11 +132,11 @@ namespace NEWTONS.Core
 
         public void AddToPhysicsEngine()
         {
-            if (!Physics2D.Bodies.Contains(this))
-                Physics2D.Bodies.Add(this);
+            if (!Physics.Bodies.Contains(this))
+                Physics.Bodies.Add(this);
         }
 
-        public void AddReference(IKinematicBodyReference2D reference)
+        public void AddReference(IRigidbodyReference reference)
         {
             _references.Add(reference);
         }

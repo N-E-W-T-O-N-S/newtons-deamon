@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace NEWTONS.Core
@@ -28,7 +31,7 @@ namespace NEWTONS.Core
             if (addToEngine)
                 AddToPhysicsEngine();
         }
-        
+
         public Rigidbody Body;
         public Vector3 Center;
         public PrimitiveShape Shape { get; }
@@ -43,14 +46,14 @@ namespace NEWTONS.Core
         /// <summary>
         /// the parent scale of the collider
         /// </summary>
-        public virtual Vector3 Scale 
-        { 
+        public virtual Vector3 Scale
+        {
             get => scale;
-            set 
-            { 
+            set
+            {
                 scale = value;
                 OnUpdateScale?.Invoke();
-            } 
+            }
         }
 
         public virtual Vector3 ScaleNoNotify { set => scale = value; }
@@ -169,14 +172,8 @@ namespace NEWTONS.Core
             axisToCheck.AddRange(normals1);
             axisToCheck.AddRange(normals2);
 
-
-            //foreach (var edge1 in edges1)
-            //{
-            //    foreach (var edge2 in edges2)
-            //    {
-            //        axisToCheck.Add(Vector3.Cross(edge1, edge2));
-            //    }
-            //}
+            // HELP THIS CREATES A STACK OVERFLOW ERROR :(((((
+            //axisToCheck = axisToCheck.Distinct().ToList();
 
             float depth = Mathf.Infinity;
             Vector3 normal = Vector2.Zero;
@@ -251,13 +248,66 @@ namespace NEWTONS.Core
             // <--------------------------------------------------->
 
             coll1.Body.MoveToPosition(coll1.Body.Position + (normal * depth1));
-            coll2.Body.MoveToPosition(coll2.Body.Position + (-normal * depth2));
+            coll2.Body.MoveToPosition(coll2.Body.Position - (normal * depth2));
 
             CollisionInfo info = new CollisionInfo()
             {
                 didCollide = true,
                 Normal = normal
             };
+
+            return info;
+        }
+
+        internal static CollisionInfo Cuboid_Sphere_Collision(CuboidCollider cuboid, SphereCollider sphere)
+        {
+            CollisionInfo info = new CollisionInfo()
+            {
+                didCollide = false,
+            };
+
+            List<Vector3> axisToCheck = new List<Vector3>();
+            
+            Vector3[] points = cuboid.Points;
+            Vector3[] normals = cuboid.Normals;
+            
+            // TODO 
+
+            return info;
+        }
+
+        internal static CollisionInfo Sphere_Sphere_Collision(SphereCollider coll1, SphereCollider coll2)
+        {
+            CollisionInfo info = new CollisionInfo()
+            {
+                didCollide = false,
+            };
+
+            Vector3 direction = coll1.GlobalCenter - coll2.GlobalCenter;
+            Vector3 normDir = direction.Normalized;
+            float dist = direction.magnitude;
+            float combinedRadius = coll1.ScaledRadius + coll2.ScaledRadius;
+
+            if (dist >= combinedRadius)
+                return info;
+
+            float depth = combinedRadius - dist;
+
+            float velocityB1 = coll1.Body.IsStatic ? 0 : coll1.Body.Velocity.magnitude;
+            float velocityB2 = coll2.Body.IsStatic ? 0 : coll2.Body.Velocity.magnitude;
+            float combinedVelocity = velocityB1 + velocityB2;
+
+            float depth1;
+            float depth2;
+
+            depth1 = (velocityB1 / combinedVelocity) * depth;
+            depth2 = (velocityB2 / combinedVelocity) * depth;
+
+            coll1.Body.MoveToPosition(coll1.Body.Position + (normDir * depth1));
+            coll2.Body.MoveToPosition(coll2.Body.Position - (normDir * depth2));
+
+            info.didCollide = true;
+            info.Normal = normDir;
 
             return info;
         }

@@ -54,6 +54,7 @@ namespace NEWTONS.Core
             CollisionInfo info = other switch
             {
                 CuboidCollider cuboidCol => Cuboid_Cuboid_Collision(this, cuboidCol),
+                SphereCollider sphereCol => Cuboid_Sphere_Collision(this, sphereCol),
                 _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),
             };
 

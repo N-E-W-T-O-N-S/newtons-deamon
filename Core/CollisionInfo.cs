@@ -7,6 +7,6 @@ namespace NEWTONS.Core
     public struct CollisionInfo
     {
         public bool didCollide;
-        public Vector3 Normal;
+        public Vector3 normal;
     }
 }

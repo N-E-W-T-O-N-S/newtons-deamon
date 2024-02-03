@@ -83,7 +83,7 @@ namespace NEWTONS.Core
             float meff;
 
             //Vector3 n = (pos2 - pos1).Normalized;
-            Vector3 n = info.Normal;
+            Vector3 n = info.normal;
 
 
             if (secondBody.IsStatic)
@@ -237,7 +237,7 @@ namespace NEWTONS.Core
             CollisionInfo info = new CollisionInfo()
             {
                 didCollide = true,
-                Normal = normal
+                normal = normal
             };
 
             return info;
@@ -293,7 +293,7 @@ namespace NEWTONS.Core
             coll2.Body.MoveToPosition(coll2.Body.Position - (normDir * depth2));
 
             info.didCollide = true;
-            info.Normal = normDir;
+            info.normal = normDir;
 
             return info;
         }

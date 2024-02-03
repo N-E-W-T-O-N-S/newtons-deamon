@@ -134,7 +134,7 @@ namespace NEWTONS.Core
             coll2.Body.MoveToPosition(coll2.Body.Position + (-normal * depth2));
 
             info.didCollide = true;
-            info.Normal = normal;
+            info.normal = normal;
 
             return info;
         }
@@ -170,7 +170,7 @@ namespace NEWTONS.Core
             coll2.Body.MoveToPosition(coll2.Body.Position - (normDir * depth2));
 
             info.didCollide = true;
-            info.Normal = normDir;
+            info.normal = normDir;
 
             return info;
         }
@@ -264,7 +264,7 @@ namespace NEWTONS.Core
             circle.Body.MoveToPosition(circle.Body.Position + (-normal * depth2));
 
             info.didCollide = true;
-            info.Normal = normal;
+            info.normal = normal;
 
             return info;
         }

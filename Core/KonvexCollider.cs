@@ -31,17 +31,31 @@ namespace NEWTONS.Core
 
         public KonvexCollider()
         {
+            Size = new Vector3(1, 1, 1);
             PointsRaw = _defaultPoints;
             Indices = _defaultIndices;
             NormalsRaw = _defaultNormals;
         }
 
-        public KonvexCollider(Vector3[] points, int[] indices, Vector3[] normals, Vector3 scale, Rigidbody rigidbody, Vector3 center, PrimitiveShape shape, float restitution) : base(scale, rigidbody, center, shape, restitution)
+        public KonvexCollider(Vector3[] points, int[] indices, Vector3[] normals, Vector3 size, Vector3 scale, Rigidbody rigidbody, Vector3 center, PrimitiveShape shape, float restitution, bool addToEngine = true) : base(scale, rigidbody, center, shape, restitution, addToEngine)
         {
             PointsRaw = points;
             Indices = indices;
             NormalsRaw = normals;
+            Size = size;
         }
+
+        /// <summary>
+        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
+        /// </summary>
+        public Vector3 size;
+
+        /// <summary>
+        /// size of the collider
+        /// </summary>
+        public virtual Vector3 Size { get => size; set => size = new Vector3(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0), Mathf.Max(value.z, 0)); }
+
+        public virtual Vector3 ScaledSize => Vector3.Scale(Scale, size);
 
         public Vector3[] NormalsRaw;
 

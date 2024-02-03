@@ -20,16 +20,23 @@ namespace NEWTONS.Core
             new Vector2(0.25f, -0.433f)
         };
 
-        [Obsolete]
         public KonvexCollider2D()
         {
+            Size = new Vector2(1, 1);
             PointsRaw = _defaultPoints;
         }
 
-        public KonvexCollider2D(Vector2[] points, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape) : base(rigidbody, scale, center, centerOfMass, shape)
+        public KonvexCollider2D(Vector2[] points, Vector2 size, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, centerOfMass, shape, addToEngine)
         {
+            Size = size;
             PointsRaw = points;
         }
+
+        public Vector2 size;
+
+        public virtual Vector2 Size { get => size; set => size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y)); }
+
+        public virtual Vector2 ScaledSize => Vector2.Scale(Size, Scale);
 
         /// <summary>
         /// no rotation or scale
@@ -105,76 +112,18 @@ namespace NEWTONS.Core
             }
         }
 
-        public bool Collision(KonvexCollider2D other)
+        public override CollisionInfo IsColliding(Collider2D other)
         {
-            if (Body.Velocity == Vector2.Zero && other.Body.Velocity == Vector2.Zero)
-                return false;
-
-            Vector2[] aEdgeNormals = EdgeNormals;
-            Vector2[] bEdgeNormals = other.EdgeNormals;
-            Vector2[] aScaledPoints = Points;
-            Vector2[] bScaledPoints = other.Points;
-            // Maybe do not concat
-            Vector2[] axisToCheck = aEdgeNormals.Concat(bEdgeNormals).ToArray();
-
-            float depth = Mathf.Infinity;
-            Vector2 normal = Vector2.Zero;
-
-            //TODO: optimisation
-            for (int i = 0; i < axisToCheck.Length; i++)
+            CollisionInfo info = other switch
             {
-                float aMin = Mathf.Infinity;
-                float aMax = Mathf.NegativeInfinity;
-                float bMin = Mathf.Infinity;
-                float bMax = Mathf.NegativeInfinity;
+                KonvexCollider2D konvex => Konvex_Konvex_Collision(this, konvex),
+                CircleCollider circle => Konvex_Circle_Collision(this, circle),
+                _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),
+            };
 
-                for (int j = 0; j < aScaledPoints.Length; j++)
-                {
-                    float dot = Vector2.Dot(axisToCheck[i], aScaledPoints[j] + GlobalCenter);
-                    if (dot < aMin)
-                        aMin = dot;
-                    if (dot > aMax)
-                        aMax = dot;
-                }
+            // TODO: Collision response
 
-                for (int j = 0; j < bScaledPoints.Length; j++)
-                {
-                    float dot = Vector2.Dot(axisToCheck[i], bScaledPoints[j] + other.GlobalCenter);
-                    if (dot < bMin)
-                        bMin = dot;
-                    if (dot > bMax)
-                        bMax = dot;
-                }
-
-                if (aMin >= bMax || bMin >= aMax)
-                    return false;
-
-                float d = Mathf.Min(aMax - bMin, bMax - aMin);
-                if (d < depth)
-                {
-                    depth = d;
-                    normal = axisToCheck[i];
-                }
-
-            }
-
-            Vector2 dir = other.GlobalCenter - GlobalCenter;
-            
-            if (Vector2.Dot(dir, normal) > 0)
-                normal = -normal;
-
-            float velocityB1 = Body.Velocity.magnitude;
-            float velocityB2 = other.Body.Velocity.magnitude;
-            float combinedVelocity = velocityB1 + velocityB2;
-
-            float depth1 = (velocityB1 / combinedVelocity) * depth;
-            float depth2 = (velocityB2 / combinedVelocity) * depth;
-
-
-            Body.MoveToPosition(Body.Position + (normal * depth1));
-            other.Body.MoveToPosition(other.Body.Position + (-normal * depth2));
-
-            return true;
+            return info;
         }
     }
 }

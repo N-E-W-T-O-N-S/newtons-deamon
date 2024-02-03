@@ -17,13 +17,11 @@ namespace NEWTONS.Core
 
         public Collider()
         {
-            Size = new Vector3(1, 1, 1);
             Scale = new Vector3(1, 1, 1);
         }
 
         public Collider(Vector3 scale, Rigidbody rigidbody, Vector3 center, PrimitiveShape shape, float restitution, bool addToEngine = true)
         {
-            Size = scale;
             Body = rigidbody;
             Center = center;
             Shape = shape;
@@ -57,19 +55,6 @@ namespace NEWTONS.Core
         }
 
         public virtual Vector3 ScaleNoNotify { set => scale = value; }
-
-
-        /// <summary>
-        /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
-        /// </summary>
-        public Vector3 size;
-
-        /// <summary>
-        /// size of the collider
-        /// </summary>
-        public virtual Vector3 Size { get => size; set => size = new Vector3(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0), Mathf.Max(value.z, 0)); }
-
-        public virtual Vector3 ScaledSize => Vector3.Scale(Scale, size);
 
         /// <summary>
         /// the global center of the collider
@@ -173,7 +158,7 @@ namespace NEWTONS.Core
             axisToCheck.AddRange(normals2);
 
             // HELP THIS CREATES A STACK OVERFLOW ERROR :(((((
-            //axisToCheck = axisToCheck.Distinct().ToList();
+            // axisToCheck = axisToCheck.Distinct().ToList();
 
             float depth = Mathf.Infinity;
             Vector3 normal = Vector2.Zero;
@@ -228,7 +213,6 @@ namespace NEWTONS.Core
             float velocityB2 = coll2.Body.IsStatic ? 0 : coll2.Body.Velocity.magnitude;
             float combinedVelocity = velocityB1 + velocityB2;
 
-
             // TEMP SOLUTION BECAUSE THERE ARE NO ROTATIONAL FORCES
             // <--------------------------------------------------->
             float depth1;
@@ -258,7 +242,7 @@ namespace NEWTONS.Core
 
             return info;
         }
-
+        
         internal static CollisionInfo Cuboid_Sphere_Collision(CuboidCollider cuboid, SphereCollider sphere)
         {
             CollisionInfo info = new CollisionInfo()
@@ -271,6 +255,8 @@ namespace NEWTONS.Core
             Vector3[] points = cuboid.Points;
             Vector3[] normals = cuboid.Normals;
             
+
+
             // TODO 
 
             return info;

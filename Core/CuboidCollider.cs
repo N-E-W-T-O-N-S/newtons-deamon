@@ -44,7 +44,7 @@ namespace NEWTONS.Core
             NormalsRaw = defaultNormals;
         }
 
-        public CuboidCollider(Vector3 scale, Rigidbody rigidbody, Vector3 center, float restitution) : base(defaultPoints, defaultIndices, defaultNormals, scale, rigidbody, center, PrimitiveShape.Cube, restitution)
+        public CuboidCollider(Vector3 scale, Vector3 size, Rigidbody rigidbody, Vector3 center, float restitution, bool addToEngine = true) : base(defaultPoints, defaultIndices, defaultNormals, size, scale, rigidbody, center, PrimitiveShape.Cube, restitution, addToEngine)
         {
 
         }

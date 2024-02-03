@@ -9,22 +9,19 @@ namespace NEWTONS.Core
     {
         public SphereCollider()
         {
-            Radius = 1;
+            Radius = 0.5f;
         }
 
-        public SphereCollider(float radius, Vector3 scale, Rigidbody rigidbody, Vector3 center, PrimitiveShape shape, float restitution) : base(scale, rigidbody, center, shape, restitution)
+        public SphereCollider(float radius, Vector3 scale, Rigidbody rigidbody, Vector3 center, PrimitiveShape shape, float restitution, bool addToEngine = true) : base(scale, rigidbody, center, shape, restitution, addToEngine)
         {
             Radius = radius;
         }
 
-        /// <summary>
-        /// radius stored in z component
-        /// </summary>
-        public override Vector3 Size { get => base.Size; set => base.Size = new Vector3(0, 0, Mathf.Max(value.z)); }
+        public float radius;
 
-        public float Radius { get => Size.z; set => Size = new Vector3(0, 0, Mathf.Max(value, 0)); }
+        public float Radius { get => radius; set => radius = Mathf.Max(value, 0); }
 
-        public float ScaledRadius => Size.z * Mathf.Max(Mathf.Abs(Scale.x), Mathf.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
+        public float ScaledRadius => Radius * Mathf.Max(Mathf.Abs(Scale.x), Mathf.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
 
         public override CollisionInfo IsColliding(Collider other)
         {

@@ -71,19 +71,19 @@ namespace NEWTONS.Core
 
             for (int i = 0; i < Colliders.Count; i++)
             {
-                // TODO: Scale may not be the best way to determine the size of the collider
-                var qtDataToCheck = _quadtree.Receive(Colliders[i].GlobalCenter, Colliders[i].Size);
+                // TODO: Add boundary to get Scale for the Quadtree
+                var qtDataToCheck = _quadtree.Receive(Colliders[i].GlobalCenter, Colliders[i].Scale);
 
-                KonvexCollider2D c1 = (KonvexCollider2D)Colliders[i];
+                Collider2D c1 = Colliders[i];
                 foreach (var qtData in qtDataToCheck)
                 {
-                    KonvexCollider2D c2 = (KonvexCollider2D)qtData.Data;
+                    Collider2D c2 = qtData.Data;
                     ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
                     if (c1 == c2 || checkd.Contains(compareTupl))
                         continue;
 
                     checks++;
-                    bool hit = c1.Collision(c2);
+                    CollisionInfo info = c1.IsColliding(c2);
 
                     compareTupl = (c2, c1);
                     checkd.Add(compareTupl);

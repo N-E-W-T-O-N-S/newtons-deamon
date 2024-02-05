@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NEWTONS.Debuger;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -183,10 +184,14 @@ namespace NEWTONS.Core
             };
 
             List<Vector2> axisToCheck = konvex.EdgeNormals.ToList();
+
             Vector2[] points = konvex.Points;
 
             Vector2 circleCenter = circle.GlobalCenter;
             Vector2 konvexCenter = konvex.GlobalCenter;
+
+            float radius = circle.ScaledRadius;
+            float diameter = radius * 2;
 
             Vector2 circleCornerDir = new Vector2();
             float sqrDist = Mathf.Infinity;
@@ -212,9 +217,8 @@ namespace NEWTONS.Core
             {
                 float aMin = Mathf.Infinity;
                 float aMax = Mathf.NegativeInfinity;
-                float bMin = Mathf.Infinity;
-                float bMax = Mathf.NegativeInfinity;
 
+                // Konvex projection
                 for (int j = 0; j < points.Length; j++)
                 {
                     float dot = Vector2.Dot(axisToCheck[i], points[j] + konvexCenter);
@@ -224,17 +228,11 @@ namespace NEWTONS.Core
                         aMax = dot;
                 }
 
-                for (int j = -1; j <= 1; j++)
-                {
-                    if (j == 0)
-                        continue;
-
-                    float dot = Vector2.Dot(axisToCheck[i], circleCenter + axisToCheck[i] * (circle.ScaledRadius * j));
-                    if (dot < bMin)
-                        bMin = dot;
-                    if (dot > bMax) 
-                        bMax = dot;
-                }
+                // Circle projection
+                // maybe more performant (funny)
+                float diff = diameter * (axisToCheck[i].x * axisToCheck[i].x + axisToCheck[i].y * axisToCheck[i].y); // difference between bMin and bMax
+                float bMax = Vector2.Dot(axisToCheck[i], circleCenter + axisToCheck[i] * radius);
+                float bMin = bMax - diff;
 
                 if (aMin >= bMax || bMin >= aMax)
                     return info;
@@ -252,6 +250,17 @@ namespace NEWTONS.Core
             if (Vector2.Dot(dir, normal) > 0)
                 normal = -normal;
 
+            // TODO: Implement velocity based collision resolution
+            Vector2 velNormal = circle.Body.Velocity.Normalized == Vector2.Zero ? konvex.Body.Velocity.Normalized : circle.Body.Velocity.Normalized;
+            Vector2 dp = circleCenter + normal * radius;
+            Vector2 lineP = dp - normal * depth;
+
+            float df = -(lineP.x * normal.x + lineP.y * normal.y);
+            float dividend = -df - dp.x * normal.x - dp.y * normal.y;
+            float divisor = -velNormal.x * normal.x - velNormal.y * normal.y;
+
+            depth = dividend / divisor;
+
             float velocityB1 = konvex.Body.Velocity.magnitude;
             float velocityB2 = circle.Body.Velocity.magnitude;
             float combinedVelocity = velocityB1 + velocityB2;
@@ -260,8 +269,8 @@ namespace NEWTONS.Core
             float depth2 = (velocityB2 / combinedVelocity) * depth;
 
 
-            konvex.Body.MoveToPosition(konvex.Body.Position + (normal * depth1));
-            circle.Body.MoveToPosition(circle.Body.Position + (-normal * depth2));
+            konvex.Body.MoveToPosition(konvex.Body.Position + (velNormal * depth1));
+            circle.Body.MoveToPosition(circle.Body.Position + (-velNormal * depth2));
 
             info.didCollide = true;
             info.normal = normal;

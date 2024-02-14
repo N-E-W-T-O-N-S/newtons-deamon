@@ -55,7 +55,7 @@ namespace NEWTONS.Core
         /// <summary>
         /// the global center of the collider
         /// </summary>
-        public virtual Vector2 GlobalCenter => Center + Body.Position; 
+        public virtual Vector2 GlobalCenter => Center + Body.Position;
 
         public virtual float Rotation => Body.Rotation;
 
@@ -178,7 +178,7 @@ namespace NEWTONS.Core
 
         internal static CollisionInfo Konvex_Circle_Collision(KonvexCollider2D konvex, CircleCollider circle)
         {
-            CollisionInfo info = new CollisionInfo() 
+            CollisionInfo info = new CollisionInfo()
             {
                 didCollide = false,
             };
@@ -251,26 +251,43 @@ namespace NEWTONS.Core
                 normal = -normal;
 
             // TODO: Implement velocity based collision resolution
-            Vector2 velNormal = circle.Body.Velocity.Normalized == Vector2.Zero ? konvex.Body.Velocity.Normalized : circle.Body.Velocity.Normalized;
+            Vector2 circleVN = circle.Body.Velocity.Normalized;
+            Vector2 konvexVN = konvex.Body.Velocity.Normalized;
+
             Vector2 dp = circleCenter + normal * radius;
             Vector2 lineP = dp - normal * depth;
 
-            float df = -(lineP.x * normal.x + lineP.y * normal.y);
-            float dividend = -df - dp.x * normal.x - dp.y * normal.y;
-            float divisor = -velNormal.x * normal.x - velNormal.y * normal.y;
+            // circle resolution
+            // <---------------->
+            float circleDepth = 0;
 
-            depth = dividend / divisor;
+            if (circleVN != Vector2.Zero)
+            {
+                float df = -(lineP.x * normal.x + lineP.y * normal.y);
+                float dividend = -df - dp.x * normal.x - dp.y * normal.y;
+                float divisor = -circleVN.x * normal.x - circleVN.y * normal.y;
 
-            float velocityB1 = konvex.Body.Velocity.magnitude;
-            float velocityB2 = circle.Body.Velocity.magnitude;
-            float combinedVelocity = velocityB1 + velocityB2;
+                circleDepth = dividend / divisor;
+            }
+            // <---------------->
 
-            float depth1 = (velocityB1 / combinedVelocity) * depth;
-            float depth2 = (velocityB2 / combinedVelocity) * depth;
+            // konvex resolution
+            // <---------------->
+            float konvexDepth = 0;
+
+            if (konvexVN != Vector2.Zero)
+            {
+                float df = lineP.x * normal.x + lineP.y * normal.y;
+                float dividend = -df + dp.x * normal.x + dp.y * normal.y;
+                float divisor = -konvexVN.x * normal.x - konvexVN.y * normal.y;
+
+                konvexDepth = dividend / divisor;
+            }
+            // <---------------->
 
 
-            konvex.Body.MoveToPosition(konvex.Body.Position + (velNormal * depth1));
-            circle.Body.MoveToPosition(circle.Body.Position + (-velNormal * depth2));
+            konvex.Body.MoveToPosition(konvex.Body.Position + (-konvexVN * konvexDepth));
+            circle.Body.MoveToPosition(circle.Body.Position + (-circleVN * circleDepth));
 
             info.didCollide = true;
             info.normal = normal;

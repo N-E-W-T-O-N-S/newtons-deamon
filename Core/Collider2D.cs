@@ -193,6 +193,9 @@ namespace NEWTONS.Core
             float radius = circle.ScaledRadius;
             float diameter = radius * 2;
 
+            Vector2 circleVN = circle.Body.Velocity.Normalized;
+            Vector2 konvexVN = konvex.Body.Velocity.Normalized;
+
             Vector2 circleCornerDir = new Vector2();
             float sqrDist = Mathf.Infinity;
 
@@ -210,8 +213,12 @@ namespace NEWTONS.Core
 
             axisToCheck.Add(circleCornerDir.Normalized);
 
+            Vector2[] normals = konvex.EdgeNormals;
+
             float depth = Mathf.Infinity;
             Vector2 normal = Vector2.Zero;
+            Vector2 minCorner = Vector2.Zero;
+            Vector2 maxCorner = Vector2.Zero;
 
             for (int i = 0; i < axisToCheck.Count; i++)
             {
@@ -242,48 +249,104 @@ namespace NEWTONS.Core
                 {
                     depth = d;
                     normal = axisToCheck[i];
+                    if (i < points.Length)
+                    {
+                        minCorner = points[(i + 1) % points.Length] + konvexCenter;
+                        maxCorner = points[i] + konvexCenter;
+                    }
+                    else
+                    {
+                        minCorner = Vector2.Zero;
+                        maxCorner = Vector2.Zero;
+                    }
                 }
             }
 
-            Vector2 dir = circle.GlobalCenter - konvex.GlobalCenter;
+            Vector2 kTOc = circle.GlobalCenter - konvex.GlobalCenter;
 
-            if (Vector2.Dot(dir, normal) > 0)
-                normal = -normal;
+            Vector2 directedNormal;
+
+            if (Vector2.Dot(kTOc, normal) > 0)
+                directedNormal = -normal;
+            else
+                directedNormal = normal;
+
 
             // TODO: Implement velocity based collision resolution
-            Vector2 circleVN = circle.Body.Velocity.Normalized;
-            Vector2 konvexVN = konvex.Body.Velocity.Normalized;
 
             Vector2 dp = circleCenter + normal * radius;
             Vector2 lineP = dp - normal * depth;
 
-            // circle resolution
-            // <---------------->
+            // Circle resolution
+            // <--------------->
             float circleDepth = 0;
-
             if (circleVN != Vector2.Zero)
             {
-                float df = -(lineP.x * normal.x + lineP.y * normal.y);
-                float dividend = -df - dp.x * normal.x - dp.y * normal.y;
-                float divisor = -circleVN.x * normal.x - circleVN.y * normal.y;
+                if (!normals.Contains(normal))
+                {
+                    Vector2 hitP_0 = directedNormal * radius - directedNormal * depth;
+                    float a = circleVN.x * circleVN.x + circleVN.y * circleVN.y;
+                    float b = 2 * hitP_0.x * circleVN.x + 2 * hitP_0.y * circleVN.y;
+                    float c = hitP_0.x * hitP_0.x + hitP_0.y * hitP_0.y - radius * radius;
 
-                circleDepth = dividend / divisor;
+                    float determinant = b * b - 4 * a * c;
+                    if (determinant >= 0)
+                        circleDepth = (-b + Mathf.Sqrt(determinant)) / 2 * a;
+                }
+                else
+                {
+                    float lineD = -(lineP.x * directedNormal.x + lineP.y * directedNormal.y);
+                    float dividend = -lineD - dp.x * directedNormal.x - dp.y * directedNormal.y;
+                    float divisor = -circleVN.x * directedNormal.x - circleVN.y * directedNormal.y;
+
+                    if (divisor != 0)
+                    {
+                        float d = dividend / divisor;
+                        float min = Vector2.Distance(dp, minCorner);
+                        float max = Vector2.Distance(dp, maxCorner);
+                        Debug.Log(Mathf.Abs(d) + " min: " + Mathf.Min(min, max));
+                        Debug.Log("normal: " + normal);
+                        Debug.Log("corner1: " + minCorner + min + "corner2: " + maxCorner + max);
+                        d = Mathf.Clamp(Mathf.Abs(d), 0, Mathf.Min(min, max));
+                        circleDepth = d;
+                    }
+                }
             }
-            // <---------------->
+            // <--------------->
 
-            // konvex resolution
-            // <---------------->
+            // Konvex resolution
+            // <--------------->
             float konvexDepth = 0;
-
             if (konvexVN != Vector2.Zero)
             {
-                float df = lineP.x * normal.x + lineP.y * normal.y;
-                float dividend = -df + dp.x * normal.x + dp.y * normal.y;
-                float divisor = -konvexVN.x * normal.x - konvexVN.y * normal.y;
+                if (!normals.Contains(normal))
+                {
+                    Vector2 hitP_0 = directedNormal * radius - directedNormal * depth;
+                    float a = konvexVN.x * konvexVN.x + konvexVN.y * konvexVN.y;
+                    float b = -2 * hitP_0.x * konvexVN.x - 2 * hitP_0.y * konvexVN.y;
+                    float c = hitP_0.x * hitP_0.x + hitP_0.y * hitP_0.y - radius * radius;
 
-                konvexDepth = dividend / divisor;
+                    float determinant = b * b - 4 * a * c;
+                    if (determinant >= 0)
+                        konvexDepth = (-b + Mathf.Sqrt(determinant)) / 2 * a;
+                }
+                else
+                {
+                    float df = -(lineP.x * directedNormal.x + lineP.y * directedNormal.y);
+                    float dividend = -df - dp.x * directedNormal.x - dp.y * directedNormal.y;
+                    float divisor = konvexVN.x * directedNormal.x + konvexVN.y * directedNormal.y;
+
+                    if (divisor != 0)
+                        konvexDepth = dividend / divisor;
+                }
             }
-            // <---------------->
+            // <--------------->
+
+
+            //float velocityDirectionPercentage = Mathf.Abs(Vector2.Dot(konvexVN, circleVN));
+
+            //float depth1 = depth * (velocityDirectionPercentage / 2);
+            //float depth2 = depth * (1 - velocityDirectionPercentage / 2);
 
 
             konvex.Body.MoveToPosition(konvex.Body.Position + (-konvexVN * konvexDepth));

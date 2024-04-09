@@ -11,7 +11,7 @@ namespace NEWTONS.Core
         public static List<Collider2D> Colliders { get; set; } = new List<Collider2D>();
         public static List<Rigidbody2D> Bodies { get; set; } = new List<Rigidbody2D>();
 
-        private static Quadtree<Collider2D> _quadtree;
+        private static Quadtree<Collider2D>? _quadtree;
 
         /// <summary>
         /// Acceleration applied to the Physics World

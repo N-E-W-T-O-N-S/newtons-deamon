@@ -187,6 +187,16 @@ namespace NEWTONS.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max)
+        {
+            return new Vector2()
+            {
+                x = Mathf.Clamp(value.x, min.x, max.x),
+                y = Mathf.Clamp(value.y, min.y, max.y),
+            };
+        }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
         {
             t = Mathf.Clamp01(t);
@@ -252,7 +262,7 @@ namespace NEWTONS.Core
         public readonly string ToString(string? format, IFormatProvider? formatProvider)
         {
             if (string.IsNullOrEmpty(format))
-                format = "F2";
+                format = "F5";
             formatProvider ??= CultureInfo.InvariantCulture.NumberFormat;
 
             return string.Format("({0}, {1})", x.ToString(format!, formatProvider!), y.ToString(format!, formatProvider!));

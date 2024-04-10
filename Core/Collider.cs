@@ -102,27 +102,25 @@ namespace NEWTONS.Core
             if (v1 == Vector3.Zero && v2 == Vector3.Zero)
                 return;
 
-            Vector3 vimp = Vector3.ComponentMultiply(n, (v1 - v2));
-            Vector3 j = (1 + e) * meff * vimp;
+            float vimp = Vector3.Dot(n, v1 - v2);
+            float j = ((1 + e) * meff) * vimp;
             Vector3 dv1;
             Vector3 dv2;
 
             if (firstBody.IsStatic)
             {
                 dv1 = new Vector3(0, 0, 0);
-                dv2 = Vector3.ComponentMultiply(j / m2, n);
+                dv2 = (j / m2) * n;
             }
             else if (secondBody.IsStatic)
             {
-                dv1 = -Vector3.ComponentMultiply(j / m1, n);
-                //dv1.x *= -1;
+                dv1 = -(j / m1) * n;
                 dv2 = new Vector3(0, 0, 0);
             }
             else
             {
-                dv1 = -Vector3.ComponentMultiply(j / m1, n);
-                //dv1.x *= -1;
-                dv2 = Vector3.ComponentMultiply(j / m2, n);
+                dv1 = -(j / m2) * n;
+                dv2 = (j / m2) * n;
             }
 
             firstBody.Velocity += dv1;

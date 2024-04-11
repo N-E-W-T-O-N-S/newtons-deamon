@@ -28,6 +28,32 @@ namespace NEWTONS.Core
             this.z = z;
         }
 
+        public float this[int i]
+        {
+            get => i switch
+            {
+                0 => x,
+                1 => y,
+                2 => z,
+                _ => throw new IndexOutOfRangeException()
+            };
+            set
+            {
+                switch (i)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value;
+                        break;
+                    case 2:
+                        z = value;
+                        break;
+                }
+            }
+        }
+
         /// <summary>
         /// Returns new Vector3(0, 0, 0);
         /// </summary>

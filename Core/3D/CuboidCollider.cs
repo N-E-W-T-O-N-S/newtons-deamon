@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._3D
 {
     [System.Serializable]
     public class CuboidCollider : KonvexCollider

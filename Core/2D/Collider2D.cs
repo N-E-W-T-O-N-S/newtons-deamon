@@ -5,7 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._2D
 {
     [System.Serializable]
     public abstract class Collider2D : IRigidbodyReference2D

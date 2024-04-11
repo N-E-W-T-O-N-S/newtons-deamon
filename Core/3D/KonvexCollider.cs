@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._3D
 {
     [System.Serializable]
     public class KonvexCollider : Collider

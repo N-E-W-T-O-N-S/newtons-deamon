@@ -4,7 +4,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._2D
 {
     [System.Serializable]
     public class Rigidbody2D : IDisposable
@@ -100,7 +100,7 @@ namespace NEWTONS.Core
         public float Drag
         {
             get => drag;
-            set { drag = Mathf.Max(value, PhysicsInfo.MinDrag); }
+            set => drag = Mathf.Max(value, PhysicsInfo.MinDrag);
         }
 
         public bool UseGravity;
@@ -116,12 +116,12 @@ namespace NEWTONS.Core
         }
 
         //TODO: Look into have deltaTime be a global variable
-        public void AddForce(Vector2 force, ForceMode forceMode, float deltaTime)
+        public void AddForce(Vector2 force, ForceMode forceMode)
         {
             switch (forceMode)
             {
                 case ForceMode.Force:
-                    Velocity += force / Mass * deltaTime;
+                    Velocity += force / Mass * Physics2D.DeltaTime;
                     break;
                 case ForceMode.VelocityChange:
                     Velocity += force;

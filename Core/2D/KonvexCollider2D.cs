@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._2D
 {
     [System.Serializable]
     public class KonvexCollider2D : Collider2D

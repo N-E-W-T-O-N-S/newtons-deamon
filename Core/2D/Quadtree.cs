@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._2D
 {
     public class Quadtree<T>
     {
@@ -77,12 +77,12 @@ namespace NEWTONS.Core
         /// Gets all the QuadtreeData in the given area
         /// </summary>
         /// <param name="pos">position of the rectangle</param>
-        /// <param name="scale">scale of the rectangle in halfs</param>
+        /// <param name="size">scale of the rectangle in halfs</param>
         /// <returns></returns>
-        public List<QuadtreeData<T>> Receive(Vector2 pos, Vector2 scale)
+        public List<QuadtreeData<T>> Receive(Vector2 pos, Vector2 size)
         {
             List<QuadtreeData<T>> data = new List<QuadtreeData<T>>();
-            Rectangle rect = new Rectangle(pos, scale);
+            Rectangle rect = new Rectangle(pos, size);
             if (!Boundary.Intersects(rect))
                 return data;
 
@@ -96,7 +96,7 @@ namespace NEWTONS.Core
             {
                 if (_nodes[i] == null)
                     break;
-                data.AddRange(_nodes[i].Receive(pos, scale));
+                data.AddRange(_nodes[i].Receive(pos, size));
             }
 
             return data;

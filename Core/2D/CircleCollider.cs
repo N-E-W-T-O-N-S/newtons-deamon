@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._2D
 {
     [System.Serializable]
     public class CircleCollider : Collider2D

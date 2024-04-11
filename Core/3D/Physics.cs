@@ -3,12 +3,14 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._3D
 {
-    public sealed class Physics
+    public static class Physics
     {
         public static List<Rigidbody> Bodies { get; set; } = new List<Rigidbody>();
         public static List<Collider> Colliders { get; set; } = new List<Collider>();
+
+        public static float DeltaTime { get; set; }
 
         /// <summary>
         /// Acceleration applied to the Physics World
@@ -22,7 +24,7 @@ namespace NEWTONS.Core
         public static float Density
         {
             get => density;
-            set { density = Mathf.Max(value, PhysicsInfo.MinDensity); }
+            set => density = Mathf.Max(value, PhysicsInfo.MinDensity);
         }
 
         private static float temperature;
@@ -30,12 +32,12 @@ namespace NEWTONS.Core
         public static float Temperature
         {
             get => temperature;
-            set { temperature = Mathf.Max(value, PhysicsInfo.MinTemperature); }
+            set => temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
         }
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Update(float deltaTime)
+        public static void Update()
         {
             for (int i = 0; i < Bodies.Count; i++)
             {
@@ -45,14 +47,14 @@ namespace NEWTONS.Core
                     continue;
 
                 if (body.UseGravity)
-                    body.Velocity += Gravity * deltaTime;
-                //if (!UsePhysicalDrag)
-                //    body.Velocity += -body.Velocity.Normalized * (body.Drag / body.Mass * deltaTime);
-                if (body.Velocity != Vector3.Zero)
-                    deltaPos += body.Velocity * deltaTime;
+                    body.Velocity += Gravity * DeltaTime;
 
-                if (deltaPos != Vector3.Zero)
+                if (body.Velocity != Vector3.Zero)
+                {
+                    deltaPos += body.Velocity * DeltaTime;
                     body.MoveToPosition(body.Position + deltaPos);
+                }
+
             }
 
             for (int i = 0; i < Colliders.Count; i++)

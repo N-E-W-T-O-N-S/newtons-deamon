@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._3D
 {
     [System.Serializable]
     public class SphereCollider : Collider

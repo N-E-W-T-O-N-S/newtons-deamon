@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._3D
 {
     [System.Serializable]
     public class Rigidbody : IDisposable
@@ -92,8 +92,7 @@ namespace NEWTONS.Core
         public float Mass
         {
             get => mass;
-            set { mass = Mathf.Max(value, PhysicsInfo.MinMass); }
-        }
+            set => mass = Mathf.Max(value, PhysicsInfo.MinMass);        }
 
         [Obsolete("Use Drag instead")]
         public float drag;
@@ -101,7 +100,7 @@ namespace NEWTONS.Core
         public float Drag
         {
             get => drag;
-            set { drag = Mathf.Max(value, PhysicsInfo.MinDrag); }
+            set => drag = Mathf.Max(value, PhysicsInfo.MinDrag);
         }
 
         public bool UseGravity;
@@ -116,13 +115,12 @@ namespace NEWTONS.Core
             Rotation = newRotation;
         }
 
-        //TODO: Look into have deltaTime be a global variable
-        public void AddForce(Vector3 force, ForceMode forceMode, float deltaTime)
+        public void AddForce(Vector3 force, ForceMode forceMode)
         {
             switch (forceMode)
             {
                 case ForceMode.Force:
-                    Velocity += force / Mass * deltaTime;
+                    Velocity += force / Mass * Physics.DeltaTime;
                     break;
                 case ForceMode.VelocityChange:
                     Velocity += force;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._3D
 {
     [System.Serializable]
     public abstract class Collider : IRigidbodyReference

@@ -4,12 +4,14 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace NEWTONS.Core
+namespace NEWTONS.Core._2D
 {
-    public sealed class Physics2D
+    public static class Physics2D
     {
         public static List<Collider2D> Colliders { get; set; } = new List<Collider2D>();
         public static List<Rigidbody2D> Bodies { get; set; } = new List<Rigidbody2D>();
+
+        public static float DeltaTime { get; set; }
 
         private static Quadtree<Collider2D>? _quadtree;
 
@@ -38,7 +40,7 @@ namespace NEWTONS.Core
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Update(float deltaTime)
+        public static void Update()
         {
             for (int i = 0; i < Bodies.Count; i++)
             {
@@ -49,17 +51,15 @@ namespace NEWTONS.Core
                 Vector2 deltaPos = Vector2.Zero;
 
                 if (body.UseGravity)
-                    body.Velocity += Gravity * deltaTime;
+                    body.Velocity += Gravity * DeltaTime;
 
                 if (body.Velocity != Vector2.Zero)
-                    deltaPos += body.Velocity * deltaTime;
-
-                if (deltaPos != Vector2.Zero)
+                {
+                    deltaPos += body.Velocity * DeltaTime;
                     body.MoveToPosition(body.Position + deltaPos);
+                }
             }
             
-            int checks = 0;
-
             // TODO: infinite quadtree
             Rectangle boundary = new Rectangle(new Vector2(0, 0), new Vector2(100, 100));
             _quadtree = new Quadtree<Collider2D>(boundary, 4);
@@ -83,14 +83,12 @@ namespace NEWTONS.Core
                     if (c1 == c2 || checkd.Contains(compareTupl))
                         continue;
 
-                    checks++;
                     CollisionInfo info = c1.IsColliding(c2);
 
                     compareTupl = (c2, c1);
                     checkd.Add(compareTupl);
                 }
             }
-            return checks;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

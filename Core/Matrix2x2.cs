@@ -1,47 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
-using System.Reflection;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace NEWTONS.Core
 {
-    public struct Matrix3x3 : IEquatable<Matrix3x3>, IFormattable
+    public struct Matrix2x2 : IEquatable<Matrix2x2>, IFormattable
     {
-        public float m00, m01, m02;
-        public float m10, m11, m12;
-        public float m20, m21, m22;
+        public float m00, m01;
+        public float m10, m11;
 
-        public Matrix3x3(Vector3 col1, Vector3 col2, Vector3 col3)
+        public Matrix2x2(Vector2 col1, Vector2 col2)
         {
             m00 = col1.x;
             m01 = col2.x;
-            m02 = col3.x;
             m10 = col1.y;
             m11 = col2.y;
-            m12 = col3.y;
-            m20 = col1.z;
-            m21 = col2.z;
-            m22 = col3.z;
         }
-
-        /// <summary>
-        /// The identity matrix of a 3x3 matrix
-        /// </summary>
-        public static readonly Matrix3x3 identity = new Matrix3x3()
-        {
-            m00 = 1,
-            m01 = 0,
-            m02 = 0,
-            m10 = 0,
-            m11 = 1,
-            m12 = 0,
-            m20 = 0,
-            m21 = 0,
-            m22 = 1,
-        };
 
         private float this[int i]
         {
@@ -52,13 +29,8 @@ namespace NEWTONS.Core
                 {
                     0 => m00,
                     1 => m10,
-                    2 => m20,
-                    3 => m01,
-                    4 => m11,
-                    5 => m21,
-                    6 => m02,
-                    7 => m12,
-                    8 => m22,
+                    2 => m01,
+                    3 => m11,
                     _ => throw new IndexOutOfRangeException("Invalid matrix index!"),
                 };
             }
@@ -74,25 +46,10 @@ namespace NEWTONS.Core
                         m10 = value;
                         break;
                     case 2:
-                        m20 = value;
-                        break;
-                    case 3:
                         m01 = value;
                         break;
-                    case 4:
+                    case 3:
                         m11 = value;
-                        break;
-                    case 5:
-                        m21 = value;
-                        break;
-                    case 6:
-                        m02 = value;
-                        break;
-                    case 7:
-                        m12 = value;
-                        break;
-                    case 8:
-                        m22 = value;
                         break;
                     default:
                         throw new IndexOutOfRangeException("Invalid matrix index!");
@@ -105,12 +62,12 @@ namespace NEWTONS.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                return this[row + column * 3];
+                return this[row + column * 2];
             }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
-                this[row + column * 3] = value;
+                this[row + column * 2] = value;
             }
         }
 
@@ -119,11 +76,10 @@ namespace NEWTONS.Core
         /// </summary>
         /// <exception cref="IndexOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Vector3 GetCol(int i) => i switch
+        public readonly Vector2 GetCol(int i) => i switch
         {
-            0 => new Vector3(m00, m10, m20),
-            1 => new Vector3(m01, m11, m21),
-            2 => new Vector3(m02, m12, m22),
+            0 => new Vector3(m00, m10),
+            1 => new Vector3(m01, m11),
             _ => throw new IndexOutOfRangeException("Invalid column index!")
         };
 
@@ -132,11 +88,10 @@ namespace NEWTONS.Core
         /// </summary>
         /// <exception cref="IndexOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetCol(int i, Vector3 col)
+        public void SetCol(int i, Vector2 col)
         {
             this[0, i] = col.x;
             this[1, i] = col.y;
-            this[2, i] = col.z;
         }
 
         /// <summary>
@@ -144,11 +99,10 @@ namespace NEWTONS.Core
         /// </summary>
         /// <exception cref="IndexOutOfRangeException"></exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly Vector3 GetRow(int i) => i switch
+        public readonly Vector2 GetRow(int i) => i switch
         {
-            0 => new Vector3(m00, m01, m02),
-            1 => new Vector3(m10, m11, m12),
-            2 => new Vector3(m20, m21, m22),
+            0 => new Vector2(m00, m01),
+            1 => new Vector2(m10, m11),
             _ => throw new IndexOutOfRangeException("Invalid row index!")
         };
 
@@ -161,61 +115,53 @@ namespace NEWTONS.Core
         {
             this[i, 0] = row.x;
             this[i, 1] = row.y;
-            this[i, 2] = row.z;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Vector3 TransformPoint(Vector3 point) => this * point;
+        public Vector2 TransformPoint(Vector2 point) => this * point;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator ==(Matrix3x3 a, Matrix3x3 b) => (a.GetCol(0) == b.GetCol(0) && a.GetCol(1) == b.GetCol(1) && a.GetCol(2) == b.GetCol(2));
+        public static bool operator ==(Matrix2x2 a, Matrix2x2 b) => (a.GetCol(0) == b.GetCol(0) && a.GetCol(1) == b.GetCol(1) && a.GetCol(2) == b.GetCol(2));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool operator !=(Matrix3x3 a, Matrix3x3 b) => !(a == b);
+        public static bool operator !=(Matrix2x2 a, Matrix2x2 b) => !(a == b);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix3x3 operator -(Matrix3x3 a, Matrix3x3 b) => new Matrix3x3(a.GetCol(0) - b.GetCol(0), a.GetCol(1) - b.GetCol(1), a.GetCol(2) - b.GetCol(2));
+        public static Matrix2x2 operator -(Matrix2x2 a, Matrix2x2 b) => new Matrix2x2(a.GetCol(0) - b.GetCol(0), a.GetCol(1) - b.GetCol(1));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix3x3 operator -(Matrix3x3 a) => new Matrix3x3(-a.GetCol(0), -a.GetCol(1), -a.GetCol(2));
+        public static Matrix2x2 operator -(Matrix2x2 a) => new Matrix2x2(-a.GetCol(0), -a.GetCol(1));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix3x3 operator +(Matrix3x3 a, Matrix3x3 b) => new Matrix3x3(a.GetCol(0) + b.GetCol(0), a.GetCol(1) + b.GetCol(1), a.GetCol(2) + b.GetCol(2));
+        public static Matrix2x2 operator +(Matrix2x2 a, Matrix2x2 b) => new Matrix2x2(a.GetCol(0) + b.GetCol(0), a.GetCol(1) + b.GetCol(1));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix3x3 operator *(Matrix3x3 a, float b) => new Matrix3x3(a.GetCol(0) * b, a.GetCol(1) * b, a.GetCol(2) * b);
+        public static Matrix2x2 operator *(Matrix2x2 a, float b) => new Matrix2x2(a.GetCol(0) * b, a.GetCol(1) * b);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix3x3 operator *(float b, Matrix3x3 a) => new Matrix3x3(a.GetCol(0) * b, a.GetCol(1) * b, a.GetCol(2) * b);
+        public static Matrix2x2 operator *(float b, Matrix2x2 a) => new Matrix2x2(a.GetCol(0) * b, a.GetCol(1) * b);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Vector3 operator *(Matrix3x3 a, Vector3 b) => new Vector3(Vector3.Dot(a.GetRow(0), b), Vector3.Dot(a.GetRow(1), b), Vector3.Dot(a.GetRow(2), b));
+        public static Vector2 operator *(Matrix2x2 a, Vector2 b) => new Vector2(Vector2.Dot(a.GetRow(0), b), Vector2.Dot(a.GetRow(1), b));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Matrix3x3 operator *(Matrix3x3 a, Matrix3x3 b) => new Matrix3x3()
+        public static Matrix2x2 operator *(Matrix2x2 a, Matrix2x2 b) => new Matrix2x2()
         {
             m00 = Vector3.Dot(a.GetRow(0), b.GetCol(0)),
             m01 = Vector3.Dot(a.GetRow(0), b.GetCol(1)),
-            m02 = Vector3.Dot(a.GetRow(0), b.GetCol(2)),
 
             m10 = Vector3.Dot(a.GetRow(1), b.GetCol(0)),
             m11 = Vector3.Dot(a.GetRow(1), b.GetCol(1)),
-            m12 = Vector3.Dot(a.GetRow(1), b.GetCol(2)),
-
-            m20 = Vector3.Dot(a.GetRow(2), b.GetCol(0)),
-            m21 = Vector3.Dot(a.GetRow(2), b.GetCol(1)),
-            m22 = Vector3.Dot(a.GetRow(2), b.GetCol(2)),
         };
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly bool Equals(Matrix3x3 other) => (other.m00 == m00 && other.m01 == m01 && other.m02 == m02 &&
-                                                        other.m10 == m10 && other.m11 == m11 && other.m12 == m12 &&
-                                                        other.m20 == m20 && other.m21 == m21 && other.m22 == m22);
+        public readonly bool Equals(Matrix2x2 other) => (other.m00 == m00 && other.m01 == m01 &&
+                                                        other.m10 == m10 && other.m11 == m11);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
         {
-            if (obj is Matrix3x3 matrix)
+            if (obj is Matrix2x2 matrix)
                 return Equals(matrix);
             return base.Equals(obj);
         }
@@ -233,10 +179,9 @@ namespace NEWTONS.Core
                 format = "F5";
             formatProvider ??= CultureInfo.InvariantCulture.NumberFormat;
 
-            return string.Format("({0}, {1}, {2} \n {3}, {4}, {5} \n {6}, {7}, {8})",
-                m00.ToString(format!, formatProvider!), m01.ToString(format!, formatProvider!), m02.ToString(format!, formatProvider!),
-                m10.ToString(format!, formatProvider!), m11.ToString(format!, formatProvider!), m12.ToString(format!, formatProvider!),
-                m20.ToString(format!, formatProvider!), m21.ToString(format!, formatProvider!), m22.ToString(format!, formatProvider!)
+            return string.Format("({0}, {1} \n {2}, {3})",
+                m00.ToString(format!, formatProvider!), m01.ToString(format!, formatProvider!),
+                m10.ToString(format!, formatProvider!), m11.ToString(format!, formatProvider!)
                 );
         }
 
@@ -246,15 +191,9 @@ namespace NEWTONS.Core
             HashCode hash = new HashCode();
             hash.Add(m00);
             hash.Add(m01);
-            hash.Add(m02);
             hash.Add(m10);
             hash.Add(m11);
-            hash.Add(m12);
-            hash.Add(m20);
-            hash.Add(m21);
-            hash.Add(m22);
             return hash.ToHashCode();
         }
-
     }
 }

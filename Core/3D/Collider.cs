@@ -26,6 +26,7 @@ namespace NEWTONS.Core._3D
             Center = center;
             Shape = shape;
             Restitution = restitution;
+            Scale = scale;
             if (addToEngine)
                 AddToPhysicsEngine();
         }
@@ -59,7 +60,7 @@ namespace NEWTONS.Core._3D
         /// <summary>
         /// the global center of the collider
         /// </summary>
-        public virtual Vector3 GlobalCenter { get => Center + Body.Position; }
+        public virtual Vector3 GlobalCenter => Center + Body.Position;
 
         public virtual Quaternion Rotation => Body.Rotation;
 

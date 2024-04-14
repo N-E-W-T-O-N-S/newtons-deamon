@@ -40,8 +40,8 @@ namespace NEWTONS.Core._3D
         public Vector3 Position
         {
             get => position;
-            set 
-            { 
+            set
+            {
                 position = value;
                 OnUpdatePosition?.Invoke();
             }
@@ -71,9 +71,9 @@ namespace NEWTONS.Core._3D
         /// <summary>
         /// Does not invoke <see cref="OnUpdateRotation"/>
         /// </summary>
-        public Quaternion RotationNoNotify 
-        { 
-            set => rotation = value; 
+        public Quaternion RotationNoNotify
+        {
+            set => rotation = value;
         }
 
         // <----------------------->
@@ -92,7 +92,8 @@ namespace NEWTONS.Core._3D
         public float Mass
         {
             get => mass;
-            set => mass = Mathf.Max(value, PhysicsInfo.MinMass);        }
+            set => mass = Mathf.Max(value, PhysicsInfo.MinMass);
+        }
 
         [Obsolete("Use Drag instead")]
         public float drag;
@@ -104,6 +105,12 @@ namespace NEWTONS.Core._3D
         }
 
         public bool UseGravity;
+
+        public Matrix3x3 WorldToLocalMatrix => new Matrix3x3(
+            Quaternion.RotateVector(new Vector3(1, 0, 0), Rotation),
+            Quaternion.RotateVector(new Vector3(0, 1, 0), Rotation),
+            Quaternion.RotateVector(new Vector3(0, 0, 1), Rotation)
+        );
 
         public void MoveToPosition(Vector3 newPosition)
         {

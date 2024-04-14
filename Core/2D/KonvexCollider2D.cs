@@ -26,7 +26,7 @@ namespace NEWTONS.Core._2D
             PointsRaw = _defaultPoints;
         }
 
-        public KonvexCollider2D(Vector2[] points, Vector2 size, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, centerOfMass, shape, addToEngine)
+        public KonvexCollider2D(Vector2[] points, Vector2 size, Vector2 scale, Rigidbody2D rigidbody, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, centerOfMass, shape, addToEngine)
         {
             Size = size;
             PointsRaw = points;
@@ -112,10 +112,16 @@ namespace NEWTONS.Core._2D
             }
         }
 
+        public override float GetInertia()
+        {
+            return 1;
+        }
+
         public override CollisionInfo IsColliding(Collider2D other)
         {
             CollisionInfo info = other switch
             {
+                CuboidCollider2D cuboid => Konvex_Cuboid_Collision(this, cuboid),
                 KonvexCollider2D konvex => Konvex_Konvex_Collision(this, konvex),
                 CircleCollider circle => Konvex_Circle_Collision(this, circle),
                 _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),

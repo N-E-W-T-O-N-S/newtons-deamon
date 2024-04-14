@@ -72,10 +72,10 @@ namespace NEWTONS.Core._2D
 
             for (int i = 0; i < Colliders.Count; i++)
             {
-                // TODO: Add boundary to get Scale for the Quadtree
-                var qtDataToCheck = _quadtree.Receive(Colliders[i].GlobalCenter, Colliders[i].Scale);
-
                 Collider2D c1 = Colliders[i];
+                
+                // TODO: Add boundary to get Scale for the Quadtree
+                var qtDataToCheck = _quadtree.Receive(c1.GlobalCenter, c1.Scale * 2);
                 foreach (var qtData in qtDataToCheck)
                 {
                     Collider2D c2 = qtData.Data;

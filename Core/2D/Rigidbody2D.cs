@@ -15,14 +15,16 @@ namespace NEWTONS.Core._2D
         private List<IRigidbodyReference2D> _references = new List<IRigidbodyReference2D>();
         private bool _isDisposed = false;
 
+        public Collider2D? collider;
 
         public Rigidbody2D()
         {
             Mass = 1f;
         }
 
-        public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine)
+        public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine, Collider2D? coll = null)
         {
+            collider = coll;
             Position = position;
             Rotation = rotation;
             Mass = mass;
@@ -57,6 +59,9 @@ namespace NEWTONS.Core._2D
         [Obsolete("Use Rotation instead")]
         public float rotation;
 
+        /// <summary>
+        /// Angle in degrees
+        /// </summary>
         public float Rotation
         {
             get => rotation;
@@ -83,6 +88,13 @@ namespace NEWTONS.Core._2D
 
         public Vector2 Velocity;
 
+        /// <summary>
+        /// Angular velocity in radians per second
+        /// </summary>
+        public float AngularVelocity;
+
+        public float Inertia => collider?.GetInertia() ?? 1f;
+
         public Vector2 CenterOfMass;
 
         [Obsolete("Use Mass instead")]
@@ -104,6 +116,11 @@ namespace NEWTONS.Core._2D
         }
 
         public bool UseGravity;
+
+        public Matrix2x2 WorldToLocalMatrix => new Matrix2x2(
+            Vector2.Rotate(new Vector3(1, 0), Rotation * Mathf.Deg2Rad),
+            Vector2.Rotate(new Vector3(0, 1), Rotation * Mathf.Deg2Rad)
+        );
 
         public void MoveToPosition(Vector2 newPosition)
         {

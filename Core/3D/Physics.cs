@@ -49,6 +49,9 @@ namespace NEWTONS.Core._3D
                 if (body.UseGravity)
                     body.Velocity += Gravity * DeltaTime;
 
+                // INFO: Fake Drag
+                body.Velocity -= body.Velocity / body.Mass * DeltaTime;
+
                 if (body.Velocity != Vector3.Zero)
                 {
                     deltaPos += body.Velocity * DeltaTime;

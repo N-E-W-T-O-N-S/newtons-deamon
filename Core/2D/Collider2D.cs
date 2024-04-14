@@ -28,6 +28,7 @@ namespace NEWTONS.Core._2D
         public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true)
         {
             Body = rigidbody;
+            Scale = scale;
             Center = center;
             CenterOfMass = centerOfMass;
             Shape = shape;
@@ -59,7 +60,11 @@ namespace NEWTONS.Core._2D
 
         public virtual float Rotation => Body.Rotation;
 
+        public abstract float GetInertia();
+
         public abstract CollisionInfo IsColliding(Collider2D other);
+
+        internal static CollisionInfo Konvex_Cuboid_Collision(KonvexCollider2D coll1, CuboidCollider2D coll2) => Konvex_Konvex_Collision(coll1, coll2);
 
         internal static CollisionInfo Konvex_Konvex_Collision(KonvexCollider2D coll1, KonvexCollider2D coll2)
         {
@@ -68,7 +73,7 @@ namespace NEWTONS.Core._2D
                 didCollide = false
             };
 
-            if (coll1.Body.Velocity == Vector2.Zero && coll2.Body.Velocity == Vector2.Zero)
+            if (coll1.Body.IsStatic && coll2.Body.IsStatic)
                 return info;
 
             Vector2[] aEdgeNormals = coll1.EdgeNormals;
@@ -126,6 +131,20 @@ namespace NEWTONS.Core._2D
             float velocityB1 = coll1.Body.Velocity.magnitude;
             float velocityB2 = coll2.Body.Velocity.magnitude;
             float combinedVelocity = velocityB1 + velocityB2;
+
+            if (combinedVelocity == 0)
+            {
+                combinedVelocity = 1;
+                if (coll1.Body.IsStatic)
+                    velocityB2 = 1;
+                else if (coll2.Body.IsStatic)
+                    velocityB1 = 1;
+                else
+                {
+                    velocityB1 = 0.5f;
+                    velocityB2 = 0.5f;
+                }
+            }
 
             float depth1 = (velocityB1 / combinedVelocity) * depth;
             float depth2 = (velocityB2 / combinedVelocity) * depth;

@@ -1,0 +1,48 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text;
+
+namespace NEWTONS.Core._2D
+{
+    [System.Serializable]
+    public class CuboidCollider2D : KonvexCollider2D
+    {
+        private static readonly Vector2[] defaultPoints = new Vector2[4]
+        {
+            new Vector2(-0.5f, 0.5f),
+            new Vector2(0.5f, 0.5f),
+            new Vector2(0.5f, -0.5f),
+            new Vector2(-0.5f, -0.5f)
+        };
+
+        public CuboidCollider2D()
+        {
+            PointsRaw = defaultPoints;
+        }
+
+        public CuboidCollider2D(Vector3 scale, Vector3 size, Rigidbody2D rigidbody, Vector3 center, Vector2 centerOfMass, float restitution, bool addToEngine = true) : base(defaultPoints, size, scale, rigidbody, center, centerOfMass, PrimitiveShape2D.Square, addToEngine)
+        {
+
+        }
+
+        public override float GetInertia() => (1f / 12f) * (ScaledSize.x * Mathf.Pow(ScaledSize.y, 3));
+
+        public override CollisionInfo IsColliding(Collider2D other)
+        {
+            CollisionInfo info = other switch
+            {
+                CuboidCollider2D cuboidCol => Konvex_Konvex_Collision(this, cuboidCol),
+                KonvexCollider2D konvex => Konvex_Konvex_Collision(this, konvex),
+                CircleCollider sphereCol => Konvex_Circle_Collision(this, sphereCol),
+                _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),
+            };
+
+            //CollisionResponse(other, info);
+
+            return info;
+        }
+    }
+}

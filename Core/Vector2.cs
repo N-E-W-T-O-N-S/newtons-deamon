@@ -240,6 +240,23 @@ namespace NEWTONS.Core
             return new Vector2(num * normal.x + direction.x, num * normal.y + direction.y);
         }
 
+        /// <summary>
+        /// Rotates a vector by an angle in radians
+        /// </summary>
+        /// <returns>Rotated vector</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 Rotate(Vector2 vect, float angle)
+        {
+            float cos = MathF.Cos(angle);
+            float sin = MathF.Sin(angle);
+
+            return new Vector2
+            (
+                vect.x * cos - vect.y * sin,
+                vect.x * sin + vect.y * cos
+            );
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly override bool Equals(object other)
         {

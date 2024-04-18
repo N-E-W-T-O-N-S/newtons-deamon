@@ -18,7 +18,7 @@ namespace NEWTONS.Core
         }
 
         /// <summary>
-        /// Returns new <c>Vector2(0, 0);</c>
+        /// Returns <c>new Vector2(0, 0);</c>
         /// </summary>
         private static readonly Vector2 zeroVector = new Vector2(0, 0);
         /// <summary>
@@ -231,6 +231,40 @@ namespace NEWTONS.Core
             float numX = a.x - b.x;
             float numY = a.y - b.y;
             return MathF.Sqrt(numX * numX + numY * numY);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float SqrDistance(Vector2 a, Vector2 b)
+        {
+            float numX = a.x - b.x;
+            float numY = a.y - b.y;
+            return numX * numX + numY * numY;
+        }
+
+        /// <summary>
+        /// Gets the closest point on line la -> lb to point p
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ClosestPointOnLine(Vector2 la, Vector2 lb, Vector2 p)
+        {
+            Vector2 ab = lb - la;
+            Vector2 ap = p - la;
+
+            float projection = Dot(ab, ap);
+            float abMagSqu = ab.SqrMagnitude();
+            float t = projection / abMagSqu;
+            return Lerp(la, lb, t);
+        }
+
+        /// <summary>
+        /// Gets the closest point on line la -> lb to point p
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ClosestPointOnLine(Vector2 la, Vector2 lb, Vector2 p, out float squareDist)
+        {
+            Vector2 cp = ClosestPointOnLine(la, lb, p);
+            squareDist = SqrDistance(cp, p);
+            return cp;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

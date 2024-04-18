@@ -117,6 +117,102 @@ namespace NEWTONS.Core._2D
             return 1;
         }
 
+        public Vector3[] ClosestPointsOnShape(KonvexCollider2D collider, out float sqrDist)
+        {
+            sqrDist = Mathf.Infinity;
+            Vector2 contact1 = default;
+            Vector2 contact2 = default;
+            int contactCount = 1;
+
+
+            Vector2[] points = Points;
+            Vector2[] otherPoints = collider.Points;
+
+            Vector2 otherCenter = collider.GlobalCenter;
+            Vector2 center = GlobalCenter;
+            foreach (var point in points)
+            {
+                for (int i = 0; i < otherPoints.Length; i++)
+                {
+                    Vector2 p1 = otherPoints[i] + otherCenter;
+                    Vector2 p2 = otherPoints[(i + 1) % otherPoints.Length] + otherCenter;
+
+                    Vector2 currentCp = Vector2.ClosestPointOnLine(p1, p2, point + center, out float dist);
+
+                    float c = Mathf.Abs(dist - sqrDist);
+                    if (c < PhysicsInfo.MaxColliderDistance && currentCp != contact1)
+                    {
+                        contact2 = currentCp;
+                        contactCount = 2;
+                    }
+                    else if (dist < sqrDist)
+                    {
+                        sqrDist = dist;
+                        contact1 = currentCp;
+                        contactCount = 1;
+
+                    }
+                }
+            }
+
+            foreach (var point in otherPoints)
+            {
+                for (int i = 0; i < points.Length; i++)
+                {
+                    Vector2 p1 = points[i] + center;
+                    Vector2 p2 = points[(i + 1) % points.Length] + center;
+
+                    Vector2 currentCp = Vector2.ClosestPointOnLine(p1, p2, point + otherCenter, out float dist);
+
+                    float c = Mathf.Abs(dist - sqrDist);
+                    if (c < PhysicsInfo.MaxColliderDistance && currentCp != contact1)
+                    {
+                        contact2 = currentCp;
+                        contactCount = 2;
+                    }
+                    else if (dist < sqrDist)
+                    {
+                        sqrDist = dist;
+                        contact1 = currentCp;
+                        contactCount = 1;
+                    }
+                }
+            }
+
+            if (contactCount == 1)
+                return new Vector3[] { contact1 };
+
+
+            return new Vector3[] { contact1, contact2 };
+        }
+
+        /// <summary>
+        /// Gets the closest point on the konvex shape to the given point p
+        /// </summary>
+        /// <param name="sqrDist">squared distance from point p to the closest point</param>
+        public Vector2 ClosestPointOnShape(Vector2 p, out float sqrDist)
+        {
+            Vector2[] points = Points;
+            Vector2 center = GlobalCenter;
+
+            sqrDist = Mathf.Infinity;
+            Vector2 cp = new Vector2(Mathf.Infinity, Mathf.Infinity);
+            for (int i = 0; i < points.Length; i++)
+            {
+                Vector2 p1 = points[i] + center;
+                Vector2 p2 = points[(i + 1) % points.Length] + center;
+
+                Vector2 currentCp = Vector2.ClosestPointOnLine(p1, p2, p, out float currentSqrDist);
+                if (currentSqrDist < sqrDist)
+                {
+                    sqrDist = currentSqrDist;
+                    cp = currentCp;
+                }
+            }
+
+            return cp;
+        }
+
         public override CollisionInfo IsColliding(Collider2D other)
         {
             CollisionInfo info = other switch

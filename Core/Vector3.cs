@@ -321,6 +321,41 @@ namespace NEWTONS.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float SqrDistance(Vector3 a, Vector3 b)
+        {
+            float numX = a.x - b.x;
+            float numY = a.y - b.y;
+            float numZ = a.z - b.z;
+            return numX * numX + numY * numY + numZ * numZ;
+        }
+
+        /// <summary>
+        /// Gets the closest point on line la -> lb to point p
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 ClosestPointOnLine(Vector3 la, Vector3 lb, Vector3 p)
+        {
+            Vector3 ab = lb - la;
+            Vector3 ap = p - la;
+
+            float projection = Dot(ab, ap);
+            float abMagSqu = ab.SqrMagnitude();
+            float t = projection / abMagSqu;
+            return Lerp(la, lb, t);
+        }
+
+        /// <summary>
+        /// Gets the closest point on line la -> lb to point p
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 ClosestPointOnLine(Vector3 la, Vector3 lb, Vector3 p, out float squareDist)
+        {
+            Vector3 cp = ClosestPointOnLine(la, lb, p);
+            squareDist = SqrDistance(cp, p);
+            return cp;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Reflect(Vector3 direction, Vector3 normal)
         {
             float num = -2f * Dot(normal, direction);

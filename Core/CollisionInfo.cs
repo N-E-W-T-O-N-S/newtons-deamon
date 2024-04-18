@@ -8,5 +8,6 @@ namespace NEWTONS.Core
     {
         public bool didCollide;
         public Vector3 normal;
+        public Vector3[] contactPoints;
     }
 }

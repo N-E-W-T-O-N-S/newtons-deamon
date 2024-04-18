@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NEWTONS.Debuger;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -20,6 +21,7 @@ namespace NEWTONS.Core._2D
         public Rigidbody2D()
         {
             Mass = 1f;
+            collider = null;
         }
 
         public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine, Collider2D? coll = null)
@@ -127,9 +129,9 @@ namespace NEWTONS.Core._2D
             Position = newPosition;
         }
 
-        public void MoveToRotation(Quaternion newRotation)
+        public void MoveToRotation(float newRotation)
         {
-            throw new NotImplementedException();
+            Rotation = newRotation;
         }
 
         //TODO: Look into have deltaTime be a global variable
@@ -144,6 +146,28 @@ namespace NEWTONS.Core._2D
                     Velocity += force;
                     break;
             }
+        }
+
+        public void AddTorque(float torque, ForceMode forceMode)
+        {
+            switch (forceMode)
+            {
+                case ForceMode.Force:
+                    AngularVelocity += torque / Inertia * Physics2D.DeltaTime;
+                    break;
+                case ForceMode.VelocityChange:
+                    AngularVelocity += torque;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Gets the current linear velocity of the point on the Rigid Body
+        /// </summary>
+        public Vector2 GetVelocityOfPoint(Vector2 p)
+        {
+            Vector2 cmToP = p - (CenterOfMass + Position);
+            return Velocity + AngularVelocity * new Vector2(-cmToP.y, cmToP.x);
         }
 
         public void AddToPhysicsEngine()

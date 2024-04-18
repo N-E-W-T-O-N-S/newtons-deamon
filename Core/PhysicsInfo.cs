@@ -30,5 +30,14 @@ namespace NEWTONS.Core
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => 1E-20f; 
         }
+
+        /// <summary>
+        /// Max distance between collider to be seen as touching
+        /// </summary>
+        public static float MaxColliderDistance
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => 1e-6f;
+        }
     }
 }

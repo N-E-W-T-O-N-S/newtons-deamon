@@ -48,6 +48,7 @@ namespace NEWTONS.Core._2D
                 if (body.IsStatic)
                     continue;
                 
+                // Linear velocity
                 Vector2 deltaPos = Vector2.Zero;
 
                 if (body.UseGravity)
@@ -57,6 +58,16 @@ namespace NEWTONS.Core._2D
                 {
                     deltaPos += body.Velocity * DeltaTime;
                     body.MoveToPosition(body.Position + deltaPos);
+                }
+
+                //body.Velocity -= body.Velocity / body.Mass * DeltaTime;
+
+                // Angular velocity
+                float deltaRotation = 0f; // Angle in degrees
+                if (body.AngularVelocity != 0f)
+                {
+                    deltaRotation += body.AngularVelocity * DeltaTime * Mathf.Rad2Deg;
+                    body.MoveToRotation(body.Rotation + deltaRotation);
                 }
             }
             

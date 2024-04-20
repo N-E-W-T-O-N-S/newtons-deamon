@@ -8,8 +8,8 @@ namespace NEWTONS.Core._2D
 {
     public static class Physics2D
     {
-        public static List<Collider2D> Colliders { get; set; } = new List<Collider2D>();
-        public static List<Rigidbody2D> Bodies { get; set; } = new List<Rigidbody2D>();
+        public static HashSet<Collider2D> Colliders { get; set; } = new HashSet<Collider2D>();
+        public static HashSet<Rigidbody2D> Bodies { get; set; } = new HashSet<Rigidbody2D>();
 
         public static float DeltaTime { get; set; }
 
@@ -42,9 +42,8 @@ namespace NEWTONS.Core._2D
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Update()
         {
-            for (int i = 0; i < Bodies.Count; i++)
+            foreach (var body in Bodies)
             {
-                Rigidbody2D body = Bodies[i];
                 if (body.IsStatic)
                     continue;
                 
@@ -60,9 +59,7 @@ namespace NEWTONS.Core._2D
                     body.MoveToPosition(body.Position + deltaPos);
                 }
 
-                //body.Velocity -= body.Velocity / body.Mass * DeltaTime;
-
-                // Angular velocity
+                // Angular Velocity
                 float deltaRotation = 0f; // Angle in degrees
                 if (body.AngularVelocity != 0f)
                 {
@@ -76,14 +73,14 @@ namespace NEWTONS.Core._2D
             _quadtree = new Quadtree<Collider2D>(boundary, 4);
 
             HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
-            for (int i = 0; i < Colliders.Count; i++)
+            foreach (var collider in Colliders)
             {
-                _quadtree.Insert(new QuadtreeData<Collider2D>(Colliders[i].GlobalCenter, Colliders[i]));
+                _quadtree.Insert(new QuadtreeData<Collider2D>(collider.GlobalCenter, collider));
             }
 
-            for (int i = 0; i < Colliders.Count; i++)
+            foreach (var collider in Colliders)
             {
-                Collider2D c1 = Colliders[i];
+                Collider2D c1 = collider;
                 
                 // TODO: Add boundary to get Scale for the Quadtree
                 var qtDataToCheck = _quadtree.Receive(c1.GlobalCenter, c1.Scale * 2);
@@ -100,13 +97,6 @@ namespace NEWTONS.Core._2D
                     checkd.Add(compareTupl);
                 }
             }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void RemoveBody(Rigidbody2D body)
-        {
-            Bodies.Remove(body);
-            body.Dispose();
         }
     }
 }

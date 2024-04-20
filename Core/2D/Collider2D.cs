@@ -6,10 +6,19 @@ using System.Linq;
 namespace NEWTONS.Core._2D
 {
     [System.Serializable]
-    public abstract class Collider2D : IRigidbodyReference2D
+    public abstract class Collider2D : IDisposable
     {
         private List<IColliderReference2D> _references = new List<IColliderReference2D>();
-        private bool _isDsposed = false;
+
+        /// <summary>
+        /// Is this Collider2D already disposed
+        /// </summary>
+        public bool Disposed { get; private set; } = false;
+
+        /// <summary>
+        /// Is this Collider2D already added to the engine
+        /// </summary>
+        public bool AddedToPhysicsEngine => Physics2D.Colliders.Contains(this);
 
         public Action? OnUpdateScale;
 
@@ -64,7 +73,7 @@ namespace NEWTONS.Core._2D
 
         public virtual float Rotation => Body.Rotation;
 
-        public abstract float GetInertia();
+        public abstract float Inertia { get; }
 
         public abstract CollisionInfo IsColliding(Collider2D other);
 
@@ -178,7 +187,7 @@ namespace NEWTONS.Core._2D
                 }
             }
 
-            
+
 
             Vector2 dir = coll2.GlobalCenter - coll1.GlobalCenter;
 
@@ -374,8 +383,10 @@ namespace NEWTONS.Core._2D
 
         public void AddToPhysicsEngine()
         {
-            if (!Physics2D.Colliders.Contains(this))
-                Physics2D.Colliders.Add(this);
+            if (AddedToPhysicsEngine)
+                return;
+
+            Physics2D.Colliders.Add(this);
         }
 
         public void AddReference(IColliderReference2D reference)
@@ -385,20 +396,17 @@ namespace NEWTONS.Core._2D
 
         public void Dispose()
         {
-            if (!_isDsposed)
+            if (Disposed)
                 return;
+
+            if (AddedToPhysicsEngine)
+                Physics2D.Colliders.Remove(this);
+
             for (int i = 0; i < _references.Count; i++)
             {
                 _references[i].Dispose();
             }
-            _isDsposed = true;
+            Disposed = true;
         }
-
-        public IRigidbodyReference2D SetRigidbody(Rigidbody2D rigidbody)
-        {
-            Body = rigidbody;
-            return this;
-        }
-
     }
 }

@@ -10,11 +10,11 @@ namespace NEWTONS.Core
     public enum ForceMode
     {
         /// <summary>
-        /// Applies a continuous force to the Rigidbody, using its mass.
+        /// Applies a continuous force to the Rigidbody, using its mass/inertia.
         /// </summary>
         Force = 0,
         /// <summary>
-        /// Applies a velocity directly to the Rigidbody, ignoring its mass.
+        /// Applies a velocity directly to the Rigidbody, ignoring its mass/inertia.
         /// </summary>
         VelocityChange = 1
     }

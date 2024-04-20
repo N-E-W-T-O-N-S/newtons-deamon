@@ -6,6 +6,6 @@ namespace NEWTONS.Core._3D
 {
     public interface IColliderReference : IDisposable
     {
-        public IColliderReference SetCollider(Collider collider);
+
     }
 }

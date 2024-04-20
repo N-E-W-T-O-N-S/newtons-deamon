@@ -112,10 +112,7 @@ namespace NEWTONS.Core._2D
             }
         }
 
-        public override float GetInertia()
-        {
-            return 1;
-        }
+        public override float Inertia => 1f;
 
         public Vector3[] ClosestPointsOnShape(KonvexCollider2D collider, out float sqrDist)
         {

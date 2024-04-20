@@ -6,7 +6,6 @@ namespace NEWTONS.Core._3D
 {
     public interface IRigidbodyReference : IDisposable
     {
-        public IRigidbodyReference SetRigidbody(Rigidbody rigidbody);
 
     }
 }

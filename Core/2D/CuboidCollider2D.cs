@@ -28,7 +28,7 @@ namespace NEWTONS.Core._2D
 
         }
 
-        public override float GetInertia() => (Body.Mass / 12f) * (Mathf.Pow(ScaledSize.x, 2) + Mathf.Pow(ScaledSize.y, 2));
+        public override float Inertia => (Body.Mass / 12f) * (Mathf.Pow(ScaledSize.x, 2) + Mathf.Pow(ScaledSize.y, 2));
 
 
         public override CollisionInfo IsColliding(Collider2D other)

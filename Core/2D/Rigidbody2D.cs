@@ -14,19 +14,28 @@ namespace NEWTONS.Core._2D
         public event Action? OnUpdateRotation;
 
         private List<IRigidbodyReference2D> _references = new List<IRigidbodyReference2D>();
-        private bool _isDisposed = false;
 
-        public Collider2D? collider;
+        /// <summary>
+        /// Is this RigidBody2D already disposed
+        /// </summary>
+        public bool Disposed { get; private set; } = false;
+
+        /// <summary>
+        /// Is this RigidBody2D already added to the engine
+        /// </summary>
+        public bool AddedToPhysicsEngine => Physics2D.Bodies.Contains(this);
+
+        public Collider2D? Collider { get; set; }
 
         public Rigidbody2D()
         {
             Mass = 1f;
-            collider = null;
+            Collider = null;
         }
 
-        public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine, Collider2D? coll = null)
+        public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine, Collider2D? coll)
         {
-            collider = coll;
+            Collider = coll;
             Position = position;
             Rotation = rotation;
             Mass = mass;
@@ -35,7 +44,9 @@ namespace NEWTONS.Core._2D
                 AddToPhysicsEngine();
         }
 
-        //Active Properties
+        //<----------------------->
+        // Active Properties
+        //<----------------------->
 
         [Obsolete("Use Position instead")]
         public Vector2 position;
@@ -83,7 +94,7 @@ namespace NEWTONS.Core._2D
         }
 
         //<----------------------->
-        //Passive Properties
+        // Passive Properties
         //<----------------------->
 
         public bool IsStatic;
@@ -95,7 +106,7 @@ namespace NEWTONS.Core._2D
         /// </summary>
         public float AngularVelocity;
 
-        public float Inertia => collider?.GetInertia() ?? 1f;
+        public float Inertia => Collider?.Inertia ?? 1f;
 
         public Vector2 CenterOfMass;
 
@@ -124,17 +135,18 @@ namespace NEWTONS.Core._2D
             Vector2.Rotate(new Vector3(0, 1), Rotation * Mathf.Deg2Rad)
         );
 
+        // TODO: Buffer this
         public void MoveToPosition(Vector2 newPosition)
         {
             Position = newPosition;
         }
 
+        // TODO: Buffer this
         public void MoveToRotation(float newRotation)
         {
             Rotation = newRotation;
         }
 
-        //TODO: Look into have deltaTime be a global variable
         public void AddForce(Vector2 force, ForceMode forceMode)
         {
             switch (forceMode)
@@ -162,7 +174,7 @@ namespace NEWTONS.Core._2D
         }
 
         /// <summary>
-        /// Gets the current linear velocity of the point on the Rigid Body
+        /// Gets the current linear velocity of the point on the RigidBody
         /// </summary>
         public Vector2 GetVelocityOfPoint(Vector2 p)
         {
@@ -172,25 +184,34 @@ namespace NEWTONS.Core._2D
 
         public void AddToPhysicsEngine()
         {
-            if (!Physics2D.Bodies.Contains(this))
-                Physics2D.Bodies.Add(this);
-        }
+            if (AddedToPhysicsEngine)
+                return;
 
+            Physics2D.Bodies.Add(this);
+        }
+        
         public void AddReference(IRigidbodyReference2D reference)
         {
             _references.Add(reference);
         }
 
+        /// <summary>
+        /// Removes the RgidiBody from the engine and disposes all references
+        /// </summary>
         public void Dispose()
         {
-            if (_isDisposed)
+            if (Disposed)
                 return;
+
+            if (AddedToPhysicsEngine)
+                Physics2D.Bodies.Remove(this);
+
             for (int i = 0; i < _references.Count; i++)
             {
                 _references[i].Dispose();
             }
             _references.Clear();
-            _isDisposed = true;
+            Disposed = true;
         }
     }
 }

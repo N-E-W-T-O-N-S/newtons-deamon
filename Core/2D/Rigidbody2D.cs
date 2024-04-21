@@ -1,9 +1,7 @@
 ﻿using NEWTONS.Debuger;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core._2D
 {
@@ -27,10 +25,12 @@ namespace NEWTONS.Core._2D
 
         public Collider2D? Collider { get; set; }
 
+        /// <summary>
+        /// serialization constructor
+        /// </summary>
         public Rigidbody2D()
         {
             Mass = 1f;
-            Collider = null;
         }
 
         public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine, Collider2D? coll)
@@ -182,17 +182,28 @@ namespace NEWTONS.Core._2D
             return Velocity + AngularVelocity * new Vector2(-cmToP.y, cmToP.x);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddToPhysicsEngine()
         {
-            if (AddedToPhysicsEngine)
-                return;
-
             Physics2D.Bodies.Add(this);
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveFromPhysicsEngine()
+        {
+            Physics2D.Bodies.Remove(this);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddReference(IRigidbodyReference2D reference)
         {
             _references.Add(reference);
+        }
+
+        ~Rigidbody2D()
+        {
+            Debug.Log($"RigidBody2D - hash: {GetHashCode()} - has been disposed!");
+            Dispose();
         }
 
         /// <summary>
@@ -204,7 +215,7 @@ namespace NEWTONS.Core._2D
                 return;
 
             if (AddedToPhysicsEngine)
-                Physics2D.Bodies.Remove(this);
+                RemoveFromPhysicsEngine();
 
             for (int i = 0; i < _references.Count; i++)
             {

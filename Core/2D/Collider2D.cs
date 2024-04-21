@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core._2D
 {
     [System.Serializable]
-    public abstract class Collider2D : IDisposable
+    public abstract class Collider2D : IDisposable, IRigidbodyReference2D
     {
         private List<IColliderReference2D> _references = new List<IColliderReference2D>();
 
@@ -29,6 +30,9 @@ namespace NEWTONS.Core._2D
         public Vector2 CenterOfMass;
         public PrimitiveShape2D Shape { get; }
 
+        /// <summary>
+        /// serialization constructor
+        /// </summary>
         public Collider2D()
         {
             Scale = new Vector2(1, 1);
@@ -41,6 +45,7 @@ namespace NEWTONS.Core._2D
             Center = center;
             CenterOfMass = centerOfMass;
             Shape = shape;
+            Body.AddReference(this);
             if (addToEngine)
                 AddToPhysicsEngine();
         }
@@ -381,17 +386,28 @@ namespace NEWTONS.Core._2D
             return info;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddToPhysicsEngine()
         {
-            if (AddedToPhysicsEngine)
-                return;
-
             Physics2D.Colliders.Add(this);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveFromPhysicsEngine()
+        {
+            Physics2D.Colliders.Remove(this);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void AddReference(IColliderReference2D reference)
         {
             _references.Add(reference);
+        }
+
+        ~Collider2D()
+        {
+            Debug.Log($"Collider2D - hash: {GetHashCode()} - has been disposed!");
+            Dispose();
         }
 
         public void Dispose()
@@ -400,8 +416,9 @@ namespace NEWTONS.Core._2D
                 return;
 
             if (AddedToPhysicsEngine)
-                Physics2D.Colliders.Remove(this);
+                RemoveFromPhysicsEngine();
 
+            Body.Collider = null;
             for (int i = 0; i < _references.Count; i++)
             {
                 _references[i].Dispose();

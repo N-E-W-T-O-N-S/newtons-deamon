@@ -23,7 +23,7 @@ namespace NEWTONS.Core._2D
 
         public float ScaledRadius => radius * Mathf.Max(Mathf.Abs(Scale.x), Math.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
 
-        public override float Inertia => throw new NotImplementedException();
+        public override float Inertia => 1f;
 
         public override CollisionInfo IsColliding(Collider2D other)
         {

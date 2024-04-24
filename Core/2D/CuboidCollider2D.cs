@@ -23,7 +23,7 @@ namespace NEWTONS.Core._2D
             PointsRaw = defaultPoints;
         }
 
-        public CuboidCollider2D(Vector3 scale, Vector3 size, Rigidbody2D rigidbody, Vector3 center, Vector2 centerOfMass, float restitution, bool addToEngine = true) : base(defaultPoints, size, scale, rigidbody, center, centerOfMass, PrimitiveShape2D.Square, addToEngine)
+        public CuboidCollider2D(Vector3 scale, Vector3 size, Rigidbody2D rigidbody, Vector3 center, float restitution, bool addToEngine = true) : base(defaultPoints, size, scale, rigidbody, center, PrimitiveShape2D.Square, addToEngine)
         {
 
         }

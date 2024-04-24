@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace NEWTONS.Core._2D
 {
@@ -23,23 +24,27 @@ namespace NEWTONS.Core._2D
         /// </summary>
         public bool AddedToPhysicsEngine => Physics2D.Bodies.Contains(this);
 
-        public Collider2D? Collider { get; set; }
+
+        public Collider2D? _collider;
+
+        public Collider2D? Collider { get => _collider; set => _collider = value; }
 
         /// <summary>
         /// serialization constructor
         /// </summary>
-        public Rigidbody2D()
+        internal Rigidbody2D()
         {
             Mass = 1f;
         }
 
-        public Rigidbody2D(Vector2 position, float rotation, float drag, float mass, bool addToEngine, Collider2D? coll)
+        public Rigidbody2D(Vector2 position, float rotation, float mass, Vector2 centerOfMass, float drag, bool addToEngine, Collider2D? coll)
         {
-            Collider = coll;
             Position = position;
             Rotation = rotation;
             Mass = mass;
+            CenterOfMass = centerOfMass;
             Drag = drag;
+            Collider = coll;
             if (addToEngine)
                 AddToPhysicsEngine();
         }
@@ -202,7 +207,7 @@ namespace NEWTONS.Core._2D
 
         ~Rigidbody2D()
         {
-            Debug.Log($"RigidBody2D - hash: {GetHashCode()} - has been disposed!");
+            //Debug.Log($"RigidBody2D - hash: {GetHashCode()} - has been disposed!");
             Dispose();
         }
 
@@ -217,12 +222,26 @@ namespace NEWTONS.Core._2D
             if (AddedToPhysicsEngine)
                 RemoveFromPhysicsEngine();
 
+            OnUpdatePosition = null;
+            OnUpdateRotation = null;
+
             for (int i = 0; i < _references.Count; i++)
             {
                 _references[i].Dispose();
             }
             _references.Clear();
             Disposed = true;
+        }
+
+        //INFO: Just for fun!!!!!! (for now)
+        public static void DisposeMultiple(params Rigidbody2D[] bodies)
+        {
+            Task[] disposeTasks = new Task[bodies.Length];
+            for (int i = 0; i < bodies.Length; i++)
+            {
+                disposeTasks[i] = Task.Run(() => bodies[i].Dispose());
+            }
+            Task.WaitAll(disposeTasks);
         }
     }
 }

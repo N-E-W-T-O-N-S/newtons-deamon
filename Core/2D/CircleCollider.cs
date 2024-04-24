@@ -7,12 +7,12 @@ namespace NEWTONS.Core._2D
     [System.Serializable]
     public class CircleCollider : Collider2D
     {
-        public CircleCollider() 
+        protected CircleCollider() 
         { 
             Radius = 0.5f;
         }
 
-        public CircleCollider(float radius, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, centerOfMass, shape, addToEngine)
+        public CircleCollider(float radius, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, shape, addToEngine)
         { 
             Radius = radius;
         }

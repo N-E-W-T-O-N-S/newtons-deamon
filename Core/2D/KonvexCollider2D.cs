@@ -20,13 +20,13 @@ namespace NEWTONS.Core._2D
             new Vector2(0.25f, -0.433f)
         };
 
-        public KonvexCollider2D()
+        protected KonvexCollider2D()
         {
             Size = new Vector2(1, 1);
             PointsRaw = _defaultPoints;
         }
 
-        public KonvexCollider2D(Vector2[] points, Vector2 size, Vector2 scale, Rigidbody2D rigidbody, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, centerOfMass, shape, addToEngine)
+        public KonvexCollider2D(Vector2[] points, Vector2 size, Vector2 scale, Rigidbody2D rigidbody, Vector2 center, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, shape, addToEngine)
         {
             Size = size;
             PointsRaw = points;

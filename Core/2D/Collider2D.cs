@@ -27,23 +27,22 @@ namespace NEWTONS.Core._2D
 
         public Rigidbody2D Body;
         public Vector2 Center;
-        public Vector2 CenterOfMass;
         public PrimitiveShape2D Shape { get; }
 
         /// <summary>
         /// serialization constructor
         /// </summary>
-        public Collider2D()
+        protected Collider2D()
         {
             Scale = new Vector2(1, 1);
+            Body = new Rigidbody2D();
         }
 
-        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, Vector2 centerOfMass, PrimitiveShape2D shape, bool addToEngine = true)
+        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, PrimitiveShape2D shape, bool addToEngine = true)
         {
             Body = rigidbody;
             Scale = scale;
             Center = center;
-            CenterOfMass = centerOfMass;
             Shape = shape;
             Body.AddReference(this);
             if (addToEngine)
@@ -109,12 +108,13 @@ namespace NEWTONS.Core._2D
 
             float numerator = Vector2.Dot(-(1 + combindeRestitution) * vAB, info.normal);
 
+
             float invMassA = !riA.IsStatic ? 1 / riA.Mass : 0;
             float invMassB = !riB.IsStatic ? 1 / riB.Mass : 0;
 
-            float reducedMass = info.normal.sqrMagnitude * (invMassA + invMassB);
-            float rotationA = (Mathf.Pow(Vector2.Dot(rotatedAP, info.normal), 2)) / riA.Inertia;
-            float rotationB = (Mathf.Pow(Vector2.Dot(rotatedBP, info.normal), 2)) / riB.Inertia;
+            float reducedMass = (invMassA + invMassB);
+            float rotationA = !riA.IsStatic ? (Mathf.Pow(Vector2.Dot(rotatedAP, info.normal), 2)) / riA.Inertia : 0;
+            float rotationB = !riB.IsStatic ? (Mathf.Pow(Vector2.Dot(rotatedBP, info.normal), 2)) / riB.Inertia : 0;
 
             float denominator = reducedMass + rotationA + rotationB;
 
@@ -406,7 +406,7 @@ namespace NEWTONS.Core._2D
 
         ~Collider2D()
         {
-            Debug.Log($"Collider2D - hash: {GetHashCode()} - has been disposed!");
+            //Debug.Log($"Collider2D - hash: {GetHashCode()} - has been disposed!");
             Dispose();
         }
 
@@ -417,6 +417,8 @@ namespace NEWTONS.Core._2D
 
             if (AddedToPhysicsEngine)
                 RemoveFromPhysicsEngine();
+
+            OnUpdateScale = null;
 
             Body.Collider = null;
             for (int i = 0; i < _references.Count; i++)

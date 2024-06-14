@@ -12,7 +12,7 @@ namespace NEWTONS.Core._2D
             Radius = 0.5f;
         }
 
-        public CircleCollider(float radius, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, shape, addToEngine)
+        public CircleCollider(float radius, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, float restitution, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, restitution, shape, addToEngine)
         { 
             Radius = radius;
         }

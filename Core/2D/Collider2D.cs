@@ -28,7 +28,7 @@ namespace NEWTONS.Core._2D
         public Rigidbody2D Body;
         public Vector2 Center;
         public PrimitiveShape2D Shape { get; }
-
+        
         /// <summary>
         /// serialization constructor
         /// </summary>
@@ -38,12 +38,13 @@ namespace NEWTONS.Core._2D
             Body = new Rigidbody2D();
         }
 
-        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, PrimitiveShape2D shape, bool addToEngine)
+        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, float restitution, PrimitiveShape2D shape, bool addToEngine)
         {
             Body = rigidbody;
             Scale = scale;
             Center = center;
             Shape = shape;
+            Restitution = restitution;
             Body.AddReference(this);
             if (addToEngine)
                 AddToPhysicsEngine();
@@ -66,18 +67,16 @@ namespace NEWTONS.Core._2D
 
         public virtual Vector3 ScaleNoNotify { set => scale = value; }
 
-        public float restitution;
-
-        public float Restitution { get => restitution; set => restitution = value; }
+        public float Restitution;
 
         /// <summary>
         /// the global center of the collider
         /// </summary>
         public virtual Vector2 GlobalCenter => Center + Body.Position;
 
-        public virtual float Rotation => Body.Rotation;
-
         public abstract float Inertia { get; }
+
+        public virtual float Rotation => Body.Rotation;
 
         public abstract CollisionInfo IsColliding(Collider2D other);
 
@@ -92,39 +91,40 @@ namespace NEWTONS.Core._2D
             Rigidbody2D riA = Body;
             Rigidbody2D riB = other.Body;
 
-            Vector2 rAP = (Vector2)info.contactPoints[0] - (riA.CenterOfMass + riA.Position);
-            Vector2 rBP = (Vector2)info.contactPoints[0] - (riB.CenterOfMass + riB.Position);
+            Vector2 rAP = (Vector2)info.contactPoints[0] - (riA.CenterOfMass + GlobalCenter);
+            Vector2 rBP = (Vector2)info.contactPoints[0] - (riB.CenterOfMass + other.GlobalCenter);
 
             Vector2 rotatedAP = new Vector2(-rAP.y, rAP.x);
             Vector2 rotatedBP = new Vector2(-rBP.y, rBP.x);
 
             Vector2 contact = info.contactPoints[0];
 
-            Vector2 vAP = Body.GetVelocityOfPoint(contact);
-            Vector2 vBP = other.Body.GetVelocityOfPoint(contact);
+            Vector2 vAP = Body.GetVelocityAtPoint(contact);
+            Vector2 vBP = other.Body.GetVelocityAtPoint(contact);
             Vector2 vAB = vBP - vAP;
 
             float combindeRestitution = (Restitution + other.Restitution) / 2;
 
             float numerator = Vector2.Dot(-(1 + combindeRestitution) * vAB, info.normal);
 
-
-            float invMassA = !riA.IsStatic ? 1 / riA.Mass : 0;
-            float invMassB = !riB.IsStatic ? 1 / riB.Mass : 0;
+            float invInertiaA = riA.InvInertia;
+            float invInertiaB = riB.InvInertia;
+            float invMassA = riA.InvMass;
+            float invMassB = riB.InvMass;
 
             float reducedMass = (invMassA + invMassB);
-            float rotationA = !riA.IsStatic ? (Mathf.Pow(Vector2.Dot(rotatedAP, info.normal), 2)) / riA.Inertia : 0;
-            float rotationB = !riB.IsStatic ? (Mathf.Pow(Vector2.Dot(rotatedBP, info.normal), 2)) / riB.Inertia : 0;
+            float rotationA = (Mathf.Pow(Vector2.Dot(rotatedAP, info.normal), 2)) * invInertiaA;
+            float rotationB = (Mathf.Pow(Vector2.Dot(rotatedBP, info.normal), 2)) * invInertiaB;
 
             float denominator = reducedMass + rotationA + rotationB;
 
             float j = numerator / denominator;
 
-            riA.Velocity -= !riA.IsStatic ? (j / riA.Mass) * (Vector2)info.normal : Vector2.Zero;
-            riB.Velocity += !riB.IsStatic ? (j / riB.Mass) * (Vector2)info.normal : Vector2.Zero;
+            riA.Velocity -= (j * invMassA) * (Vector2)info.normal;
+            riB.Velocity += (j * invMassB) * (Vector2)info.normal;
 
-            riA.AngularVelocity -= !riA.IsStatic ? Vector2.Dot(rotatedAP, j * info.normal) / riA.Inertia : 0;
-            riB.AngularVelocity += !riB.IsStatic ? Vector2.Dot(rotatedBP, j * info.normal) / riB.Inertia : 0;
+            riA.AngularVelocity -= Vector2.Dot(rotatedAP, j * info.normal) * invInertiaA;
+            riB.AngularVelocity += Vector2.Dot(rotatedBP, j * info.normal) * invInertiaB;
         }
 
         internal static CollisionInfo Konvex_Cuboid_Collision(KonvexCollider2D coll1, CuboidCollider2D coll2) => Konvex_Konvex_Collision(coll1, coll2);
@@ -221,8 +221,8 @@ namespace NEWTONS.Core._2D
             float depth2 = (velocityB2 / combinedVelocity) * depth;
 
 
-            coll1.Body.Position = (coll1.Body.Position + (normal * depth1));
-            coll2.Body.Position = (coll2.Body.Position + (-normal * depth2));
+            coll1.Body.Position += (normal * depth1);
+            coll2.Body.Position += (-normal * depth2);
 
             info.didCollide = true;
             info.normal = normal;
@@ -264,8 +264,8 @@ namespace NEWTONS.Core._2D
             depth1 = (velocityB1 / combinedVelocity) * depth;
             depth2 = (velocityB2 / combinedVelocity) * depth;
 
-            coll1.Body.Position = (coll1.Body.Position + (normal * depth1));
-            coll2.Body.Position = (coll2.Body.Position - (normal * depth2));
+            coll1.Body.Position += (normal * depth1);
+            coll2.Body.Position -= (normal * depth2);
 
             info.didCollide = true;
             info.normal = normal;

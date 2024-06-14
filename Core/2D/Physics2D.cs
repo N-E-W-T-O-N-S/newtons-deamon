@@ -36,7 +36,7 @@ namespace NEWTONS.Core._2D
         public static float Temperature
         {
             get => temperature;
-            set { temperature = Mathf.Max(value, PhysicsInfo.MinTemperature); }
+            set => temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
         }
 
 
@@ -49,14 +49,14 @@ namespace NEWTONS.Core._2D
             {
                 if (body.IsStatic)
                     continue;
-                
+
                 // Linear velocity
-                Vector2 deltaPos = Vector2.Zero;
 
                 if (body.UseGravity)
                     body.Velocity += Gravity * DeltaTime;
 
 
+                Vector2 deltaPos = Vector2.Zero;
                 if (body.Velocity != Vector2.Zero)
                 {
                     deltaPos += body.Velocity * DeltaTime;
@@ -65,13 +65,13 @@ namespace NEWTONS.Core._2D
 
                 // Angular Velocity
                 float deltaRotation = 0f; // Angle in degrees
-                if (body.AngularVelocity != 0f)
+                if (body.AngularVelocity != 0f && !body.FixRotation)
                 {
                     deltaRotation += body.AngularVelocity * DeltaTime * Mathf.Rad2Deg;
                     body.Rotation += deltaRotation;
                 }
             }
-            
+
             // TODO: infinite quadtree
             Rectangle boundary = new Rectangle(new Vector2(0, 0), new Vector2(100, 100));
             _quadtree = new Quadtree<Collider2D>(boundary, 4);

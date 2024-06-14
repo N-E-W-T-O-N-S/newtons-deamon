@@ -62,6 +62,18 @@ namespace NEWTONS.Core._2D
             set => position = value;
         }
 
+        public bool fixRotation;
+
+        public bool FixRotation
+        {
+            get => fixRotation;
+            set
+            {
+                fixRotation = value;
+                AngularVelocity = fixRotation ? 0f : AngularVelocity;
+            }
+        }
+
         [Obsolete("Use Rotation instead")]
         public float rotation;
 
@@ -78,7 +90,19 @@ namespace NEWTONS.Core._2D
         // Passive Properties
         //<----------------------->
 
-        public bool IsStatic;
+        public bool isStatic;
+
+        public bool IsStatic
+        {
+            get => isStatic;
+            set
+            {
+                isStatic = value;
+                InvMass = isStatic ? 0f : 1f / Mass;
+                Velocity = isStatic ? Vector2.Zero : Velocity;
+                AngularVelocity = isStatic ? 0f : AngularVelocity;
+            }
+        }
 
         public Vector2 velocity;
 
@@ -101,6 +125,8 @@ namespace NEWTONS.Core._2D
 
         public float Inertia => Collider?.Inertia ?? 1f;
 
+        public float InvInertia => IsStatic | FixRotation ? 0f : 1f / Inertia;
+
         public Vector2 CenterOfMass;
 
         [Obsolete("Use Mass instead")]
@@ -109,8 +135,16 @@ namespace NEWTONS.Core._2D
         public float Mass
         {
             get => mass;
-            set { mass = Mathf.Max(value, PhysicsInfo.MinMass); }
+            set
+            {
+                mass = Mathf.Max(value, PhysicsInfo.MinMass);
+                InvMass = IsStatic ? 0f : 1f / mass;
+            }
         }
+
+        public float InvMass;
+
+
 
         [Obsolete("Use Drag instead")]
         public float drag;
@@ -169,7 +203,7 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// Gets the current linear velocity, of the point in world space, on the RigidBody
         /// </summary>
-        public Vector2 GetVelocityOfPoint(Vector2 p)
+        public Vector2 GetVelocityAtPoint(Vector2 p)
         {
             Vector2 cmToP = p - (CenterOfMass + Position);
             return Velocity + AngularVelocity * new Vector2(-cmToP.y, cmToP.x);

@@ -1,6 +1,7 @@
 ﻿using NEWTONS.Debuger;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -40,8 +41,10 @@ namespace NEWTONS.Core._2D
 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Update()
+        public static void Update(float delta)
         {
+            DeltaTime = delta;
+
             foreach (var body in Bodies)
             {
                 if (body.IsStatic)
@@ -53,10 +56,11 @@ namespace NEWTONS.Core._2D
                 if (body.UseGravity)
                     body.Velocity += Gravity * DeltaTime;
 
+
                 if (body.Velocity != Vector2.Zero)
                 {
                     deltaPos += body.Velocity * DeltaTime;
-                    body.MoveToPosition(body.Position + deltaPos);
+                    body.Position += deltaPos;
                 }
 
                 // Angular Velocity
@@ -64,7 +68,7 @@ namespace NEWTONS.Core._2D
                 if (body.AngularVelocity != 0f)
                 {
                     deltaRotation += body.AngularVelocity * DeltaTime * Mathf.Rad2Deg;
-                    body.MoveToRotation(body.Rotation + deltaRotation);
+                    body.Rotation += deltaRotation;
                 }
             }
             
@@ -78,10 +82,8 @@ namespace NEWTONS.Core._2D
                 _quadtree.Insert(new QuadtreeData<Collider2D>(collider.GlobalCenter, collider));
             }
 
-            foreach (var collider in Colliders)
+            foreach (var c1 in Colliders)
             {
-                Collider2D c1 = collider;
-                
                 // TODO: Add boundary to get Scale for the Quadtree
                 var qtDataToCheck = _quadtree.Receive(c1.GlobalCenter, c1.Scale * 100);
                 foreach (var qtData in qtDataToCheck)
@@ -91,12 +93,22 @@ namespace NEWTONS.Core._2D
                     if (c1 == c2 || checkd.Contains(compareTupl))
                         continue;
 
-                    CollisionInfo info = c1.IsColliding(c2);
+                    _ = c1.IsColliding(c2);
 
                     compareTupl = (c2, c1);
                     checkd.Add(compareTupl);
                 }
             }
+
+            // INFO: Inform the frontend about active changes
+            foreach (var body in Bodies)
+            {
+                body.InformPositionChange();
+                body.InformRotationChange();
+                //body.Collider?.InformScaleChange();
+            }
+
+            // TODO: Bring back the Move -and Rotate to function and scrap the idea of preserving velocity after a move (thats not how physics work!)
         }
     }
 }

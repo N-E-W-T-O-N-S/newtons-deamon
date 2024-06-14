@@ -31,7 +31,7 @@ namespace NEWTONS.Core._3D
                 AddToPhysicsEngine();
         }
 
-        public Rigidbody Body;
+        public Rigidbody? Body;
         public Vector3 Center;
         public PrimitiveShape Shape { get; }
         public float Restitution = 0.5f;

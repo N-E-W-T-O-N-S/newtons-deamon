@@ -10,7 +10,7 @@ namespace NEWTONS.Core._2D
     [System.Serializable]
     public class CuboidCollider2D : KonvexCollider2D
     {
-        private static readonly Vector2[] defaultPoints = new Vector2[4]
+        private static readonly Vector2[] _defaultPoints = new Vector2[4]
         {
             new Vector2(-0.5f, 0.5f),
             new Vector2(0.5f, 0.5f),
@@ -20,10 +20,10 @@ namespace NEWTONS.Core._2D
 
         public CuboidCollider2D()
         {
-            PointsRaw = defaultPoints;
+            PointsRaw = _defaultPoints;
         }
 
-        public CuboidCollider2D(Vector3 scale, Vector3 size, Rigidbody2D rigidbody, Vector3 center, float restitution, bool addToEngine = true) : base(defaultPoints, size, scale, rigidbody, center, PrimitiveShape2D.Square, addToEngine)
+        public CuboidCollider2D(Vector3 scale, Vector3 size, Rigidbody2D rigidbody, Vector3 center, float restitution, bool addToEngine = true) : base(_defaultPoints, size, scale, rigidbody, center, PrimitiveShape2D.Square, addToEngine)
         {
 
         }

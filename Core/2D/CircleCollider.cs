@@ -7,7 +7,7 @@ namespace NEWTONS.Core._2D
     [System.Serializable]
     public class CircleCollider : Collider2D
     {
-        protected CircleCollider() 
+        public CircleCollider() 
         { 
             Radius = 0.5f;
         }

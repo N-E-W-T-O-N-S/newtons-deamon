@@ -32,7 +32,7 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// serialization constructor
         /// </summary>
-        internal Rigidbody2D()
+        public Rigidbody2D()
         {
             Mass = 1f;
         }
@@ -59,18 +59,6 @@ namespace NEWTONS.Core._2D
         public Vector2 Position
         {
             get => position;
-            set
-            {
-                position = value;
-                OnUpdatePosition?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// Does not invoke <see cref="OnUpdatePosition"/>
-        /// </summary>
-        public Vector2 PositionNoNotify
-        {
             set => position = value;
         }
 
@@ -83,18 +71,6 @@ namespace NEWTONS.Core._2D
         public float Rotation
         {
             get => rotation;
-            set
-            {
-                rotation = value;
-                OnUpdateRotation?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// Does not invoke <see cref="OnUpdateRotation"/>
-        /// </summary>
-        public float RotationNoNotify
-        {
             set => rotation = value;
         }
 
@@ -104,12 +80,24 @@ namespace NEWTONS.Core._2D
 
         public bool IsStatic;
 
-        public Vector2 Velocity;
+        public Vector2 velocity;
+
+        public Vector2 Velocity
+        {
+            get => velocity;
+            set => velocity = value;
+        }
+
+        public float angularVelocity;
 
         /// <summary>
         /// Angular velocity in radians per second
         /// </summary>
-        public float AngularVelocity;
+        public float AngularVelocity
+        {
+            get => angularVelocity;
+            set => angularVelocity = value;
+        }
 
         public float Inertia => Collider?.Inertia ?? 1f;
 
@@ -140,16 +128,16 @@ namespace NEWTONS.Core._2D
             Vector2.Rotate(new Vector3(0, 1), Rotation * Mathf.Deg2Rad)
         );
 
-        // TODO: Buffer this
-        public void MoveToPosition(Vector2 newPosition)
+        // TODO: find a purpose
+        public void AddCurrentVelocity(Vector2 velocity)
         {
-            Position = newPosition;
+            if (IsStatic) return;
         }
 
-        // TODO: Buffer this
-        public void MoveToRotation(float newRotation)
+        //TODO: find a purpose
+        public void AddCurrentAngularVelocity(float angualrVelocity)
         {
-            Rotation = newRotation;
+            if (IsStatic) return;
         }
 
         public void AddForce(Vector2 force, ForceMode forceMode)
@@ -179,7 +167,7 @@ namespace NEWTONS.Core._2D
         }
 
         /// <summary>
-        /// Gets the current linear velocity of the point on the RigidBody
+        /// Gets the current linear velocity, of the point in world space, on the RigidBody
         /// </summary>
         public Vector2 GetVelocityOfPoint(Vector2 p)
         {
@@ -204,6 +192,9 @@ namespace NEWTONS.Core._2D
         {
             _references.Add(reference);
         }
+
+        internal void InformPositionChange() => OnUpdatePosition?.Invoke();
+        internal void InformRotationChange() => OnUpdateRotation?.Invoke();
 
         ~Rigidbody2D()
         {

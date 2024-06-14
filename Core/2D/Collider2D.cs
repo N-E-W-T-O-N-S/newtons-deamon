@@ -9,7 +9,7 @@ namespace NEWTONS.Core._2D
     [System.Serializable]
     public abstract class Collider2D : IDisposable, IRigidbodyReference2D
     {
-        private List<IColliderReference2D> _references = new List<IColliderReference2D>();
+        private readonly List<IColliderReference2D> _references = new List<IColliderReference2D>();
 
         /// <summary>
         /// Is this Collider2D already disposed
@@ -32,13 +32,13 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// serialization constructor
         /// </summary>
-        protected Collider2D()
+        public Collider2D()
         {
             Scale = new Vector2(1, 1);
             Body = new Rigidbody2D();
         }
 
-        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, PrimitiveShape2D shape, bool addToEngine = true)
+        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, PrimitiveShape2D shape, bool addToEngine)
         {
             Body = rigidbody;
             Scale = scale;
@@ -60,7 +60,7 @@ namespace NEWTONS.Core._2D
             set
             {
                 scale = value;
-                OnUpdateScale?.Invoke();
+                InformScaleChange();
             }
         }
 
@@ -221,8 +221,8 @@ namespace NEWTONS.Core._2D
             float depth2 = (velocityB2 / combinedVelocity) * depth;
 
 
-            coll1.Body.MoveToPosition(coll1.Body.Position + (normal * depth1));
-            coll2.Body.MoveToPosition(coll2.Body.Position + (-normal * depth2));
+            coll1.Body.Position = (coll1.Body.Position + (normal * depth1));
+            coll2.Body.Position = (coll2.Body.Position + (-normal * depth2));
 
             info.didCollide = true;
             info.normal = normal;
@@ -264,8 +264,8 @@ namespace NEWTONS.Core._2D
             depth1 = (velocityB1 / combinedVelocity) * depth;
             depth2 = (velocityB2 / combinedVelocity) * depth;
 
-            coll1.Body.MoveToPosition(coll1.Body.Position + (normal * depth1));
-            coll2.Body.MoveToPosition(coll2.Body.Position - (normal * depth2));
+            coll1.Body.Position = (coll1.Body.Position + (normal * depth1));
+            coll2.Body.Position = (coll2.Body.Position - (normal * depth2));
 
             info.didCollide = true;
             info.normal = normal;
@@ -371,8 +371,8 @@ namespace NEWTONS.Core._2D
             float depth2 = (velocityB2 / combinedVelocity) * depth;
 
 
-            coll1.Body.MoveToPosition(coll1.Body.Position + (normal * depth1));
-            coll2.Body.MoveToPosition(coll2.Body.Position + (-normal * depth2));
+            coll1.Body.Position += (normal * depth1);
+            coll2.Body.Position = (coll2.Body.Position + (-normal * depth2));
 
             info.didCollide = true;
             info.normal = normal;
@@ -403,6 +403,8 @@ namespace NEWTONS.Core._2D
         {
             _references.Add(reference);
         }
+
+        internal void InformScaleChange() => OnUpdateScale?.Invoke();
 
         ~Collider2D()
         {

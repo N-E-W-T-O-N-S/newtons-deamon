@@ -20,7 +20,7 @@ namespace NEWTONS.Core._2D
             new Vector2(0.25f, -0.433f)
         };
 
-        protected KonvexCollider2D()
+        public KonvexCollider2D()
         {
             Size = new Vector2(1, 1);
             PointsRaw = _defaultPoints;
@@ -60,37 +60,6 @@ namespace NEWTONS.Core._2D
                     points[i] = scaledPoints.x * a + scaledPoints.y * b;
                 }
                 return points;
-            }
-        }
-
-        [Obsolete("Use Points instead")]
-        public Vector2[] RotatedPoints
-        {
-            get
-            {
-                Vector2[] rotatedPoints = new Vector2[PointsRaw.Length];
-                float deg2Rad = Mathf.Deg2Rad;
-                Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
-                Vector2 b = new Vector2(-a.y, a.x);
-                for (int i = 0; i < PointsRaw.Length; i++)
-                {
-                    rotatedPoints[i] = PointsRaw[i].x * a + PointsRaw[i].y * b;
-                }
-                return rotatedPoints;
-            }
-        }
-
-        [Obsolete("Use Points instead")]
-        public Vector2[] ScaledPoints
-        {
-            get
-            {
-                Vector2[] scaledPoints = new Vector2[PointsRaw.Length];
-                for (int i = 0; i < PointsRaw.Length; i++)
-                {
-                    scaledPoints[i] = Vector2.Scale(PointsRaw[i], ScaledSize);
-                }
-                return scaledPoints;
             }
         }
 

@@ -67,11 +67,7 @@ namespace NEWTONS.Core._2D
         public bool FixRotation
         {
             get => fixRotation;
-            set
-            {
-                fixRotation = value;
-                AngularVelocity = fixRotation ? 0f : AngularVelocity;
-            }
+            set => fixRotation = value;
         }
 
         [Obsolete("Use Rotation instead")]
@@ -95,20 +91,14 @@ namespace NEWTONS.Core._2D
         public bool IsStatic
         {
             get => isStatic;
-            set
-            {
-                isStatic = value;
-                InvMass = isStatic ? 0f : 1f / Mass;
-                Velocity = isStatic ? Vector2.Zero : Velocity;
-                AngularVelocity = isStatic ? 0f : AngularVelocity;
-            }
+            set => isStatic = value;
         }
 
         public Vector2 velocity;
 
         public Vector2 Velocity
         {
-            get => velocity;
+            get => IsStatic ? Vector2.Zero : velocity;
             set => velocity = value;
         }
 
@@ -119,11 +109,24 @@ namespace NEWTONS.Core._2D
         /// </summary>
         public float AngularVelocity
         {
-            get => angularVelocity;
+            get => IsStatic | FixRotation ? 0f : angularVelocity;
             set => angularVelocity = value;
         }
 
-        public float Inertia => Collider?.Inertia ?? 1f;
+        public bool CustomInertia = false;
+
+        public float inertia = 1f;
+
+        public float Inertia
+        {
+            get => CustomInertia ? inertia : Collider?.Inertia ?? 1f;
+            set
+            {
+                if (!CustomInertia)
+                    return;
+                inertia = value;
+            }
+        }
 
         public float InvInertia => IsStatic | FixRotation ? 0f : 1f / Inertia;
 
@@ -135,15 +138,10 @@ namespace NEWTONS.Core._2D
         public float Mass
         {
             get => mass;
-            set
-            {
-                mass = Mathf.Max(value, PhysicsInfo.MinMass);
-                InvMass = IsStatic ? 0f : 1f / mass;
-            }
+            set => mass = Mathf.Max(value, PhysicsInfo.MinMass);
         }
 
-        public float InvMass;
-
+        public float InvMass => IsStatic ? 0f : 1f / Mass;
 
 
         [Obsolete("Use Drag instead")]
@@ -205,7 +203,7 @@ namespace NEWTONS.Core._2D
         /// </summary>
         public Vector2 GetVelocityAtPoint(Vector2 p)
         {
-            Vector2 cmToP = p - (CenterOfMass + Position);
+            Vector2 cmToP = p - (CenterOfMass + Collider?.GlobalCenter ?? Position);
             return Velocity + AngularVelocity * new Vector2(-cmToP.y, cmToP.x);
         }
 

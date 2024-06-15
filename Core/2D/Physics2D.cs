@@ -18,7 +18,7 @@ namespace NEWTONS.Core._2D
 
         /// <summary>
         /// Acceleration applied to the Physics World
-        /// <br /> Default (0, -9.81f, 0)
+        /// <br /> Default (0, -9.81f)
         /// </summary>
         public static Vector2 Gravity { get; set; } = new Vector2(0, -9.81f);
         public static bool UseCustomDrag { get; set; } = false;
@@ -44,59 +44,64 @@ namespace NEWTONS.Core._2D
         public static void Update(float delta)
         {
             DeltaTime = delta;
+            float time = delta / 20f;
 
-            foreach (var body in Bodies)
+            for (int i = 0; i < 20; i++)
             {
-                if (body.IsStatic)
-                    continue;
 
-                // Linear velocity
-
-                if (body.UseGravity)
-                    body.Velocity += Gravity * DeltaTime;
-
-
-                Vector2 deltaPos = Vector2.Zero;
-                if (body.Velocity != Vector2.Zero)
+                foreach (var body in Bodies)
                 {
-                    deltaPos += body.Velocity * DeltaTime;
-                    body.Position += deltaPos;
-                }
-
-                // Angular Velocity
-                float deltaRotation = 0f; // Angle in degrees
-                if (body.AngularVelocity != 0f && !body.FixRotation)
-                {
-                    deltaRotation += body.AngularVelocity * DeltaTime * Mathf.Rad2Deg;
-                    body.Rotation += deltaRotation;
-                }
-            }
-
-            // TODO: infinite quadtree
-            Rectangle boundary = new Rectangle(new Vector2(0, 0), new Vector2(100, 100));
-            _quadtree = new Quadtree<Collider2D>(boundary, 4);
-
-            HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
-            foreach (var collider in Colliders)
-            {
-                _quadtree.Insert(new QuadtreeData<Collider2D>(collider.GlobalCenter, collider));
-            }
-
-            foreach (var c1 in Colliders)
-            {
-                // TODO: Add boundary to get Scale for the Quadtree
-                var qtDataToCheck = _quadtree.Receive(c1.GlobalCenter, c1.Scale * 100);
-                foreach (var qtData in qtDataToCheck)
-                {
-                    Collider2D c2 = qtData.Data;
-                    ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
-                    if (c1 == c2 || checkd.Contains(compareTupl))
+                    if (body.IsStatic)
                         continue;
 
-                    _ = c1.IsColliding(c2);
+                    // Linear velocity
 
-                    compareTupl = (c2, c1);
-                    checkd.Add(compareTupl);
+                    if (body.UseGravity)
+                        body.Velocity += Gravity * DeltaTime;
+
+
+                    Vector2 deltaPos = Vector2.Zero;
+                    if (body.Velocity != Vector2.Zero)
+                    {
+                        deltaPos += body.Velocity * DeltaTime;
+                        body.Position += deltaPos;
+                    }
+
+                    // Angular Velocity
+                    float deltaRotation = 0f; // Angle in degrees
+                    if (body.AngularVelocity != 0f && !body.FixRotation)
+                    {
+                        deltaRotation += body.AngularVelocity * DeltaTime * Mathf.Rad2Deg;
+                        body.Rotation += deltaRotation;
+                    }
+                }
+
+                // TODO: infinite quadtree
+                Rectangle boundary = new Rectangle(new Vector2(0, 0), new Vector2(100, 100));
+                _quadtree = new Quadtree<Collider2D>(boundary, 4);
+
+                HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
+                foreach (var collider in Colliders)
+                {
+                    _quadtree.Insert(new QuadtreeData<Collider2D>(collider.GlobalCenter, collider));
+                }
+
+                foreach (var c1 in Colliders)
+                {
+                    // TODO: Add boundary to get Scale for the Quadtree
+                    var qtDataToCheck = _quadtree.Receive(c1.GlobalCenter, c1.Scale * 100);
+                    foreach (var qtData in qtDataToCheck)
+                    {
+                        Collider2D c2 = qtData.Data;
+                        ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
+                        if (c1 == c2 || checkd.Contains(compareTupl))
+                            continue;
+
+                        _ = c1.IsColliding(c2);
+
+                        compareTupl = (c2, c1);
+                        checkd.Add(compareTupl);
+                    }
                 }
             }
 

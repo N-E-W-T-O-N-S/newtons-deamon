@@ -57,13 +57,13 @@ namespace NEWTONS.Core._2D
                     // Linear velocity
 
                     if (body.UseGravity)
-                        body.Velocity += Gravity * DeltaTime;
+                        body.Velocity += Gravity * time;
 
 
                     Vector2 deltaPos = Vector2.Zero;
                     if (body.Velocity != Vector2.Zero)
                     {
-                        deltaPos += body.Velocity * DeltaTime;
+                        deltaPos += body.Velocity * time;
                         body.Position += deltaPos;
                     }
 
@@ -71,7 +71,7 @@ namespace NEWTONS.Core._2D
                     float deltaRotation = 0f; // Angle in degrees
                     if (body.AngularVelocity != 0f && !body.FixRotation)
                     {
-                        deltaRotation += body.AngularVelocity * DeltaTime * Mathf.Rad2Deg;
+                        deltaRotation += body.AngularVelocity * time * Mathf.Rad2Deg;
                         body.Rotation += deltaRotation;
                     }
                 }

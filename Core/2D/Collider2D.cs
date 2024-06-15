@@ -78,6 +78,8 @@ namespace NEWTONS.Core._2D
 
         public virtual float Rotation => Body.Rotation;
 
+        public abstract Bounds2D Bounds { get; }
+
         public abstract CollisionInfo IsColliding(Collider2D other);
 
         /// <summary>

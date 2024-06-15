@@ -83,6 +83,23 @@ namespace NEWTONS.Core._2D
 
         public override float Inertia => 1f;
 
+        public override Bounds2D Bounds
+        {
+            get
+            {
+                var ps = Points;
+                Vector2 center = GlobalCenter;
+
+                Bounds2D bounds = new Bounds2D(Vector2.Infinity, Vector2.NegativeInfinity);
+
+                for (int i = 0; i < ps.Length; i++)
+                {
+                    bounds.IncludePoint(ps[i] + center);
+                }
+                return bounds;
+            }
+        }
+
         public Vector3[] ClosestPointsOnShape(KonvexCollider2D collider, out float sqrDist)
         {
             sqrDist = Mathf.Infinity;

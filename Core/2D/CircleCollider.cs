@@ -25,6 +25,14 @@ namespace NEWTONS.Core._2D
 
         public override float Inertia => 1f;
 
+        public override Bounds2D Bounds
+        {
+            get
+            {
+                return new Bounds2D(ScaledRadius, GlobalCenter);
+            }
+        }
+
         public override CollisionInfo IsColliding(Collider2D other)
         {
             CollisionInfo info = other switch

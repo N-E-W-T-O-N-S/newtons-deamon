@@ -171,6 +171,24 @@ namespace NEWTONS.Core
             get => backVector;
         }
 
+        /// <summary>
+        /// Returns a <c>new Vector(Inf, Inf, Inf);</c>
+        /// </summary>
+        public static Vector3 Infinity
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
+        }
+
+        /// <summary>
+        /// Returns a <c>new Vector(-Inf, -Inf, -Inf);</c>
+        /// </summary>
+        public static Vector3 NegativeInfinity
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => new Vector3(Mathf.NegativeInfinity, Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 operator +(Vector3 a, Vector3 b) => new Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
 

@@ -17,17 +17,25 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// Is this RigidBody2D already disposed
         /// </summary>
-        public bool Disposed { get; private set; } = false;
+        public bool Disposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        } = false;
 
         /// <summary>
         /// Is this RigidBody2D already added to the engine
         /// </summary>
-        public bool AddedToPhysicsEngine => Physics2D.Bodies.Contains(this);
+        public bool AddedToPhysicsEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Physics2D.Bodies.Contains(this);
+        }
 
 
-        public Collider2D? _collider;
-
-        public Collider2D? Collider { get => _collider; set => _collider = value; }
+        public Collider2D? Collider { get; set; }
 
         /// <summary>
         /// serialization constructor
@@ -53,107 +61,140 @@ namespace NEWTONS.Core._2D
         // Active Properties
         //<----------------------->
 
-        [Obsolete("Use Position instead")]
-        public Vector2 position;
-
         public Vector2 Position
         {
-            get => position;
-            set => position = value;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
         }
 
-        public bool fixRotation;
-
-        public bool FixRotation
-        {
-            get => fixRotation;
-            set => fixRotation = value;
-        }
-
-        [Obsolete("Use Rotation instead")]
-        public float rotation;
 
         /// <summary>
         /// Angle in degrees
         /// </summary>
         public float Rotation
         {
-            get => rotation;
-            set => rotation = value;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
         }
 
         //<----------------------->
         // Passive Properties
         //<----------------------->
 
-        public bool isStatic;
+        public bool FixRotation
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        }
 
         public bool IsStatic
         {
-            get => isStatic;
-            set => isStatic = value;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
         }
 
-        public Vector2 velocity;
+        private Vector2 _velocity;
 
         public Vector2 Velocity
         {
-            get => IsStatic ? Vector2.Zero : velocity;
-            set => velocity = value;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => IsStatic ? Vector2.Zero : _velocity;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _velocity = value;
         }
 
-        public float angularVelocity;
+        private float _angularVelocity;
 
         /// <summary>
         /// Angular velocity in radians per second
         /// </summary>
         public float AngularVelocity
         {
-            get => IsStatic | FixRotation ? 0f : angularVelocity;
-            set => angularVelocity = value;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => IsStatic | FixRotation ? 0f : _angularVelocity;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _angularVelocity = value;
         }
 
-        public bool CustomInertia = false;
+        public bool CustomInertia
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        } = false;
 
-        public float inertia = 1f;
+        private float _inertia = 1f;
 
         public float Inertia
         {
-            get => CustomInertia ? inertia : Collider?.Inertia ?? 1f;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => CustomInertia ? _inertia : Collider?.Inertia ?? 1f;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 if (!CustomInertia)
                     return;
-                inertia = value;
+                _inertia = value;
             }
         }
 
-        public float InvInertia => IsStatic | FixRotation ? 0f : 1f / Inertia;
+        public float InvInertia
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => IsStatic | FixRotation ? 0f : 1f / Inertia;
+        }
 
-        public Vector2 CenterOfMass;
+        public Vector2 CenterOfMass
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        }
 
-        [Obsolete("Use Mass instead")]
-        public float mass;
+        private float _mass;
 
         public float Mass
         {
-            get => mass;
-            set => mass = Mathf.Max(value, PhysicsInfo.MinMass);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _mass;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _mass = Mathf.Max(value, PhysicsInfo.MinMass);
         }
 
-        public float InvMass => IsStatic ? 0f : 1f / Mass;
+        public float InvMass
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => IsStatic ? 0f : 1f / Mass;
+        }
 
 
-        [Obsolete("Use Drag instead")]
-        public float drag;
+        private float _drag;
 
         public float Drag
         {
-            get => drag;
-            set => drag = Mathf.Max(value, PhysicsInfo.MinDrag);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _drag;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _drag = Mathf.Max(value, PhysicsInfo.MinDrag);
         }
 
-        public bool UseGravity;
+        public bool UseGravity
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        }
 
         public Matrix2x2 WorldToLocalMatrix => new Matrix2x2(
             Vector2.Rotate(new Vector3(1, 0), Rotation * Mathf.Deg2Rad),
@@ -201,6 +242,7 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// Gets the current linear velocity, of the point in world space, on the RigidBody
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Vector2 GetVelocityAtPoint(Vector2 p)
         {
             Vector2 cmToP = p - (CenterOfMass + Collider?.GlobalCenter ?? Position);
@@ -225,7 +267,9 @@ namespace NEWTONS.Core._2D
             _references.Add(reference);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void InformPositionChange() => OnUpdatePosition?.Invoke();
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal void InformRotationChange() => OnUpdateRotation?.Invoke();
 
         ~Rigidbody2D()
@@ -237,6 +281,7 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// Removes the RgidiBody from the engine and disposes all references
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             if (Disposed)
@@ -257,6 +302,7 @@ namespace NEWTONS.Core._2D
         }
 
         //INFO: Just for fun!!!!!! (for now)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DisposeMultiple(params Rigidbody2D[] bodies)
         {
             Task[] disposeTasks = new Task[bodies.Length];

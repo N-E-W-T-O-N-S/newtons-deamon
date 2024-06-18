@@ -29,5 +29,7 @@ namespace NEWTONS.Core._2D
             if (point.y < Min.y) Min.y = point.y;
             if (point.y > Max.y) Max.y = point.y;
         }
+
+        public readonly Rectangle ToRectangle() =>  new Rectangle(Min, Max);
     }
 }

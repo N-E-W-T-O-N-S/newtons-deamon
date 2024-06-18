@@ -17,11 +17,11 @@ namespace NEWTONS.Core._2D
             Radius = radius;
         }
 
-        public float radius;
+        private float _radius;
 
-        public float Radius { get => radius; set => radius = Mathf.Max(value, 0); }
+        public float Radius { get => _radius; set => _radius = Mathf.Max(value, 0); }
 
-        public float ScaledRadius => radius * Mathf.Max(Mathf.Abs(Scale.x), Math.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
+        public float ScaledRadius => _radius * Mathf.Max(Mathf.Abs(Scale.x), Math.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
 
         public override float Inertia => 1f;
 

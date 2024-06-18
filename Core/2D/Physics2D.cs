@@ -7,6 +7,7 @@ using System.Text;
 
 namespace NEWTONS.Core._2D
 {
+    [System.Serializable]
     public static class Physics2D
     {
         public static HashSet<Collider2D> Colliders { get; set; } = new HashSet<Collider2D>();
@@ -77,19 +78,19 @@ namespace NEWTONS.Core._2D
                 }
 
                 // TODO: infinite quadtree
-                Rectangle boundary = new Rectangle(new Vector2(0, 0), new Vector2(100, 100));
+                Rectangle boundary = new Rectangle(new Vector2(0, 0), 100, 100);
                 _quadtree = new Quadtree<Collider2D>(boundary, 4);
 
                 HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
                 foreach (var collider in Colliders)
                 {
-                    _quadtree.Insert(new QuadtreeData<Collider2D>(collider.GlobalCenter, collider));
+                    _quadtree.Insert(new QuadtreeData<Collider2D>(collider.Bounds.ToRectangle(), collider));
                 }
 
                 foreach (var c1 in Colliders)
                 {
                     // TODO: Add boundary to get Scale for the Quadtree
-                    var qtDataToCheck = _quadtree.Receive(c1.GlobalCenter, c1.Scale * 100);
+                    var qtDataToCheck = _quadtree.Receive(c1.Bounds.ToRectangle());
                     foreach (var qtData in qtDataToCheck)
                     {
                         Collider2D c2 = qtData.Data;
@@ -108,9 +109,11 @@ namespace NEWTONS.Core._2D
             // INFO: Inform the frontend about active changes
             foreach (var body in Bodies)
             {
+                if (body.IsStatic) continue;
                 body.InformPositionChange();
+
+                if (body.FixRotation) continue;
                 body.InformRotationChange();
-                //body.Collider?.InformScaleChange();
             }
 
             // TODO: Bring back the Move -and Rotate to function and scrap the idea of preserving velocity after a move (thats not how physics work!)

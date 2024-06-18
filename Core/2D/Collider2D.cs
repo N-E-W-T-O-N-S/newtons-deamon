@@ -14,21 +14,39 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// Is this Collider2D already disposed
         /// </summary>
-        public bool Disposed { get; private set; } = false;
+        public bool Disposed
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private set;
+        } = false;
 
         /// <summary>
         /// Is this Collider2D already added to the engine
         /// </summary>
-        public bool AddedToPhysicsEngine => Physics2D.Colliders.Contains(this);
+        public bool AddedToPhysicsEngine
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => Physics2D.Colliders.Contains(this);
+        }
 
         public Action? OnUpdateScale;
 
         public event Action<CollisionInfo>? OnCollisionEnter;
 
         public Rigidbody2D Body;
-        public Vector2 Center;
+
+        public Vector2 Center
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        }
+
         public PrimitiveShape2D Shape { get; }
-        
+
         /// <summary>
         /// serialization constructor
         /// </summary>
@@ -50,24 +68,36 @@ namespace NEWTONS.Core._2D
                 AddToPhysicsEngine();
         }
 
-        public Vector2 scale;
+        private Vector2 _scale;
 
         /// <summary>
         /// the parent scale of the collider
         /// </summary>
         public virtual Vector3 Scale
         {
-            get => scale;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _scale;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
-                scale = value;
+                _scale = value;
                 InformScaleChange();
             }
         }
 
-        public virtual Vector3 ScaleNoNotify { set => scale = value; }
+        public virtual Vector3 ScaleNoNotify
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _scale = value;
+        }
 
-        public float Restitution;
+        public float Restitution
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        }
 
         /// <summary>
         /// the global center of the collider
@@ -82,10 +112,11 @@ namespace NEWTONS.Core._2D
 
         public abstract CollisionInfo IsColliding(Collider2D other);
 
+
         /// <summary>
         /// Applies impulse to the two colliding Rigid Bodies.
         /// </summary>
-        public virtual void CollisionResponse(Collider2D other, CollisionInfo info)
+        internal virtual void CollisionResponse(Collider2D other, CollisionInfo info)
         {
             if (!info.didCollide)
                 return;
@@ -128,19 +159,34 @@ namespace NEWTONS.Core._2D
             riA.AngularVelocity -= Vector2.Dot(rotatedAP, j * info.normal) * invInertiaA;
             riB.AngularVelocity += Vector2.Dot(rotatedBP, j * info.normal) * invInertiaB;
         }
+        
+        internal static bool BoundsOverlapCheck(Collider2D c1, Collider2D c2)
+        {
+            Bounds2D b1 = c1.Bounds;
+            Bounds2D b2 = c2.Bounds;
 
+            if (b1.Max.x < b2.Min.x || b1.Min.x > b2.Max.x)
+                return false;
+            if (b1.Max.y < b2.Min.y || b1.Min.y > b2.Max.y)
+                return false;
+
+            return true;
+        }
+
+        // TODO: custom cuboid konvex collision
         internal static CollisionInfo Konvex_Cuboid_Collision(KonvexCollider2D coll1, CuboidCollider2D coll2) => Konvex_Konvex_Collision(coll1, coll2);
 
         internal static CollisionInfo Konvex_Konvex_Collision(KonvexCollider2D coll1, KonvexCollider2D coll2)
         {
-            CollisionInfo info = new CollisionInfo()
-            {
-                didCollide = false
-            };
+            CollisionInfo info = default;
+
 
             if (coll1.Body.IsStatic && coll2.Body.IsStatic)
                 return info;
 
+            if (!BoundsOverlapCheck(coll1, coll2))
+                return info;
+            
             Vector2[] aEdgeNormals = coll1.EdgeNormals;
             Vector2[] bEdgeNormals = coll2.EdgeNormals;
             Vector2[] aPoints = coll1.Points;
@@ -241,10 +287,13 @@ namespace NEWTONS.Core._2D
 
         internal static CollisionInfo Circle_Circle_Collision(CircleCollider coll1, CircleCollider coll2)
         {
-            CollisionInfo info = new CollisionInfo()
-            {
-                didCollide = false
-            };
+            CollisionInfo info = default;
+
+            if (coll1.Body.IsStatic && coll2.Body.IsStatic)
+                return info;
+
+            if (!BoundsOverlapCheck(coll1, coll2))
+                return info;
 
             Vector2 direction = coll1.GlobalCenter - coll2.GlobalCenter;
             Vector2 normal = direction.Normalized;
@@ -284,6 +333,12 @@ namespace NEWTONS.Core._2D
         internal static CollisionInfo Konvex_Circle_Collision(KonvexCollider2D coll1, CircleCollider coll2)
         {
             CollisionInfo info = default;
+
+            if (coll1.Body.IsStatic && coll2.Body.IsStatic)
+                return info;
+
+            if (!BoundsOverlapCheck(coll1, coll2))
+                return info;
 
             Vector2[] points = coll1.Points;
 
@@ -374,7 +429,7 @@ namespace NEWTONS.Core._2D
 
 
             coll1.Body.Position += (normal * depth1);
-            coll2.Body.Position = (coll2.Body.Position + (-normal * depth2));
+            coll2.Body.Position += (normal * -depth2);
 
             info.didCollide = true;
             info.normal = normal;

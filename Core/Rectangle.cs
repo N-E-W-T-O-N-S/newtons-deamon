@@ -12,30 +12,59 @@ namespace NEWTONS.Core
         public Vector2 Position { get; }
 
         /// <summary>
-        /// the size of the rectangle in <b>half</b> widths and heights
+        /// Bottom left corner in world space
         /// </summary>
-        public Vector2 Size { get; }
+        public Vector2 Min { get; }
 
-        public Rectangle(Vector2 position, Vector2 size)
+        /// <summary>
+        /// Top right corner in world space
+        /// </summary>
+        public Vector2 Max { get; }
+
+        public float Width { get; }
+
+        public float Height { get; }
+
+        public Rectangle (Vector2 position, float width, float height)
         {
             Position = position;
-            Size = size;
+
+            Vector2 size = new Vector2 (width * 0.5f, height * 0.5f);
+            Max = size + Position;
+            Min = -size + Position;
+            Width = width;
+            Height = height;
+        }
+
+        public Rectangle (Vector2 min, Vector2 max)
+        {
+            float x = (max.x - min.x) * 0.5f + min.x;
+            float y = (max.y - min.y) * 0.5f + min.y;
+            Position = new Vector2(x, y);
+            Min = min;
+            Max = max;
+            Width = max.x - min.x;
+            Height = max.y - min.y;
         }
 
         public readonly bool InBounds(Vector2 point)
         {
-            return point.x >= Position.x - Size.x && point.x <= Position.x + Size.x && point.y >= Position.y - Size.y && point.y <= Position.y + Size.y;
+            return point.x > Min.x && point.x < Max.x && point.y > Min.y && point.y < Max.y;
         }
 
-        public readonly bool Intersects(Rectangle rectangle)
+        public readonly bool Intersects(Rectangle rect)
         {
-            return
-                (
-                rectangle.Position.x + rectangle.Size.x >= Position.x - Size.x &&
-                rectangle.Position.x - rectangle.Size.x <= Position.x + Size.x &&
-                rectangle.Position.y + rectangle.Size.y >= Position.y - Size.y &&
-                rectangle.Position.y - rectangle.Size.y <= Position.y + Size.y
-                );
+            if (Max.x < rect.Min.x || Min.x > rect.Max.x)
+                return false;
+            if (Max.y < rect.Min.y || Min.y > rect.Max.y)
+                return false;
+
+            return true;
+        }
+
+        public readonly bool Encapsulates(Rectangle rect)
+        {
+            return rect.Min.x >= Min.x && rect.Min.y >= Min.y && rect.Max.x <= Max.x && rect.Max.y <= Max.y;
         }
 
     }

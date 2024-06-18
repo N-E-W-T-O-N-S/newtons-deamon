@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace NEWTONS.Core._2D
@@ -32,22 +33,35 @@ namespace NEWTONS.Core._2D
             PointsRaw = points;
         }
 
-        public Vector2 size;
+        private Vector2 _size;
 
-        public virtual Vector2 Size { get => size; set => size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y)); }
+        public virtual Vector2 Size 
+        { 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _size;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => _size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y));
+        }
 
         public virtual Vector2 ScaledSize => Vector2.Scale(Size, Scale);
 
         /// <summary>
         /// no rotation or scale
         /// </summary>
-        public Vector2[] PointsRaw;
+        public Vector2[] PointsRaw
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set;
+        }
 
         /// <summary>
         /// rotated and scaled points
         /// </summary>
         public Vector2[] Points
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 Vector2[] points = new Vector2[PointsRaw.Length];
@@ -68,6 +82,7 @@ namespace NEWTONS.Core._2D
         /// </summary>
         public Vector2[] EdgeNormals
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 Vector2[] points = Points;
@@ -85,6 +100,7 @@ namespace NEWTONS.Core._2D
 
         public override Bounds2D Bounds
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
                 var ps = Points;

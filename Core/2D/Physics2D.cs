@@ -1,4 +1,4 @@
-﻿using NEWTONS.Debuger;
+﻿using NEWTONS.Debugger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -24,20 +24,22 @@ namespace NEWTONS.Core._2D
         public static Vector2 Gravity { get; set; } = new Vector2(0, -9.81f);
         public static bool UseCustomDrag { get; set; } = false;
 
-        private static float density;
+        public static int Steps { get; set; }
+
+        private static float _density;
 
         public static float Density
         {
-            get => density;
-            set { density = Mathf.Max(value, PhysicsInfo.MinDensity); }
+            get => _density;
+            set { _density = Mathf.Max(value, PhysicsInfo.MinDensity); }
         }
 
-        private static float temperature;
+        private static float _temperature;
 
         public static float Temperature
         {
-            get => temperature;
-            set => temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
+            get => _temperature;
+            set => _temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
         }
 
 
@@ -45,9 +47,9 @@ namespace NEWTONS.Core._2D
         public static void Update(float delta)
         {
             DeltaTime = delta;
-            float time = delta / 20f;
+            float time = delta / Steps;
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < Steps; i++)
             {
 
                 foreach (var body in Bodies)
@@ -87,10 +89,13 @@ namespace NEWTONS.Core._2D
                     _quadtree.Insert(new QuadtreeData<Collider2D>(collider.Bounds.ToRectangle(), collider));
                 }
 
+
                 foreach (var c1 in Colliders)
                 {
-                    // TODO: Add boundary to get Scale for the Quadtree
-                    var qtDataToCheck = _quadtree.Receive(c1.Bounds.ToRectangle());
+
+                    List<QuadtreeData<Collider2D>> qtDataToCheck = new List<QuadtreeData<Collider2D>>();
+                    _quadtree.Receive(c1.Bounds.ToRectangle(), qtDataToCheck);
+
                     foreach (var qtData in qtDataToCheck)
                     {
                         Collider2D c2 = qtData.Data;
@@ -98,10 +103,10 @@ namespace NEWTONS.Core._2D
                         if (c1 == c2 || checkd.Contains(compareTupl))
                             continue;
 
+                        //TODO: optimize
                         _ = c1.IsColliding(c2);
 
-                        compareTupl = (c2, c1);
-                        checkd.Add(compareTupl);
+                        checkd.Add((c2, c1));
                     }
                 }
             }
@@ -115,8 +120,6 @@ namespace NEWTONS.Core._2D
                 if (body.FixRotation) continue;
                 body.InformRotationChange();
             }
-
-            // TODO: Bring back the Move -and Rotate to function and scrap the idea of preserving velocity after a move (thats not how physics work!)
         }
     }
 }

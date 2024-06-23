@@ -1,4 +1,4 @@
-﻿using NEWTONS.Debuger;
+﻿using NEWTONS.Debugger;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -61,14 +61,23 @@ namespace NEWTONS.Core._2D
         // Active Properties
         //<----------------------->
 
+        private Vector2 _position;
+
         public Vector2 Position
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            get => _position;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
+            set
+            {
+                if (value == _position) return;
+                _position = value;
+                Debug.Log(Collider);
+                Collider?.PositionChanged();
+            }
         }
 
+        private float _rotation;
 
         /// <summary>
         /// Angle in degrees
@@ -76,9 +85,14 @@ namespace NEWTONS.Core._2D
         public float Rotation
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            get => _rotation;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
+            set
+            {
+                if (value == _rotation) return;
+                _rotation = value;
+                Collider?.RotationChanged();
+            }
         }
 
         //<----------------------->

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NEWTONS.Debugger;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -33,17 +34,49 @@ namespace NEWTONS.Core._2D
             PointsRaw = points;
         }
 
+        public override Vector3 Scale
+        {
+            get
+            {
+                return base.Scale;
+            }
+            set
+            {
+                base.Scale = value;
+                p_scaledSizeNeedsUpdate = true;
+            }
+        }
+
         private Vector2 _size;
 
-        public virtual Vector2 Size 
-        { 
+        public virtual Vector2 Size
+        {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _size;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => _size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y));
+            set 
+            { 
+                _size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y));
+                p_scaledSizeNeedsUpdate = true;
+            }
         }
 
-        public virtual Vector2 ScaledSize => Vector2.Scale(Size, Scale);
+        protected bool p_scaledSizeNeedsUpdate = true;
+
+        private Vector2 _scaledSize;
+
+        public virtual Vector2 ScaledSize
+        {
+            get
+            {
+                if (p_scaledSizeNeedsUpdate)
+                    _scaledSize = Vector2.Scale(Size, Scale);
+
+                p_scaledSizeNeedsUpdate = false;
+                p_pointsNeedsUpdate = true;
+                return _scaledSize;
+            }
+        }
 
         /// <summary>
         /// no rotation or scale
@@ -56,6 +89,10 @@ namespace NEWTONS.Core._2D
             set;
         }
 
+        protected bool p_pointsNeedsUpdate = true;
+
+        private Vector2[] _points = new Vector2[0];
+
         /// <summary>
         /// rotated and scaled points
         /// </summary>
@@ -64,6 +101,8 @@ namespace NEWTONS.Core._2D
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
+                if (!p_pointsNeedsUpdate) return _points;
+
                 Vector2[] points = new Vector2[PointsRaw.Length];
                 float deg2Rad = Mathf.Deg2Rad;
                 Vector2 a = new Vector2(Mathf.Cos(Rotation * deg2Rad), Mathf.Sin(Rotation * deg2Rad)).Normalized;
@@ -73,9 +112,19 @@ namespace NEWTONS.Core._2D
                     Vector2 scaledPoints = Vector2.Scale(PointsRaw[i], ScaledSize);
                     points[i] = scaledPoints.x * a + scaledPoints.y * b;
                 }
-                return points;
+
+                _points = points;
+                p_pointsNeedsUpdate = false;
+                p_boundsNeedsUpdate = true;
+                p_edgeNormalsNeedsUpdate = true;
+
+                return _points;
             }
         }
+
+        protected bool p_edgeNormalsNeedsUpdate = true;
+
+        private Vector2[] _edgeNormals = new Vector2[0];
 
         /// <summary>
         /// 90° counterclockwise rotated edge normalized
@@ -85,6 +134,8 @@ namespace NEWTONS.Core._2D
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
+                if (!p_edgeNormalsNeedsUpdate) return _edgeNormals;
+
                 Vector2[] points = Points;
                 Vector2[] normals = new Vector2[points.Length];
                 for (int i = 0; i < points.Length; i++)
@@ -92,17 +143,24 @@ namespace NEWTONS.Core._2D
                     Vector2 edge = points[(i + 1) % points.Length] - points[i];
                     normals[i] = new Vector2(-edge.y, edge.x).Normalized;
                 }
-                return normals;
+
+                p_edgeNormalsNeedsUpdate = false;
+
+                return _edgeNormals;
             }
         }
 
         public override float Inertia => 1f;
+
+        private Bounds2D _bounds;
 
         public override Bounds2D Bounds
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
+                if (!p_boundsNeedsUpdate) return _bounds;
+
                 var ps = Points;
                 Vector2 center = GlobalCenter;
 
@@ -112,6 +170,10 @@ namespace NEWTONS.Core._2D
                 {
                     bounds.IncludePoint(ps[i] + center);
                 }
+
+                _bounds = bounds;
+                p_boundsNeedsUpdate = false;
+
                 return bounds;
             }
         }
@@ -195,7 +257,8 @@ namespace NEWTONS.Core._2D
             Vector2 center = GlobalCenter;
 
             sqrDist = Mathf.Infinity;
-            Vector2 cp = new Vector2(Mathf.Infinity, Mathf.Infinity);
+            Vector2 cp = Vector2.Infinity;
+            ;
             for (int i = 0; i < points.Length; i++)
             {
                 Vector2 p1 = points[i] + center;
@@ -225,6 +288,19 @@ namespace NEWTONS.Core._2D
             // TODO: Collision response
 
             return info;
+        }
+
+        internal override void RotationChanged()
+        {
+            p_boundsNeedsUpdate = true;
+            p_pointsNeedsUpdate = true;
+        }
+
+        internal override void PositionChanged()
+        {
+            base.PositionChanged();
+            p_pointsNeedsUpdate = true;
+            p_boundsNeedsUpdate = true;
         }
     }
 }

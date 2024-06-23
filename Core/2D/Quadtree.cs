@@ -1,4 +1,4 @@
-﻿using NEWTONS.Debuger;
+﻿using NEWTONS.Debugger;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -111,11 +111,13 @@ namespace NEWTONS.Core._2D
         /// Gets all the QuadtreeData in the given area
         /// </summary>
         /// <returns></returns>
-        public List<QuadtreeData<T>> Receive(Rectangle rect)
+        
+
+        // TODO: Pass data list directly into the method
+        public void Receive(Rectangle rect, List<QuadtreeData<T>> data)
         {
-            List<QuadtreeData<T>> data = new List<QuadtreeData<T>>();
             if (!Boundary.Intersects(rect))
-                return data;
+                return;
 
             foreach (var item in Data)
             {
@@ -126,21 +128,20 @@ namespace NEWTONS.Core._2D
                             data.Add(item);
                         break;
                     case QuadtreeData<T>.DataType.Area:
-                        if (rect.Intersects(item.Area!))
+                        if (rect.Intersects(item.Area))
                             data.Add(item);
                         break;
                 }
 
             }
 
+            if (_nodes[0] == null)
+                return;
+
             for (int i = 0; i < _nodes.Length; i++)
             {
-                if (_nodes[i] == null)
-                    break;
-                data.AddRange(_nodes[i].Receive(rect));
+                _nodes[i].Receive(rect, data);
             }
-
-            return data;
         }
 
         public List<Quadtree<T>> GetTrees()

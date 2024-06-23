@@ -1,4 +1,4 @@
-﻿using NEWTONS.Debuger;
+﻿using NEWTONS.Debugger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,12 +37,18 @@ namespace NEWTONS.Core._2D
 
         public Rigidbody2D Body;
 
+        private Vector2 _center;
+
         public Vector2 Center
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get;
+            get => _center;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set;
+            set
+            {
+                _center = value;
+                p_globalCenterNeedsUpdate = true;
+            }
         }
 
         public PrimitiveShape2D Shape { get; }
@@ -64,6 +70,7 @@ namespace NEWTONS.Core._2D
             Shape = shape;
             Restitution = restitution;
             Body.AddReference(this);
+
             if (addToEngine)
                 AddToPhysicsEngine();
         }
@@ -99,16 +106,40 @@ namespace NEWTONS.Core._2D
             set;
         }
 
+        protected bool p_globalCenterNeedsUpdate = true;
+
+        private Vector2 _globalCenter;
+
         /// <summary>
         /// the global center of the collider
         /// </summary>
-        public virtual Vector2 GlobalCenter => Center + Body.Position;
+        public virtual Vector2 GlobalCenter
+        {
+            get
+            {
+                Debug.Log("p_globalCenterNeedsUpdate: " + p_globalCenterNeedsUpdate);
+                if (p_globalCenterNeedsUpdate)
+                    _globalCenter = Body.Position + Center;
+
+                p_globalCenterNeedsUpdate = false;
+                return _globalCenter;
+            }
+        }
 
         public abstract float Inertia { get; }
 
         public virtual float Rotation => Body.Rotation;
 
+        protected bool p_boundsNeedsUpdate = true;
+
         public abstract Bounds2D Bounds { get; }
+
+        internal virtual void RotationChanged() { }
+
+        internal virtual void PositionChanged()
+        {
+            p_globalCenterNeedsUpdate = true;
+        }
 
         public abstract CollisionInfo IsColliding(Collider2D other);
 
@@ -159,7 +190,7 @@ namespace NEWTONS.Core._2D
             riA.AngularVelocity -= Vector2.Dot(rotatedAP, j * info.normal) * invInertiaA;
             riB.AngularVelocity += Vector2.Dot(rotatedBP, j * info.normal) * invInertiaB;
         }
-        
+
         internal static bool BoundsOverlapCheck(Collider2D c1, Collider2D c2)
         {
             Bounds2D b1 = c1.Bounds;
@@ -186,7 +217,7 @@ namespace NEWTONS.Core._2D
 
             if (!BoundsOverlapCheck(coll1, coll2))
                 return info;
-            
+
             Vector2[] aEdgeNormals = coll1.EdgeNormals;
             Vector2[] bEdgeNormals = coll2.EdgeNormals;
             Vector2[] aPoints = coll1.Points;

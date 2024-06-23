@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NEWTONS.Debuger
+namespace NEWTONS.Debugger
 {
     /// <summary>
     /// NEWTONS own Debug class
@@ -26,27 +26,27 @@ namespace NEWTONS.Debuger
         /// raises a log-message event
         /// </summary>
         /// <param name="message">message to be called</param>
-        internal static void Log(object message)
+        internal static void Log(object? message)
         {
-            OnLog?.Invoke(message.ToString());
+            OnLog?.Invoke(message?.ToString() ?? "NULL");
         }
 
         /// <summary>
         /// raises a warning-message event
         /// </summary>
         /// <param name="message">message to be called</param>
-        internal static void LogWarning(object message)
+        internal static void LogWarning(object? message)
         {
-            OnWarning?.Invoke(message.ToString());
+            OnWarning?.Invoke(message?.ToString() ?? "NULL");
         }
 
         /// <summary>
         /// raises a error-message event
         /// </summary>
         /// <param name="message">message to be called</param>
-        internal static void LogError(object message)
+        internal static void LogError(object? message)
         {
-            OnError?.Invoke(message.ToString());
+            OnError?.Invoke(message?.ToString() ?? "NULL");
         }
     }
 }

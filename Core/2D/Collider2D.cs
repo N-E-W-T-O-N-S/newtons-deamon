@@ -117,7 +117,6 @@ namespace NEWTONS.Core._2D
         {
             get
             {
-                Debug.Log("p_globalCenterNeedsUpdate: " + p_globalCenterNeedsUpdate);
                 if (p_globalCenterNeedsUpdate)
                     _globalCenter = Body.Position + Center;
 
@@ -211,17 +210,20 @@ namespace NEWTONS.Core._2D
         {
             CollisionInfo info = default;
 
-
             if (coll1.Body.IsStatic && coll2.Body.IsStatic)
                 return info;
 
             if (!BoundsOverlapCheck(coll1, coll2))
                 return info;
 
-            Vector2[] aEdgeNormals = coll1.EdgeNormals;
-            Vector2[] bEdgeNormals = coll2.EdgeNormals;
             Vector2[] aPoints = coll1.Points;
             Vector2[] bPoints = coll2.Points;
+            Vector2[] aEdgeNormals = coll1.EdgeNormals;
+            Vector2[] bEdgeNormals = coll2.EdgeNormals;
+
+            Debug.Log("points length: " + aPoints.Length + " " + bPoints.Length);
+            Debug.Log("edges length: " + aEdgeNormals.Length + " " + bEdgeNormals.Length);
+
             // Maybe do not concat
             Vector2[] axisToCheck = aEdgeNormals.Concat(bEdgeNormals).ToArray();
 

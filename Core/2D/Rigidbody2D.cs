@@ -72,7 +72,6 @@ namespace NEWTONS.Core._2D
             {
                 if (value == _position) return;
                 _position = value;
-                Debug.Log(Collider);
                 Collider?.PositionChanged();
             }
         }

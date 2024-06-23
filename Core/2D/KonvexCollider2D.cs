@@ -144,6 +144,7 @@ namespace NEWTONS.Core._2D
                     normals[i] = new Vector2(-edge.y, edge.x).Normalized;
                 }
 
+                _edgeNormals = normals;
                 p_edgeNormalsNeedsUpdate = false;
 
                 return _edgeNormals;

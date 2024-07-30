@@ -30,6 +30,23 @@ namespace NEWTONS.Core._2D
 
         public override float Inertia => (Body.Mass / 12f) * (Mathf.Pow(ScaledSize.x, 2) + Mathf.Pow(ScaledSize.y, 2));
 
+        public override Vector2[] EdgeNormals
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (!p_edgeNormalsNeedsUpdate) return p_edgeNormals;
+
+                var points = Points;
+                p_edgeNormals = new Vector2[2];
+
+                p_edgeNormals[0] = (points[0] - points[1]).Normalized;
+                p_edgeNormals[1] = (points[1] - points[2]).Normalized;
+
+                p_edgeNormalsNeedsUpdate = false;
+                return p_edgeNormals;
+            }
+        }
 
         public override CollisionInfo IsColliding(Collider2D other)
         {
@@ -40,8 +57,6 @@ namespace NEWTONS.Core._2D
                 CircleCollider sphereCol => Konvex_Circle_Collision(this, sphereCol),
                 _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),
             };
-
-            //CollisionResponse(other, info);
 
             return info;
         }

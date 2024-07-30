@@ -124,17 +124,17 @@ namespace NEWTONS.Core._2D
 
         protected bool p_edgeNormalsNeedsUpdate = true;
 
-        private Vector2[] _edgeNormals = new Vector2[0];
+        protected Vector2[] p_edgeNormals = new Vector2[0];
 
         /// <summary>
         /// 90° counterclockwise rotated edge normalized
         /// </summary>
-        public Vector2[] EdgeNormals
+        public virtual Vector2[] EdgeNormals
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if (!p_edgeNormalsNeedsUpdate) return _edgeNormals;
+                if (!p_edgeNormalsNeedsUpdate) return p_edgeNormals;
 
                 Vector2[] points = Points;
                 Vector2[] normals = new Vector2[points.Length];
@@ -144,10 +144,10 @@ namespace NEWTONS.Core._2D
                     normals[i] = new Vector2(-edge.y, edge.x).Normalized;
                 }
 
-                _edgeNormals = normals;
+                p_edgeNormals = normals;
                 p_edgeNormalsNeedsUpdate = false;
 
-                return _edgeNormals;
+                return p_edgeNormals;
             }
         }
 

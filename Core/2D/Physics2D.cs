@@ -104,7 +104,8 @@ namespace NEWTONS.Core._2D
                             continue;
 
                         //TODO: optimize
-                        _ = c1.IsColliding(c2);
+                        var info = c1.IsColliding(c2);
+                        Collider2D.CollisionResponse(c1, c2, info);
 
                         checkd.Add((c2, c1));
                     }

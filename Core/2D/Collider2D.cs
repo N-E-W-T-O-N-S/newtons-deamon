@@ -146,27 +146,27 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// Applies impulse to the two colliding Rigid Bodies.
         /// </summary>
-        internal virtual void CollisionResponse(Collider2D other, CollisionInfo info)
+        internal static void CollisionResponse(Collider2D c1, Collider2D c2, CollisionInfo info)
         {
             if (!info.didCollide)
                 return;
 
-            Rigidbody2D riA = Body;
-            Rigidbody2D riB = other.Body;
+            Rigidbody2D riA = c1.Body;
+            Rigidbody2D riB = c2.Body;
 
-            Vector2 rAP = (Vector2)info.contactPoints[0] - (riA.CenterOfMass + GlobalCenter);
-            Vector2 rBP = (Vector2)info.contactPoints[0] - (riB.CenterOfMass + other.GlobalCenter);
+            Vector2 rAP = (Vector2)info.contactPoints[0] - (riA.CenterOfMass + c1.GlobalCenter);
+            Vector2 rBP = (Vector2)info.contactPoints[0] - (riB.CenterOfMass + c2.GlobalCenter);
 
             Vector2 rotatedAP = new Vector2(-rAP.y, rAP.x);
             Vector2 rotatedBP = new Vector2(-rBP.y, rBP.x);
 
             Vector2 contact = info.contactPoints[0];
 
-            Vector2 vAP = Body.GetVelocityAtPoint(contact);
-            Vector2 vBP = other.Body.GetVelocityAtPoint(contact);
+            Vector2 vAP = c1.Body.GetVelocityAtPoint(contact);
+            Vector2 vBP = c2.Body.GetVelocityAtPoint(contact);
             Vector2 vAB = vBP - vAP;
 
-            float combindeRestitution = (Restitution + other.Restitution) / 2;
+            float combindeRestitution = (c1.Restitution + c2.Restitution) / 2;
 
             float numerator = Vector2.Dot(-(1 + combindeRestitution) * vAB, info.normal);
 
@@ -220,9 +220,6 @@ namespace NEWTONS.Core._2D
             Vector2[] bPoints = coll2.Points;
             Vector2[] aEdgeNormals = coll1.EdgeNormals;
             Vector2[] bEdgeNormals = coll2.EdgeNormals;
-
-            Debug.Log("points length: " + aPoints.Length + " " + bPoints.Length);
-            Debug.Log("edges length: " + aEdgeNormals.Length + " " + bEdgeNormals.Length);
 
             // Maybe do not concat
             Vector2[] axisToCheck = aEdgeNormals.Concat(bEdgeNormals).ToArray();
@@ -309,8 +306,6 @@ namespace NEWTONS.Core._2D
             info.normal = normal;
             info.contactPoints = coll1.ClosestPointsOnShape(coll2, out _);
 
-            coll1.CollisionResponse(coll2, info);
-
             // BUFFER THOSE
             coll1.OnCollisionEnter?.Invoke(info);
             coll2.OnCollisionEnter?.Invoke(info);
@@ -354,8 +349,6 @@ namespace NEWTONS.Core._2D
             info.didCollide = true;
             info.normal = normal;
             info.contactPoints = new Vector3[] { coll2.GlobalCenter + normal * coll2.Radius };
-
-            coll1.CollisionResponse(coll2, info);
 
             coll1.OnCollisionEnter?.Invoke(info);
             coll2.OnCollisionEnter?.Invoke(info);
@@ -467,8 +460,6 @@ namespace NEWTONS.Core._2D
             info.didCollide = true;
             info.normal = normal;
             info.contactPoints = new Vector3[] { coll1.ClosestPointOnShape(circleCenter, out _) };
-
-            coll1.CollisionResponse(coll2, info);
 
             coll1.OnCollisionEnter?.Invoke(info);
             coll2.OnCollisionEnter?.Invoke(info);

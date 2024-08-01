@@ -50,6 +50,8 @@ namespace NEWTONS.Core
                     case 2:
                         z = value;
                         break;
+                    default:
+                        throw new IndexOutOfRangeException();
                 }
             }
         }

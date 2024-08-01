@@ -17,6 +17,33 @@ namespace NEWTONS.Core
             this.y = y;
         }
 
+        public float this[int i]
+        {
+            readonly get
+            {
+                return i switch
+                {
+                    0 => x,
+                    1 => y,
+                    _ => throw new IndexOutOfRangeException(),
+                };
+            }
+            set
+            {
+                switch (i)
+                {
+                    case 0:
+                        x = value;
+                        break;
+                    case 1:
+                        y = value; 
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
+        }
+
         /// <summary>
         /// Returns <c>new Vector2(0, 0);</c>
         /// </summary>
@@ -111,7 +138,7 @@ namespace NEWTONS.Core
             get => new Vector2(Mathf.Infinity, Mathf.Infinity);
         }
 
-                /// <summary>
+        /// <summary>
         /// Returns a <c>new Vector(-Inf, -Inf);</c>
         /// </summary>
         public static Vector2 NegativeInfinity
@@ -213,7 +240,7 @@ namespace NEWTONS.Core
                 y = Mathf.Clamp(value.y, min.y, max.y),
             };
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Lerp(Vector2 a, Vector2 b, float t)
         {

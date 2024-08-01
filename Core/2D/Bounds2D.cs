@@ -15,10 +15,10 @@ namespace NEWTONS.Core._2D
             Max = max;
         }
 
-        public Bounds2D(float radius, Vector2 position)
+        public Bounds2D(float size, Vector2 position)
         {
-            Min = new Vector2(-radius, -radius) + position;
-            Max = new Vector2(radius, radius) + position;
+            Min = new Vector2(-size, -size) + position;
+            Max = new Vector2(size, size) + position;
         }
 
         public void IncludePoint(Vector2 point)
@@ -30,6 +30,36 @@ namespace NEWTONS.Core._2D
             if (point.y > Max.y) Max.y = point.y;
         }
 
-        public readonly Rectangle ToRectangle() =>  new Rectangle(Min, Max);
+        public readonly bool InBounds(Vector2 point)
+        {
+            return point.x > Min.x && point.x < Max.x && point.y > Min.y && point.y < Max.y;
+        }
+
+        public readonly bool Intersects(Bounds2D bounds)
+        {
+            if (Max.x < bounds.Min.x || Min.x > bounds.Max.x)
+                return false;
+            if (Max.y < bounds.Min.y || Min.y > bounds.Max.y)
+                return false;
+
+            return true;
+        }
+
+        public readonly bool Encapsulates(Bounds2D bounds)
+        {
+            return bounds.Min.x >= Min.x && bounds.Min.y >= Min.y && bounds.Max.x <= Max.x && bounds.Max.y <= Max.y;
+        }
+
+        public readonly Rectangle ToRectangle() => new Rectangle(Min, Max);
+
+        /// <summary>
+        /// A bounding box that is infinitely large but inverted
+        /// </summary>
+        public static Bounds2D InvertedBounds => new Bounds2D(Vector2.Infinity, Vector2.NegativeInfinity);
+
+        public override string ToString()
+        {
+            return $"Min: {Min}, Max: {Max}";
+        }
     }
 }

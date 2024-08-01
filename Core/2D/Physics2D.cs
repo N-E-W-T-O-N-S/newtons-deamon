@@ -1,4 +1,5 @@
-﻿using NEWTONS.Debugger;
+﻿using Microsoft.Win32.SafeHandles;
+using NEWTONS.Debugger;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -15,7 +16,10 @@ namespace NEWTONS.Core._2D
 
         public static float DeltaTime { get; set; }
 
+        public static Broadphase broadphaseAlgorithm = Broadphase.Quadtree;
+
         private static Quadtree<Collider2D>? _quadtree;
+        public static BVH2D<Collider2D> _bvh;
 
         /// <summary>
         /// Acceleration applied to the Physics World
@@ -42,6 +46,10 @@ namespace NEWTONS.Core._2D
             set => _temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
         }
 
+        static Physics2D()
+        {
+            _bvh = new BVH2D<Collider2D>();
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Update(float delta)
@@ -79,37 +87,17 @@ namespace NEWTONS.Core._2D
                     }
                 }
 
-                // TODO: infinite quadtree
-                Rectangle boundary = new Rectangle(new Vector2(0, 0), 100, 100);
-                _quadtree = new Quadtree<Collider2D>(boundary, 4);
-
-                HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
-                foreach (var collider in Colliders)
+                // JUST FOR TESTING
+                switch (broadphaseAlgorithm)
                 {
-                    _quadtree.Insert(new QuadtreeData<Collider2D>(collider.Bounds.ToRectangle(), collider));
+                    case Broadphase.Quadtree:
+                        Quadtree();
+                        break;
+                    case Broadphase.BVH:
+                        BVH();
+                        break;
                 }
 
-
-                foreach (var c1 in Colliders)
-                {
-
-                    List<QuadtreeData<Collider2D>> qtDataToCheck = new List<QuadtreeData<Collider2D>>();
-                    _quadtree.Receive(c1.Bounds.ToRectangle(), qtDataToCheck);
-
-                    foreach (var qtData in qtDataToCheck)
-                    {
-                        Collider2D c2 = qtData.Data;
-                        ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
-                        if (c1 == c2 || checkd.Contains(compareTupl))
-                            continue;
-
-                        //TODO: optimize
-                        var info = c1.IsColliding(c2);
-                        Collider2D.CollisionResponse(c1, c2, info);
-
-                        checkd.Add((c2, c1));
-                    }
-                }
             }
 
             // INFO: Inform the frontend about active changes
@@ -121,6 +109,92 @@ namespace NEWTONS.Core._2D
                 if (body.FixRotation) continue;
                 body.InformRotationChange();
             }
+        }
+
+        // JUST FOR TESTING
+        private static void BVH()
+        {
+            BVHData2D<Collider2D>[] data = new BVHData2D<Collider2D>[Colliders.Count];
+
+            int i = 0;
+            foreach (var collider in Colliders)
+            {
+                data[i] = new BVHData2D<Collider2D>(collider.GlobalCenter, collider.Bounds, collider);
+                i++;
+            }
+
+            _bvh.Build(data);
+
+            int checking = 0;
+            HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
+            foreach (var c1 in Colliders)
+            {
+
+                List<BVHData2D<Collider2D>> bvhDataToCheck = new List<BVHData2D<Collider2D>>();
+                _bvh.Receive(c1.Bounds, bvhDataToCheck);
+
+                checking += bvhDataToCheck.Count;
+
+                foreach (var bvhData in bvhDataToCheck)
+                {
+                    Collider2D c2 = bvhData.data;
+                    ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
+                    if (c1 == c2 || checkd.Contains(compareTupl))
+                        continue;
+
+                    //TODO: optimize
+                    var info = c1.IsColliding(c2);
+                    Collider2D.CollisionResponse(c1, c2, info);
+
+                    checkd.Add((c2, c1));
+                }
+            }
+            //Debug.Log(checking);
+        }
+
+        // JUST FOR TESTING
+        private static void Quadtree()
+        {
+            // TODO: infinite quadtree
+            Rectangle boundary = new Rectangle(new Vector2(0, 0), 100, 100);
+            _quadtree = new Quadtree<Collider2D>(boundary, 4);
+
+            foreach (var collider in Colliders)
+            {
+                _quadtree.Insert(new QuadtreeData<Collider2D>(collider.Bounds.ToRectangle(), collider));
+            }
+
+            int checking = 0;
+            HashSet<ValueTuple<Collider2D, Collider2D>> checkd = new HashSet<ValueTuple<Collider2D, Collider2D>>(); // THIS!!!!!!
+            foreach (var c1 in Colliders)
+            {
+
+                List<QuadtreeData<Collider2D>> qtDataToCheck = new List<QuadtreeData<Collider2D>>();
+                _quadtree.Receive(c1.Bounds.ToRectangle(), qtDataToCheck);
+
+                checking += qtDataToCheck.Count;
+
+                foreach (var qtData in qtDataToCheck)
+                {
+                    Collider2D c2 = qtData.Data;
+                    ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
+                    if (c1 == c2 || checkd.Contains(compareTupl))
+                        continue;
+
+                    //TODO: optimize
+                    var info = c1.IsColliding(c2);
+                    Collider2D.CollisionResponse(c1, c2, info);
+
+                    checkd.Add((c2, c1));
+                }
+            }
+            //Debug.Log(checking);
+        }
+
+        public enum Broadphase
+        {
+            Quadtree = 0,
+            BVH = 1
         }
     }
 }

@@ -25,17 +25,17 @@ namespace NEWTONS.Core._2D
 
             nodes[0].leftChild = 0;
             nodes[0].startIndex = 0;
-            nodes[0].indexCount = (uint)bvhData.Length;
+            nodes[0].indexCount = bvhData.Length;
 
-            UpdateBounds(0u);
+            UpdateBounds(0);
 
-            uint usedNodes = 1;
-            Subdivide(0u, ref usedNodes);
+            int usedNodes = 1;
+            Subdivide(0, ref usedNodes);
         }
 
-        public void UpdateBounds(uint index)
+        public void UpdateBounds(int index)
         {
-            var node = nodes[index];
+            ref var node = ref nodes[index];
 
             if (node.indexCount == 1)
             {
@@ -52,20 +52,17 @@ namespace NEWTONS.Core._2D
                 node.bounds.IncludePoint(bounds.Min);
                 node.bounds.IncludePoint(bounds.Max);
             }
-
-            nodes[index] = node;
         }
 
-        public void Subdivide(uint index, ref uint usedNodes)
+        public void Subdivide(int index, ref int usedNodes)
         {
-            //TODO: change to break only if indexCount is 1
-            BVHNode2D node = nodes[index];
+            ref BVHNode2D node = ref nodes[index];
 
             if (node.indexCount == 1) return;
             if (node.indexCount == 2)
             {
-                uint leftChildIdx = usedNodes++;
-                uint rightChildIdx = usedNodes++;
+                int leftChildIdx = usedNodes++;
+                int rightChildIdx = usedNodes++;
 
                 nodes[leftChildIdx].startIndex = node.startIndex;
                 nodes[leftChildIdx].indexCount = 1;
@@ -75,8 +72,6 @@ namespace NEWTONS.Core._2D
 
                 node.leftChild = leftChildIdx;
                 node.indexCount = 0;
-
-                nodes[index] = node;
 
                 UpdateBounds(leftChildIdx);
                 UpdateBounds(rightChildIdx);
@@ -89,47 +84,48 @@ namespace NEWTONS.Core._2D
             int axis = 0;
             if (boundsSize.y > boundsSize.x) axis = 1;
 
+            // INFO: This whole thing does weired. the median object splits the sorted array in half
+            // so the sorting part after this is useless because the array is already sorted and the split is in the half
             float[] axisPoints = new float[node.indexCount];
             for (int i = 0; i < node.indexCount; i++)
                 axisPoints[i] = this.bvhData[node.startIndex + i].position[axis];
 
+            // INFO: O(N log(N)) 🤮
             Array.Sort(axisPoints);
 
             //TODO: better way than offsetting the split position
             float splitPos = axisPoints[axisPoints.Length / 2] + 1e-6f;
 
-            int start = (int)node.startIndex;
-            int j = start + (int)node.indexCount - 1;
+            int start = node.startIndex;
+            int j = start + node.indexCount - 1;
             while (start <= j)
             {
                 if (bvhData[start].position[axis] < splitPos)
                     start++;
                 else
                 {
-                    Swap(start, j);
+                    Swap(ref bvhData[start], ref bvhData[j]);
                     j--;
                 }
             }
 
-            uint leftCount = (uint)start - node.startIndex;
+            int leftCount = start - node.startIndex;
             if (leftCount <= 0)
                 leftCount = 1;
             else if (leftCount >= node.indexCount)
                 leftCount = node.indexCount - 1;
 
-            uint leftChildIndex = usedNodes++;
-            uint rightChildIndex = usedNodes++;
+            int leftChildIndex = usedNodes++;
+            int rightChildIndex = usedNodes++;
 
             nodes[leftChildIndex].startIndex = node.startIndex;
             nodes[leftChildIndex].indexCount = leftCount;
 
-            nodes[rightChildIndex].startIndex = (uint)start;
+            nodes[rightChildIndex].startIndex = start;
             nodes[rightChildIndex].indexCount = node.indexCount - leftCount;
 
             node.leftChild = leftChildIndex;
             node.indexCount = 0;
-
-            nodes[index] = node;
 
             UpdateBounds(leftChildIndex);
             UpdateBounds(rightChildIndex);
@@ -138,14 +134,14 @@ namespace NEWTONS.Core._2D
             Subdivide(rightChildIndex, ref usedNodes);
         }
 
-        private void Swap(int i, int j)
+        private void Swap<S>(ref S i, ref S j)
         {
-            (bvhData[j], bvhData[i]) = (bvhData[i], bvhData[j]);
+            (j, i) = (i, j);
         }
 
         public void Receive(Bounds2D bounds, List<BVHData2D<T>> bvhData) => Receive(bounds, 0, bvhData);
 
-        private void Receive(Bounds2D bounds, uint nodeIndex, List<BVHData2D<T>> bvhData)
+        private void Receive(Bounds2D bounds, int nodeIndex, List<BVHData2D<T>> bvhData)
         {
             var node = nodes[nodeIndex];
             if (!bounds.Intersects(node.bounds))
@@ -157,7 +153,7 @@ namespace NEWTONS.Core._2D
             {
                 //Debug.Log(node.indexCount);
                 for (int i = 0; i < node.indexCount; i++)
-                    bvhData.Add(this.bvhData[(int)node.startIndex + i]);
+                    bvhData.Add(this.bvhData[node.startIndex + i]);
                 return;
             }
 

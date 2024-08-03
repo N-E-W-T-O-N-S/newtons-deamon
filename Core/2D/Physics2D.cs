@@ -138,8 +138,8 @@ namespace NEWTONS.Core._2D
                 foreach (var bvhData in bvhDataToCheck)
                 {
                     Collider2D c2 = bvhData.data;
-                    ValueTuple<Collider2D, Collider2D> compareTupl = (c1, c2);
-                    if (c1 == c2 || checkd.Contains(compareTupl))
+                    ValueTuple<Collider2D, Collider2D> compareTuple = (c1, c2);
+                    if (c1 == c2 || checkd.Contains(compareTuple))
                         continue;
 
                     //TODO: optimize
@@ -156,8 +156,15 @@ namespace NEWTONS.Core._2D
         private static void Quadtree()
         {
             // TODO: infinite quadtree
-            Rectangle boundary = new Rectangle(new Vector2(0, 0), 100, 100);
-            _quadtree = new Quadtree<Collider2D>(boundary, 4);
+            Bounds2D boundary = Bounds2D.InvertedBounds;
+
+            foreach (var collider in Colliders)
+            {
+                boundary.IncludePoint(collider.Bounds.Min);
+                boundary.IncludePoint(collider.Bounds.Max);
+            }
+
+            _quadtree = new Quadtree<Collider2D>(boundary.ToRectangle(), 4);
 
             foreach (var collider in Colliders)
             {

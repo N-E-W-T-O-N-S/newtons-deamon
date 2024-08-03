@@ -192,18 +192,9 @@ namespace NEWTONS.Core._2D
 
         internal static bool BoundsOverlapCheck(Collider2D c1, Collider2D c2)
         {
-            Bounds2D b1 = c1.Bounds;
-            Bounds2D b2 = c2.Bounds;
-
-            if (b1.Max.x < b2.Min.x || b1.Min.x > b2.Max.x)
-                return false;
-            if (b1.Max.y < b2.Min.y || b1.Min.y > b2.Max.y)
-                return false;
-
-            return true;
+            return c1.Bounds.Intersects(c2.Bounds);
         }
 
-        // TODO: custom cuboid konvex collision
         internal static CollisionInfo Konvex_Cuboid_Collision(KonvexCollider2D coll1, CuboidCollider2D coll2) => Konvex_Konvex_Collision(coll1, coll2);
 
         internal static CollisionInfo Konvex_Konvex_Collision(KonvexCollider2D coll1, KonvexCollider2D coll2)
@@ -222,7 +213,7 @@ namespace NEWTONS.Core._2D
             Vector2[] bEdgeNormals = coll2.EdgeNormals;
 
             // Maybe do not concat
-            Vector2[] axisToCheck = aEdgeNormals.Concat(bEdgeNormals).ToArray();
+            var axisToCheck = aEdgeNormals.Concat(bEdgeNormals).ToArray();
 
             float depth = Mathf.Infinity;
             Vector2 normal = Vector2.Zero;

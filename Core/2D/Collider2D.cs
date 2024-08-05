@@ -51,23 +51,17 @@ namespace NEWTONS.Core._2D
             }
         }
 
-        public PrimitiveShape2D Shape { get; }
-
-        /// <summary>
-        /// serialization constructor
-        /// </summary>
         public Collider2D()
         {
             Scale = new Vector2(1, 1);
             Body = new Rigidbody2D();
         }
 
-        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, float restitution, PrimitiveShape2D shape, bool addToEngine)
+        public Collider2D(Rigidbody2D rigidbody, Vector2 scale, Vector2 center, float restitution, bool addToEngine)
         {
             Body = rigidbody;
             Scale = scale;
             Center = center;
-            Shape = shape;
             Restitution = restitution;
             Body.AddReference(this);
 
@@ -80,7 +74,7 @@ namespace NEWTONS.Core._2D
         /// <summary>
         /// the parent scale of the collider
         /// </summary>
-        public virtual Vector3 Scale
+        public virtual Vector2 Scale
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _scale;
@@ -92,7 +86,7 @@ namespace NEWTONS.Core._2D
             }
         }
 
-        public virtual Vector3 ScaleNoNotify
+        public virtual Vector2 ScaleNoNotify
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => _scale = value;
@@ -190,11 +184,6 @@ namespace NEWTONS.Core._2D
             riB.AngularVelocity += Vector2.Dot(rotatedBP, j * info.normal) * invInertiaB;
         }
 
-        internal static bool BoundsOverlapCheck(Collider2D c1, Collider2D c2)
-        {
-            return c1.Bounds.Intersects(c2.Bounds);
-        }
-
         internal static CollisionInfo Konvex_Cuboid_Collision(KonvexCollider2D coll1, CuboidCollider2D coll2) => Konvex_Konvex_Collision(coll1, coll2);
 
         internal static CollisionInfo Konvex_Konvex_Collision(KonvexCollider2D coll1, KonvexCollider2D coll2)
@@ -204,8 +193,8 @@ namespace NEWTONS.Core._2D
             if (coll1.Body.IsStatic && coll2.Body.IsStatic)
                 return info;
 
-            if (!BoundsOverlapCheck(coll1, coll2))
-                return info;
+            //if (!BoundsOverlapCheck(coll1, coll2))
+            //    return info;
 
             Vector2[] aPoints = coll1.Points;
             Vector2[] bPoints = coll2.Points;
@@ -261,8 +250,6 @@ namespace NEWTONS.Core._2D
                 }
             }
 
-
-
             Vector2 dir = coll2.GlobalCenter - coll1.GlobalCenter;
 
             if (Vector2.Dot(dir, normal) > 0)
@@ -311,8 +298,8 @@ namespace NEWTONS.Core._2D
             if (coll1.Body.IsStatic && coll2.Body.IsStatic)
                 return info;
 
-            if (!BoundsOverlapCheck(coll1, coll2))
-                return info;
+            //if (!BoundsOverlapCheck(coll1, coll2))
+            //    return info;
 
             Vector2 direction = coll1.GlobalCenter - coll2.GlobalCenter;
             Vector2 normal = direction.Normalized;
@@ -354,8 +341,8 @@ namespace NEWTONS.Core._2D
             if (coll1.Body.IsStatic && coll2.Body.IsStatic)
                 return info;
 
-            if (!BoundsOverlapCheck(coll1, coll2))
-                return info;
+            //if (!BoundsOverlapCheck(coll1, coll2))
+            //    return info;
 
             Vector2[] points = coll1.Points;
 
@@ -370,7 +357,7 @@ namespace NEWTONS.Core._2D
 
             for (int i = 0; i < points.Length; i++)
             {
-                Vector3 dirX = points[i] + konvexCenter - circleCenter;
+                Vector2 dirX = points[i] + konvexCenter - circleCenter;
                 float dist = dirX.sqrMagnitude;
 
                 if (dist < sqrDist)
@@ -480,7 +467,6 @@ namespace NEWTONS.Core._2D
 
         ~Collider2D()
         {
-            //Debug.Log($"Collider2D - hash: {GetHashCode()} - has been disposed!");
             Dispose();
         }
 

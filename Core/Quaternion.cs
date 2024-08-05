@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core
 {
@@ -6,7 +7,7 @@ namespace NEWTONS.Core
     /// A struct to represent rotation in 3D space
     /// </summary>
     [System.Serializable]
-    public struct Quaternion
+    public struct Quaternion : IEquatable<Quaternion>
     {
         public float x, y, z, w;
 
@@ -38,7 +39,9 @@ namespace NEWTONS.Core
             return new Quaternion(x, y, z, w);
         }
         public static Quaternion operator -(Quaternion q1, Quaternion q2) => new Quaternion(q1.x - q2.x, q1.y - q2.y, q1.z - q2.z, q1.w - q2.w);
-            
+        public static bool operator ==(Quaternion q1, Quaternion q2) => q1.x == q2.x && q1.y == q2.y && q1.z == q2.z && q1.w == q2.w;
+        public static bool operator !=(Quaternion q1, Quaternion q2) => !(q1 == q2);
+
         /// <summary>
         /// adds two quaternions
         /// </summary>
@@ -172,8 +175,22 @@ namespace NEWTONS.Core
 
         public override string ToString()
         {
-            return $"{x}, {y}, {z}, {w}";
+            return $"({x}, {y}, {z}, {w})";
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Quaternion quaternion && Equals(quaternion);
+        }
+
+        public bool Equals(Quaternion other)
+        {
+            return x == other.x && y == other.y && z == other.z && w == other.w;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(x, y, z, w);
         }
     }
-
 }

@@ -28,13 +28,13 @@ namespace NEWTONS.Core._2D
             PointsRaw = _defaultPoints;
         }
 
-        public KonvexCollider2D(Vector2[] points, Vector2 size, Vector2 scale, Rigidbody2D rigidbody, Vector2 center, float restitution, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, restitution, shape, addToEngine)
+        public KonvexCollider2D(Vector2[] points, Vector2 size, Vector2 scale, Rigidbody2D rigidbody, Vector2 center, float restitution, bool addToEngine = true) : base(rigidbody, scale, center, restitution, addToEngine)
         {
             Size = size;
             PointsRaw = points;
         }
 
-        public override Vector3 Scale
+        public override Vector2 Scale
         {
             get
             {
@@ -165,7 +165,7 @@ namespace NEWTONS.Core._2D
                 var ps = Points;
                 Vector2 center = GlobalCenter;
 
-                Bounds2D bounds = new Bounds2D(Vector2.Infinity, Vector2.NegativeInfinity);
+                Bounds2D bounds = Bounds2D.InvertedBounds;
 
                 for (int i = 0; i < ps.Length; i++)
                 {
@@ -286,13 +286,12 @@ namespace NEWTONS.Core._2D
                 _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),
             };
 
-            // TODO: Collision response
-
             return info;
         }
 
         internal override void RotationChanged()
         {
+            base.RotationChanged();
             p_boundsNeedsUpdate = true;
             p_pointsNeedsUpdate = true;
         }

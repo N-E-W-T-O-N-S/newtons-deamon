@@ -12,12 +12,12 @@ namespace NEWTONS.Core._2D
             Radius = 0.5f;
         }
 
-        public CircleCollider(float radius, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, float restitution, PrimitiveShape2D shape, bool addToEngine = true) : base(rigidbody, scale, center, restitution, shape, addToEngine)
+        public CircleCollider(float radius, Rigidbody2D rigidbody, Vector2 scale, Vector2 center, float restitution, bool addToEngine = true) : base(rigidbody, scale, center, restitution, addToEngine)
         {
             Radius = radius;
         }
 
-        public override Vector3 Scale
+        public override Vector2 Scale
         {
             get
             {
@@ -51,7 +51,7 @@ namespace NEWTONS.Core._2D
             get
             {
                 if (p_scaledRadiusNeedsUpdate)
-                    _scaledRadius = _radius * Mathf.Max(Mathf.Abs(Scale.x), Math.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
+                    _scaledRadius = _radius * Mathf.Max(Mathf.Abs(Scale.x), Mathf.Abs(Scale.y));
 
                 p_scaledRadiusNeedsUpdate = false;
                 return _scaledRadius;

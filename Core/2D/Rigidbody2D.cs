@@ -132,7 +132,7 @@ namespace NEWTONS.Core._2D
         public float AngularVelocity
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsStatic | FixRotation ? 0f : _angularVelocity;
+            get => IsStatic || FixRotation ? 0f : _angularVelocity;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => _angularVelocity = value;
         }
@@ -163,7 +163,7 @@ namespace NEWTONS.Core._2D
         public float InvInertia
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsStatic | FixRotation ? 0f : 1f / Inertia;
+            get => IsStatic || FixRotation ? 0f : 1f / Inertia;
         }
 
         public Vector2 CenterOfMass

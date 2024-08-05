@@ -12,16 +12,53 @@ namespace NEWTONS.Core._3D
             Radius = 0.5f;
         }
 
-        public SphereCollider(float radius, Vector3 scale, Rigidbody rigidbody, Vector3 center, PrimitiveShape shape, float restitution, bool addToEngine = true) : base(scale, rigidbody, center, shape, restitution, addToEngine)
+        public SphereCollider(float radius, Vector3 scale, Rigidbody rigidbody, Vector3 center, float restitution, bool addToEngine = true) : base(rigidbody, scale, center, restitution, addToEngine)
         {
             Radius = radius;
         }
 
-        public float radius;
+        public override Vector3 Scale
+        {
+            get
+            {
+                return base.Scale;
+            }
+            set
+            {
+                base.Scale = value;
+                p_scaledRadiusNeedsUpdate = true;
+            }
+        }
 
-        public float Radius { get => radius; set => radius = Mathf.Max(value, 0); }
+        private float _radius;
 
-        public float ScaledRadius => Radius * Mathf.Max(Mathf.Abs(Scale.x), Mathf.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
+        public float Radius
+        {
+            get => _radius;
+            set
+            {
+                _radius = Mathf.Max(value, 0);
+                p_scaledRadiusNeedsUpdate = true;
+            }
+        }
+
+        protected bool p_scaledRadiusNeedsUpdate = true;
+
+        private float _scaledRadius;
+
+        public float ScaledRadius
+        {
+            get
+            {
+                if (p_scaledRadiusNeedsUpdate)
+                    _scaledRadius = _radius * Mathf.Max(Mathf.Abs(Scale.x), Mathf.Max(Mathf.Abs(Scale.y), Mathf.Abs(Scale.z)));
+
+                p_scaledRadiusNeedsUpdate = false;
+                return _scaledRadius;
+            }
+        }
+
+        public override Bounds Bounds => new Bounds(ScaledRadius, GlobalCenter);
 
         public override CollisionInfo IsColliding(Collider other)
         {
@@ -31,8 +68,6 @@ namespace NEWTONS.Core._3D
                 CuboidCollider cuboidCol => Cuboid_Sphere_Collision(cuboidCol, this),
                 _ => throw new ArgumentException($"{other.GetType()} is not collidable with {GetType()}"),
             };
-
-            CollisionResponse(other, info);
 
             return info;
         }

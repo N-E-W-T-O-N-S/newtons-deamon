@@ -1,4 +1,6 @@
-﻿using System;
+﻿using NEWTONS.Core._2D;
+using NEWTONS.Debugger;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -7,8 +9,10 @@ namespace NEWTONS.Core._3D
 {
     public static class Physics
     {
-        public static List<Rigidbody> Bodies { get; set; } = new List<Rigidbody>();
-        public static List<Collider> Colliders { get; set; } = new List<Collider>();
+        public static HashSet<Rigidbody> Bodies { get; set; } = new HashSet<Rigidbody>();
+        public static HashSet<Collider> Colliders { get; set; } = new HashSet<Collider>();
+
+        public static BVH<Collider> _bvh;
 
         public static float DeltaTime { get; set; }
 
@@ -19,29 +23,36 @@ namespace NEWTONS.Core._3D
         public static Vector3 Gravity { get; set; } = new Vector3(0, -9.81f, 0);
         public static bool UseCustomDrag { get; set; } = false;
 
-        private static float density;
+        public static int Steps { get; set; }
+
+        private static float _density;
 
         public static float Density
         {
-            get => density;
-            set => density = Mathf.Max(value, PhysicsInfo.MinDensity);
+            get => _density;
+            set { _density = Mathf.Max(value, PhysicsInfo.MinDensity); }
         }
 
-        private static float temperature;
+        private static float _temperature;
 
         public static float Temperature
         {
-            get => temperature;
-            set => temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
+            get => _temperature;
+            set => _temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
         }
 
+        static Physics()
+        {
+            _bvh = new BVH<Collider>();
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Update()
+        public static void Update(float delta)
         {
-            for (int i = 0; i < Bodies.Count; i++)
+            DeltaTime = delta;
+
+            foreach (var body in Bodies)
             {
-                Rigidbody body = Bodies[i];
                 Vector3 deltaPos = Vector3.Zero;
                 if (body.IsStatic)
                     continue;
@@ -50,7 +61,7 @@ namespace NEWTONS.Core._3D
                     body.Velocity += Gravity * DeltaTime;
 
                 // INFO: Fake Drag
-                body.Velocity -= body.Velocity / body.Mass * DeltaTime;
+                //body.Velocity -= body.Velocity / body.Mass * DeltaTime;
 
                 if (body.Velocity != Vector3.Zero)
                 {
@@ -60,24 +71,51 @@ namespace NEWTONS.Core._3D
 
             }
 
-            for (int i = 0; i < Colliders.Count; i++)
+            BVHData<Collider>[] data = new BVHData<Collider>[Colliders.Count];
+
+            int i = 0;
+            foreach (var collider in Colliders)
             {
-                for (int j = 0; j < Colliders.Count; j++)
+                data[i] = new BVHData<Collider>(collider.GlobalCenter, collider.Bounds, collider);
+                i++;
+            }
+
+            _bvh.Build(data);
+
+            int checking = 0;
+            HashSet<ValueTuple<Collider, Collider>> checkd = new HashSet<ValueTuple<Collider, Collider>>(); // THIS!!!!!!
+            foreach (var c1 in Colliders)
+            {
+
+                List<BVHData<Collider>> bvhDataToCheck = new List<BVHData<Collider>>();
+                Debug.Log(c1.Bounds);
+                _bvh.Receive(c1.Bounds, bvhDataToCheck);
+
+                checking += bvhDataToCheck.Count;
+
+                foreach (var bvhData in bvhDataToCheck)
                 {
-                    Collider c1 = Colliders[i];
-                    Collider c2 = Colliders[j];
-                    if (c1 == c2 || (c1.Body.IsStatic && c2.Body.IsStatic))
+                    Collider c2 = bvhData.data;
+                    ValueTuple<Collider, Collider> compareTuple = (c1, c2);
+                    if (c1 == c2 || checkd.Contains(compareTuple))
                         continue;
-                    c1.IsColliding(c2);
+
+                    //TODO: optimize
+                    var info = c1.IsColliding(c2);
+                    Collider.CollisionResponse(c1, c2, info);
+
+                    checkd.Add((c2, c1));
                 }
             }
-        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void RemoveBody(Rigidbody body)
-        {
-            Bodies.Remove(body);
-            body.Dispose();
+            foreach (var body in Bodies)
+            {
+                if (body.IsStatic) continue;
+                body.InformPositionChange();
+
+                if (body.FixRotation) continue;
+                body.InformRotationChange();
+            }
         }
     }
 }

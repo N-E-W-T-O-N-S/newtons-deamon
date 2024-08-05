@@ -35,7 +35,7 @@ namespace NEWTONS.Core._2D
             return point.x > Min.x && point.x < Max.x && point.y > Min.y && point.y < Max.y;
         }
 
-        public readonly bool Intersects(Bounds2D bounds)
+        public readonly bool Intersect(Bounds2D bounds)
         {
             if (Max.x < bounds.Min.x || Min.x > bounds.Max.x)
                 return false;
@@ -45,9 +45,24 @@ namespace NEWTONS.Core._2D
             return true;
         }
 
+        public static bool Intersect(Bounds2D b1, Bounds2D b2)
+        {
+            if (b1.Max.x < b2.Min.x || b1.Min.x > b2.Max.x)
+                return false;
+            if (b1.Max.y < b2.Min.y || b1.Min.y > b2.Max.y)
+                return false;
+
+            return true;
+        }
+
         public readonly bool Encapsulates(Bounds2D bounds)
         {
-            return bounds.Min.x >= Min.x && bounds.Min.y >= Min.y && bounds.Max.x <= Max.x && bounds.Max.y <= Max.y;
+            if (bounds.Min.x < Min.x || bounds.Max.x > Max.x)
+                return false;
+            if (bounds.Min.y < Min.y || bounds.Max.y > Max.y)
+                return false;
+
+            return true;
         }
 
         public readonly Rectangle ToRectangle() => new Rectangle(Min, Max);
@@ -57,7 +72,7 @@ namespace NEWTONS.Core._2D
         /// </summary>
         public static Bounds2D InvertedBounds => new Bounds2D(Vector2.Infinity, Vector2.NegativeInfinity);
 
-        public override string ToString()
+        public readonly override string ToString()
         {
             return $"Min: {Min}, Max: {Max}";
         }

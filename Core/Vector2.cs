@@ -45,6 +45,10 @@ namespace NEWTONS.Core
         }
 
         /// <summary>
+        /// Returns <c>new Vector2(1, 1);</c>
+        /// </summary>
+        private static readonly Vector2 oneVector = new Vector2(1, 1);
+        /// <summary>
         /// Returns <c>new Vector2(0, 0);</c>
         /// </summary>
         private static readonly Vector2 zeroVector = new Vector2(0, 0);
@@ -73,6 +77,12 @@ namespace NEWTONS.Core
             get => MathF.Sqrt(x * x + y * y);
         }
 
+        public float sqrMagnitude
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => x * x + y * y;
+        }
+
         public readonly Vector2 Normalized
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -82,6 +92,15 @@ namespace NEWTONS.Core
                 result.Normalize();
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Returns <c>new Vector2(1, 1);</c>
+        /// </summary>
+        public static Vector2 One
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => oneVector;
         }
 
         /// <summary>

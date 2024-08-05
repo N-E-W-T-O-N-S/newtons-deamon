@@ -50,61 +50,64 @@ namespace NEWTONS.Core._3D
         public static void Update(float delta)
         {
             DeltaTime = delta;
+            float time = delta / Steps;
 
-            foreach (var body in Bodies)
+            for (int step = 0; step < Steps; step++)
             {
-                Vector3 deltaPos = Vector3.Zero;
-                if (body.IsStatic)
-                    continue;
-
-                if (body.UseGravity)
-                    body.Velocity += Gravity * DeltaTime;
-
-                // INFO: Fake Drag
-                //body.Velocity -= body.Velocity / body.Mass * DeltaTime;
-
-                if (body.Velocity != Vector3.Zero)
+                foreach (var body in Bodies)
                 {
-                    deltaPos += body.Velocity * DeltaTime;
-                    body.MoveToPosition(body.Position + deltaPos);
-                }
-
-            }
-
-            BVHData<Collider>[] data = new BVHData<Collider>[Colliders.Count];
-
-            int i = 0;
-            foreach (var collider in Colliders)
-            {
-                data[i] = new BVHData<Collider>(collider.GlobalCenter, collider.Bounds, collider);
-                i++;
-            }
-
-            _bvh.Build(data);
-
-            int checking = 0;
-            HashSet<ValueTuple<Collider, Collider>> checkd = new HashSet<ValueTuple<Collider, Collider>>(); // THIS!!!!!!
-            foreach (var c1 in Colliders)
-            {
-
-                List<BVHData<Collider>> bvhDataToCheck = new List<BVHData<Collider>>();
-                Debug.Log(c1.Bounds);
-                _bvh.Receive(c1.Bounds, bvhDataToCheck);
-
-                checking += bvhDataToCheck.Count;
-
-                foreach (var bvhData in bvhDataToCheck)
-                {
-                    Collider c2 = bvhData.data;
-                    ValueTuple<Collider, Collider> compareTuple = (c1, c2);
-                    if (c1 == c2 || checkd.Contains(compareTuple))
+                    Vector3 deltaPos = Vector3.Zero;
+                    if (body.IsStatic)
                         continue;
 
-                    //TODO: optimize
-                    var info = c1.IsColliding(c2);
-                    Collider.CollisionResponse(c1, c2, info);
+                    if (body.UseGravity)
+                        body.Velocity += Gravity * time;
 
-                    checkd.Add((c2, c1));
+                    // INFO: Fake Drag
+                    //body.Velocity -= body.Velocity / body.Mass * time;
+
+                    if (body.Velocity != Vector3.Zero)
+                    {
+                        deltaPos += body.Velocity * time;
+                        body.MoveToPosition(body.Position + deltaPos);
+                    }
+
+                }
+
+                BVHData<Collider>[] data = new BVHData<Collider>[Colliders.Count];
+
+                int i = 0;
+                foreach (var collider in Colliders)
+                {
+                    data[i] = new BVHData<Collider>(collider.GlobalCenter, collider.Bounds, collider);
+                    i++;
+                }
+
+                _bvh.Build(data);
+
+                int checking = 0;
+                HashSet<ValueTuple<Collider, Collider>> checkd = new HashSet<ValueTuple<Collider, Collider>>(); // THIS!!!!!!
+                foreach (var c1 in Colliders)
+                {
+
+                    List<BVHData<Collider>> bvhDataToCheck = new List<BVHData<Collider>>();
+                    _bvh.Receive(c1.Bounds, bvhDataToCheck);
+
+                    checking += bvhDataToCheck.Count;
+
+                    foreach (var bvhData in bvhDataToCheck)
+                    {
+                        Collider c2 = bvhData.data;
+                        ValueTuple<Collider, Collider> compareTuple = (c1, c2);
+                        if (c1 == c2 || checkd.Contains(compareTuple))
+                            continue;
+
+                        //TODO: optimize
+                        var info = c1.IsColliding(c2);
+                        Collider.CollisionResponse(c1, c2, info);
+
+                        checkd.Add((c2, c1));
+                    }
                 }
             }
 

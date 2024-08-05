@@ -57,6 +57,10 @@ namespace NEWTONS.Core
         }
 
         /// <summary>
+        /// Returns new Vector3(1, 1, 1);
+        /// </summary>
+        private static readonly Vector3 oneVector = new Vector3(1, 1, 1);
+        /// <summary>
         /// Returns new Vector3(0, 0, 0);
         /// </summary>
         private static readonly Vector3 zeroVector = new Vector3(0, 0, 0);
@@ -108,6 +112,15 @@ namespace NEWTONS.Core
                 result.Normalize();
                 return result;
             }
+        }
+
+        /// <summary>
+        /// Returns <c>new Vector3(1, 1, 1);</c>
+        /// </summary>
+        public static Vector3 One
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => oneVector;
         }
 
         /// <summary>

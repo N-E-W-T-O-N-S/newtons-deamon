@@ -5,23 +5,23 @@ using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Text;
 
-namespace NEWTONS.Core._2D
+namespace NEWTONS.Core._3D
 {
-    public class BVH2D<T>
+    public class BVH<T>
     {
-        public BVHData2D<T>[] bvhData;
-        public BVHNode2D[] nodes;
+        public BVHData<T>[] bvhData;
+        public BVHNode[] nodes;
 
-        public BVH2D()
+        public BVH()
         {
-            bvhData = new BVHData2D<T>[0];
-            nodes = new BVHNode2D[0];
+            bvhData = new BVHData<T>[0];
+            nodes = new BVHNode[0];
         }
 
-        public void Build(BVHData2D<T>[] bvhData)
+        public void Build(BVHData<T>[] bvhData)
         {
             this.bvhData = bvhData;
-            nodes = new BVHNode2D[bvhData.Length * 2 - 1];
+            nodes = new BVHNode[bvhData.Length * 2 - 1];
 
             nodes[0].leftChild = 0;
             nodes[0].startIndex = 0;
@@ -43,11 +43,11 @@ namespace NEWTONS.Core._2D
                 return;
             }
 
-            node.bounds = Bounds2D.InvertedBounds;
+            node.bounds = Bounds.InvertedBounds;
 
             for (uint i = 0; i < node.indexCount; i++)
             {
-                Bounds2D bounds = bvhData[node.startIndex + i].bounds;
+                Bounds bounds = bvhData[node.startIndex + i].bounds;
 
                 node.bounds.IncludePoint(bounds.Min);
                 node.bounds.IncludePoint(bounds.Max);
@@ -56,7 +56,7 @@ namespace NEWTONS.Core._2D
 
         public void Subdivide(int index, ref int usedNodes)
         {
-            ref BVHNode2D node = ref nodes[index];
+            ref BVHNode node = ref nodes[index];
 
             if (node.indexCount == 1) return;
             if (node.indexCount == 2)
@@ -79,7 +79,7 @@ namespace NEWTONS.Core._2D
                 return;
             }
 
-            Vector2 boundsSize = node.bounds.Max - node.bounds.Min;
+            Vector3 boundsSize = node.bounds.Max - node.bounds.Min;
 
             int axis = 0;
             if (boundsSize.y > boundsSize.x) axis = 1;
@@ -134,19 +134,14 @@ namespace NEWTONS.Core._2D
             Subdivide(rightChildIndex, ref usedNodes);
         }
 
-        private void Swap<ST>(ref ST i, ref ST j) where ST : struct
+        private void Swap<ST>(ref ST i, ref ST j)
         {
             (j, i) = (i, j);
         }
 
-        private void Swap<ST>(ST i, ST j) where ST : class
-        {
-            (j, i) = (i, j);
-        }
+        public void Receive(Bounds bounds, List<BVHData<T>> bvhData) => Receive(bounds, 0, bvhData);
 
-        public void Receive(Bounds2D bounds, List<BVHData2D<T>> bvhData) => Receive(bounds, 0, bvhData);
-
-        private void Receive(Bounds2D bounds, int nodeIndex, List<BVHData2D<T>> bvhData)
+        private void Receive(Bounds bounds, int nodeIndex, List<BVHData<T>> bvhData)
         {
             var node = nodes[nodeIndex];
             if (!bounds.Intersect(node.bounds))

@@ -21,6 +21,10 @@ namespace NEWTONS.Core._3D
         public void Build(BVHData<T>[] bvhData)
         {
             this.bvhData = bvhData;
+
+            if (bvhData.Length == 0)
+                return;
+
             nodes = new BVHNode[bvhData.Length * 2 - 1];
 
             nodes[0].leftChild = 0;

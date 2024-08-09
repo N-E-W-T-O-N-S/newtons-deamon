@@ -68,6 +68,14 @@ namespace NEWTONS.Core._2D
             }
         }
 
+        public override float GetSurfaceOfMoveDirection()
+        {
+            if (Body.Velocity == Vector2.Zero)
+                return 0f;
+
+            return ScaledRadius * 2;
+        }
+
         public override CollisionInfo IsColliding(Collider2D other)
         {
             CollisionInfo info = other switch

@@ -127,6 +127,8 @@ namespace NEWTONS.Core._2D
 
         public abstract Bounds2D Bounds { get; }
 
+        public abstract float GetSurfaceOfMoveDirection();
+
         internal virtual void RotationChanged() { }
 
         internal virtual void PositionChanged()

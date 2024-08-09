@@ -54,8 +54,8 @@ namespace NEWTONS.Core._2D
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _size;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set 
-            { 
+            set
+            {
                 _size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y));
                 p_scaledSizeNeedsUpdate = true;
             }
@@ -137,14 +137,24 @@ namespace NEWTONS.Core._2D
                 if (!p_edgeNormalsNeedsUpdate) return p_edgeNormals;
 
                 Vector2[] points = Points;
+
+                // INFO: using hashset anywhere causes a stackoverflow error or maby it is because of the ToArray with the HashSet!! WHY?!?!
                 Vector2[] normals = new Vector2[points.Length];
+                int k = 0;
                 for (int i = 0; i < points.Length; i++)
                 {
                     Vector2 edge = points[(i + 1) % points.Length] - points[i];
-                    normals[i] = new Vector2(-edge.y, edge.x).Normalized;
+                    Vector2 normal = new Vector2(-edge.y, edge.x).Normalized;
+
+                    if (normals.Contains(-normal) || normals.Contains(normal))
+                        continue;
+
+                    normals[k] = normal;
+                    k++;
                 }
 
-                p_edgeNormals = normals;
+                p_edgeNormals = new Vector2[k];
+                Array.Copy(normals, p_edgeNormals, p_edgeNormals.Length);
                 p_edgeNormalsNeedsUpdate = false;
 
                 return p_edgeNormals;
@@ -274,6 +284,30 @@ namespace NEWTONS.Core._2D
             }
 
             return cp;
+        }
+
+        public override float GetSurfaceOfMoveDirection()
+        {
+            if (Body.Velocity == Vector2.Zero)
+                return 0f;
+
+            Vector2[] points = Points;
+            Vector2 dir = Body.Velocity.Normalized;
+            Vector2 projectVector = new Vector2(-dir.y, dir.x);
+
+            float min = Mathf.Infinity;
+            float max = Mathf.NegativeInfinity;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                float projection = Vector2.Dot(points[i], projectVector);
+                if (projection < min)
+                    min = projection;
+                if (projection > max)
+                    max = projection;
+            }
+
+            return Mathf.Abs(max - min);
         }
 
         public override CollisionInfo IsColliding(Collider2D other)

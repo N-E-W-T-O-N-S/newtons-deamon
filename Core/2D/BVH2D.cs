@@ -21,7 +21,7 @@ namespace NEWTONS.Core._2D
         public void Build(BVHData2D<T>[] bvhData)
         {
             this.bvhData = bvhData;
-            
+
             if (bvhData.Length == 0)
                 return;
 
@@ -100,24 +100,34 @@ namespace NEWTONS.Core._2D
             //TODO: better way than offsetting the split position
             float splitPos = axisPoints[axisPoints.Length / 2] + 1e-6f;
 
-            int start = node.startIndex;
-            int j = start + node.indexCount - 1;
-            while (start <= j)
+            int rightStart = node.startIndex;
+            int j = rightStart + node.indexCount - 1;
+            while (rightStart <= j)
             {
-                if (bvhData[start].position[axis] < splitPos)
-                    start++;
+                if (bvhData[rightStart].position[axis] < splitPos)
+                    rightStart++;
                 else
                 {
-                    Swap(ref bvhData[start], ref bvhData[j]);
+                    Swap(ref bvhData[rightStart], ref bvhData[j]);
                     j--;
                 }
             }
 
-            int leftCount = start - node.startIndex;
-            if (leftCount <= 0)
-                leftCount = 1;
-            else if (leftCount >= node.indexCount)
-                leftCount = node.indexCount - 1;
+
+            int leftCount = rightStart - node.startIndex;
+            if (leftCount == 0)
+            {
+                rightStart++;
+                leftCount++;
+            }
+            else if (leftCount == node.indexCount)
+            {
+                rightStart--;
+                leftCount--; ;
+            }
+
+            if (leftCount < 0 || leftCount > node.indexCount)
+                throw new Exception($"leftCount was {leftCount}! That is either smaller than 0 or larger than the nodes indexCount of {node.indexCount}!");
 
             int leftChildIndex = usedNodes++;
             int rightChildIndex = usedNodes++;
@@ -125,7 +135,7 @@ namespace NEWTONS.Core._2D
             nodes[leftChildIndex].startIndex = node.startIndex;
             nodes[leftChildIndex].indexCount = leftCount;
 
-            nodes[rightChildIndex].startIndex = start;
+            nodes[rightChildIndex].startIndex = rightStart;
             nodes[rightChildIndex].indexCount = node.indexCount - leftCount;
 
             node.leftChild = leftChildIndex;
@@ -139,11 +149,6 @@ namespace NEWTONS.Core._2D
         }
 
         private void Swap<ST>(ref ST i, ref ST j) where ST : struct
-        {
-            (j, i) = (i, j);
-        }
-
-        private void Swap<ST>(ST i, ST j) where ST : class
         {
             (j, i) = (i, j);
         }

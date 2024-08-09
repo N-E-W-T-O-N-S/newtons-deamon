@@ -25,7 +25,7 @@ namespace NEWTONS.Core
             get => -273.15f;
         }
 
-        public static float MinDrag
+        public static float MinDragCoefficient
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => 0;
@@ -34,7 +34,7 @@ namespace NEWTONS.Core
         public static float MinDensity
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => 1E-20f;
+            get => 0f;
         }
 
         /// <summary>

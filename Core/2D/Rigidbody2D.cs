@@ -51,7 +51,7 @@ namespace NEWTONS.Core._2D
             Rotation = rotation;
             Mass = mass;
             CenterOfMass = centerOfMass;
-            Drag = drag;
+            DragCoefficient = drag;
             Collider = coll;
             if (addToEngine)
                 AddToPhysicsEngine();
@@ -191,14 +191,14 @@ namespace NEWTONS.Core._2D
         }
 
 
-        private float _drag;
+        private float _dragCoefficient;
 
-        public float Drag
+        public float DragCoefficient
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _drag;
+            get => _dragCoefficient;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => _drag = Mathf.Max(value, PhysicsInfo.MinDrag);
+            set => _dragCoefficient = Mathf.Max(value, PhysicsInfo.MinDragCoefficient);
         }
 
         public bool UseGravity
@@ -210,9 +210,11 @@ namespace NEWTONS.Core._2D
         }
 
         public Matrix2x2 WorldToLocalMatrix => new Matrix2x2(
-            Vector2.Rotate(new Vector3(1, 0), Rotation * Mathf.Deg2Rad),
-            Vector2.Rotate(new Vector3(0, 1), Rotation * Mathf.Deg2Rad)
+            Vector2.Rotate(new Vector2(1, 0), Rotation * Mathf.Deg2Rad),
+            Vector2.Rotate(new Vector2(0, 1), Rotation * Mathf.Deg2Rad)
         );
+
+        public float Drag => DragCoefficient * Physics2D.Density * (Collider?.GetSurfaceOfMoveDirection() ?? Mathf.PI) * Mathf.Pow(Velocity.magnitude, 2) * 0.5f;
 
         // TODO: find a purpose
         public void AddCurrentVelocity(Vector2 velocity)
@@ -318,12 +320,10 @@ namespace NEWTONS.Core._2D
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DisposeMultiple(params Rigidbody2D[] bodies)
         {
-            Task[] disposeTasks = new Task[bodies.Length];
             for (int i = 0; i < bodies.Length; i++)
             {
-                disposeTasks[i] = Task.Run(() => bodies[i].Dispose());
+                bodies[i].Dispose();
             }
-            Task.WaitAll(disposeTasks);
         }
     }
 }

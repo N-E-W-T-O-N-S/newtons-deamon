@@ -196,7 +196,7 @@ namespace NEWTONS.Core._3D
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _drag;
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => _drag = Mathf.Max(value, PhysicsInfo.MinDrag);
+            set => _drag = Mathf.Max(value, PhysicsInfo.MinDragCoefficient);
         }
 
         public bool UseGravity

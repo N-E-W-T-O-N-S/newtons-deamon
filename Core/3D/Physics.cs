@@ -1,8 +1,10 @@
 ﻿using NEWTONS.Core._2D;
 using NEWTONS.Debugger;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace NEWTONS.Core._3D
@@ -12,7 +14,7 @@ namespace NEWTONS.Core._3D
         public static HashSet<Rigidbody> Bodies { get; set; } = new HashSet<Rigidbody>();
         public static HashSet<Collider> Colliders { get; set; } = new HashSet<Collider>();
 
-        public static BVH<Collider> _bvh;
+        private static BVH<Collider> _bvh = new BVH<Collider>();
 
         public static float DeltaTime { get; set; }
 
@@ -41,41 +43,16 @@ namespace NEWTONS.Core._3D
             set => _temperature = Mathf.Max(value, PhysicsInfo.MinTemperature);
         }
 
-        static Physics()
-        {
-            _bvh = new BVH<Collider>();
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Update(float delta)
         {
             DeltaTime = delta;
             float time = delta / Steps;
 
+            BVHData<Collider>[] data = new BVHData<Collider>[Colliders.Count];
+
             for (int step = 0; step < Steps; step++)
             {
-                foreach (var body in Bodies)
-                {
-                    Vector3 deltaPos = Vector3.Zero;
-                    if (body.IsStatic)
-                        continue;
-
-                    if (body.UseGravity)
-                        body.Velocity += Gravity * time;
-
-                    // INFO: Fake Drag
-                    //body.Velocity -= body.Velocity / body.Mass * time;
-
-                    if (body.Velocity != Vector3.Zero)
-                    {
-                        deltaPos += body.Velocity * time;
-                        body.MoveToPosition(body.Position + deltaPos);
-                    }
-
-                }
-
-                BVHData<Collider>[] data = new BVHData<Collider>[Colliders.Count];
-
                 int i = 0;
                 foreach (var collider in Colliders)
                 {
@@ -87,8 +64,28 @@ namespace NEWTONS.Core._3D
 
                 int checking = 0;
                 HashSet<ValueTuple<Collider, Collider>> checkd = new HashSet<ValueTuple<Collider, Collider>>(); // THIS!!!!!!
-                foreach (var c1 in Colliders)
+
+                foreach (var body in Bodies)
                 {
+                    if (!body.IsStatic)
+                    {
+                        if (body.UseGravity)
+                            body.Velocity += Gravity * time;
+
+                        // INFO: Fake Drag
+                        //body.Velocity -= body.Velocity / body.Mass * time;
+
+                        Vector3 deltaPos = Vector3.Zero;
+                        if (body.Velocity != Vector3.Zero)
+                        {
+                            deltaPos += body.Velocity * time;
+                            body.MoveToPosition(body.Position + deltaPos);
+                        }
+                    }
+
+                    Collider? c1 = body.Collider;
+                    if (c1 == null)
+                        continue;
 
                     List<BVHData<Collider>> bvhDataToCheck = new List<BVHData<Collider>>();
                     _bvh.Receive(c1.Bounds, bvhDataToCheck);

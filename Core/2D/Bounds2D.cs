@@ -4,6 +4,7 @@ using System.Text;
 
 namespace NEWTONS.Core._2D
 {
+    [System.Serializable]
     public struct Bounds2D
     {
         public Vector2 Min;

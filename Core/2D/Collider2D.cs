@@ -39,7 +39,7 @@ namespace NEWTONS.Core._2D
 
         private Vector2 _center;
 
-        public Vector2 Center
+        public virtual Vector2 Center
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _center;
@@ -47,6 +47,7 @@ namespace NEWTONS.Core._2D
             set
             {
                 _center = value;
+                p_boundsNeedsUpdate = true;
                 p_globalCenterNeedsUpdate = true;
             }
         }

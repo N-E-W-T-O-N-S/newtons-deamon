@@ -93,7 +93,7 @@ namespace NEWTONS.Core._3D
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set => _scale = value;
         }
-
+        
         public float Restitution
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

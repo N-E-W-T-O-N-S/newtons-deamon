@@ -51,6 +51,19 @@ namespace NEWTONS.Core._2D
             }
         }
 
+        public override Vector2 ScaleNoNotify
+        {
+            set
+            {
+                if (base.Scale == value)
+                    return;
+
+                base.ScaleNoNotify = value;
+                p_pointsNeedsUpdate = true;
+                p_scaledSizeNeedsUpdate = true;
+            }
+        }
+
         private Vector2 _size;
 
         public virtual Vector2 Size

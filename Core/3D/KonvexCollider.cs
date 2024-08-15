@@ -64,6 +64,20 @@ namespace NEWTONS.Core._3D
             }
         }
 
+        public override Vector3 ScaleNoNotify
+        {
+            set
+            {
+                if (Scale == value)
+                    return;
+
+                base.ScaleNoNotify = value;
+                p_pointsNeedsUpdate = true;
+                p_scaledSizeNeedsUpdate = true;
+            }
+
+        }
+
         /// <summary>
         /// <u><b>WARNING:</b></u> <b>Do NOT use! Only for Serilization</b>
         /// </summary>

@@ -55,7 +55,11 @@ namespace NEWTONS.Core._3D
             }
             set
             {
+                if (base.Scale == value)
+                    return;
+
                 base.Scale = value;
+                p_pointsNeedsUpdate = true;
                 p_scaledSizeNeedsUpdate = true;
             }
         }
@@ -73,7 +77,12 @@ namespace NEWTONS.Core._3D
             get => size;
             set
             {
-                size = new Vector3(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0), Mathf.Max(value.z, 0));
+                Vector3 newSize = new Vector3(Mathf.Max(value.x, 0), Mathf.Max(value.y, 0), Mathf.Max(value.z, 0));
+                if (newSize == size)
+                    return;
+
+                size = newSize;
+                p_pointsNeedsUpdate = true;
                 p_scaledSizeNeedsUpdate = true;
             }
         }

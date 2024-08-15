@@ -42,7 +42,11 @@ namespace NEWTONS.Core._2D
             }
             set
             {
+                if (base.Scale == value)
+                    return;
+
                 base.Scale = value;
+                p_pointsNeedsUpdate = true;
                 p_scaledSizeNeedsUpdate = true;
             }
         }
@@ -56,7 +60,12 @@ namespace NEWTONS.Core._2D
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
-                _size = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y));
+                Vector2 newSize = new Vector2(Mathf.Abs(value.x), Mathf.Abs(value.y));
+                if (_size == newSize)
+                    return;
+
+                _size = newSize;
+                p_pointsNeedsUpdate = true;
                 p_scaledSizeNeedsUpdate = true;
             }
         }
